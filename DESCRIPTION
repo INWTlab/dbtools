@@ -6,6 +6,7 @@ Date: 2015-07-29
 Author: INWT-Statistics GmbH
 Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
 Description: ...
-Imports: dplyr, magrittr, RMySQL, futile.logger
+Imports: aoos, dplyr, magrittr, RMySQL, futile.logger
 License: GPL-3 | file LICENSE
 LazyData: TRUE
+Suggests: testthat

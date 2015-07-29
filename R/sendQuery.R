@@ -17,7 +17,16 @@ sendQuery.DBCredentials <- function(db, query, ...) {
   query <- as.character(query)
   db <- as.list(db)
 
-  reTry(sendQuery, db = db, query = query, ...)
+  doRbind <- function(x) {
+    if (inherits(x[[1]], "data.frame")) x %>% rbind_all %>% as.data.frame
+    else x
+  }
+
+  iterQuery <- function(query, ...) {
+    lapply(query, function(q) reTry(sendQuery, db = db, query = q, ...)) %>% doRbind
+  }
+
+  iterQuery(query, ...)
 
 }
 
@@ -27,14 +36,6 @@ sendQuery.list <- function(db, query, ...) {
   # db: is a list
   # query: is a character vector of queries
 
-  prepareForReturn <- function(datList) {
-    if(sapply(datList, is.null) %>% any) {
-      NULL
-    } else {
-      datList %>% rbind_all %>% as.data.frame
-    }
-  }
-
   on.exit({
     if(exists("con")) {
       dbDisconnect(con)
@@ -42,12 +43,7 @@ sendQuery.list <- function(db, query, ...) {
   })
 
   con <- do.call(dbConnect, db)
-  sendQuery(con, "SET NAMES 'utf8';")
-  downloadedData <- lapply(query, sendQuery, db = con)
-  downloadedData <- prepareForReturn(downloadedData)
-
-  wrngs <- sendQuery(con, "SHOW WARNINGS;")
-  if (nrow(wrngs) > 0) warning(wrngs)
+  downloadedData <- sendQuery(con, query)
 
   downloadedData
 
@@ -61,22 +57,43 @@ sendQuery.default <- function(db, query, ...) {
 
   stopifnot(inherits(db, "DBIConnection"))
 
+  dbSendQuery <- function(...) {
+    suppressWarnings( RMySQL::dbSendQuery(...) )
+  }
+
+  setNamesUtf8 <- function(con) {
+    if (inherits(con, "MySQLConnection")) {
+      dbSendQuery(con, "SET NAMES 'utf8';")
+    }
+  }
+
   fetchFirstResult <- function(res) {
     on.exit(dbClearResult(res))
-    if (dbHasCompleted(res)) dbFetch(res, n = -1)
+    if (!dbHasCompleted(res)) dbFetch(res, n = -1)
     else NULL
   }
 
   dumpRemainingResults <- function(con) {
-    while (dbMoreResults(con)) {
-      dump <- dbNextResult(con)
-      dbClearResult(dump)
+    if (inherits(con, "MySQLConnection")) {
+      while (dbMoreResults(con)) {
+        dump <- dbNextResult(con)
+        dbClearResult(dump)
+      }
     }
   }
 
-  res <- suppressWarnings(dbSendQuery(db, query))
+  checkForWarnings <- function(con) {
+    if (inherits(con, "MySQLConnection")) {
+      wrngs <- sendQuery(con, "SHOW WARNINGS;")
+      if (nrow(wrngs) > 0) warning(wrngs)
+    }
+  }
+
+  setNamesUtf8(db)
+  res <- dbSendQuery(db, query)
   dat <- fetchFirstResult(res)
   dumpRemainingResults(db)
+  checkForWarnings(db)
   dat
 
 }
