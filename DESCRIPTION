@@ -4,7 +4,8 @@ Title: Tools for querying databases
 Version: 0.1.0
 Date: 2015-07-29
 Author: INWT-Statistics GmbH
-Maintainer: INWT-Statistics GmbH <info@inwt-statistics.de>
+Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
 Description: ...
+Imports: dplyr, magrittr, RMySQL, futile.logger
 License: GPL-3 | file LICENSE
 LazyData: TRUE
