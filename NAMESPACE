@@ -2,7 +2,8 @@
 
 S3method(as.list,DBCredentials)
 S3method(sendQuery,DBCredentials)
-S3method(sendQuery,default)
+S3method(sendQuery,DBIConnection)
+S3method(sendQuery,MySQLConnection)
 S3method(sendQuery,list)
 export(DBCredentials)
 export(reTry)

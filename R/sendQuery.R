@@ -51,42 +51,38 @@ sendQuery.list <- function(db, query, ...) {
 
 #' @export
 #' @rdname sendQuery
-sendQuery.default <- function(db, query, ...) {
+sendQuery.DBIConnection <- function(db, query, ...) {
   # db: is a connection
   # query: is a character of length 1
 
-  stopifnot(inherits(db, "DBIConnection"))
+  res <- dbSendQuery(db, query)
+  dat <- fetchFirstResult(res)
+  dat
+
+}
+
+#' @export
+#' @rdname sendQuery
+sendQuery.MySQLConnection <- function(db, query, ...) {
 
   dbSendQuery <- function(...) {
     suppressWarnings( RMySQL::dbSendQuery(...) )
   }
 
   setNamesUtf8 <- function(con) {
-    if (inherits(con, "MySQLConnection")) {
-      dbSendQuery(con, "SET NAMES 'utf8';")
-    }
-  }
-
-  fetchFirstResult <- function(res) {
-    on.exit(dbClearResult(res))
-    if (!dbHasCompleted(res)) dbFetch(res, n = -1)
-    else NULL
+    dbSendQuery(con, "SET NAMES 'utf8';")
   }
 
   dumpRemainingResults <- function(con) {
-    if (inherits(con, "MySQLConnection")) {
-      while (dbMoreResults(con)) {
-        dump <- dbNextResult(con)
-        dbClearResult(dump)
-      }
+    while (dbMoreResults(con)) {
+      dump <- dbNextResult(con)
+      dbClearResult(dump)
     }
   }
 
   checkForWarnings <- function(con) {
-    if (inherits(con, "MySQLConnection")) {
-      wrngs <- sendQuery(con, "SHOW WARNINGS;")
-      if (nrow(wrngs) > 0) warning(wrngs)
-    }
+    wrngs <- sendQuery(con, "SHOW WARNINGS;")
+    if (nrow(wrngs) > 0) warning(wrngs)
   }
 
   setNamesUtf8(db)
@@ -97,3 +93,11 @@ sendQuery.default <- function(db, query, ...) {
   dat
 
 }
+
+fetchFirstResult <- function(res) {
+  # Helper used in sendQuery methods.
+  on.exit(dbClearResult(res))
+  if (!dbHasCompleted(res)) dbFetch(res, n = -1)
+  else NULL
+}
+

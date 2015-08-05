@@ -3,7 +3,8 @@
 \name{sendQuery}
 \alias{sendQuery}
 \alias{sendQuery.DBCredentials}
-\alias{sendQuery.default}
+\alias{sendQuery.DBIConnection}
+\alias{sendQuery.MySQLConnection}
 \alias{sendQuery.list}
 \title{Send query to database and fetch result}
 \usage{
@@ -13,7 +14,9 @@ sendQuery(db, query, ...)
 
 \method{sendQuery}{list}(db, query, ...)
 
-\method{sendQuery}{default}(db, query, ...)
+\method{sendQuery}{DBIConnection}(db, query, ...)
+
+\method{sendQuery}{MySQLConnection}(db, query, ...)
 }
 \arguments{
 \item{db}{a database}
