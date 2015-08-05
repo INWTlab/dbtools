@@ -13,5 +13,5 @@ env:
 
 notifications:
   email:
-    on_success: change
-    on_failure: change
+    on_success: sebastian.warnholz@inwt-statistics.de
+    on_failure: sebastian.warnholz@inwt-statistics.de

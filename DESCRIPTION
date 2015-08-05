@@ -9,4 +9,4 @@ Description: ...
 Imports: aoos, dplyr, magrittr, RMySQL, futile.logger
 License: GPL-3 | file LICENSE
 LazyData: TRUE
-Suggests: testthat
+Suggests: testthat, RSQLite
