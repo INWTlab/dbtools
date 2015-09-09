@@ -95,6 +95,7 @@ test_that("sendQuery for RMySQL DB", {
 
 
   # Should work, but ...
+  # TODO
 #   dat <- sendQuery(cred, "SELECT 1 AS x; SELECT 2 AS y;")
 #
 #   INWTSales::inSendQuery(INWTSales::genSQLCredINWT(), "SELECT 1 AS x; SELECT 2 AS y;")
