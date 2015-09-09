@@ -1,6 +1,7 @@
-#' @importFrom aoos retList
-#' @importFrom RMySQL dbConnect dbDisconnect dbSendQuery dbClearResult dbHasCompleted dbMoreResults dbNextResult dbFetch
-#' @importFrom dplyr rbind_all
+#' @import aoos
+#' @import methods
+#' @importFrom RMySQL dbConnect dbDisconnect dbSendQuery dbClearResult dbHasCompleted dbListResults dbMoreResults dbNextResult dbFetch
+#' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%
 NULL

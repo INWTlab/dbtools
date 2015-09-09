@@ -18,15 +18,15 @@ sendQuery.DBCredentials <- function(db, query, ...) {
   db <- as.list(db)
 
   doRbind <- function(x) {
-    if (inherits(x[[1]], "data.frame")) x %>% rbind_all %>% as.data.frame
+    if (inherits(x[[1]], "data.frame")) x %>% bind_rows
     else x
   }
 
   iterQuery <- function(query, ...) {
-    lapply(query, function(q) reTry(sendQuery, db = db, query = q, ...)) %>% doRbind
+    lapply(query, function(q) reTry(sendQuery, db = db, query = q, ...))
   }
 
-  iterQuery(query, ...)
+  iterQuery(query, ...) %>% doRbind
 
 }
 
@@ -37,7 +37,7 @@ sendQuery.list <- function(db, query, ...) {
   # query: is a character vector of queries
 
   on.exit({
-    if(exists("con")) {
+    if (exists("con")) {
       dbDisconnect(con)
     }
   })
@@ -66,7 +66,7 @@ sendQuery.DBIConnection <- function(db, query, ...) {
 sendQuery.MySQLConnection <- function(db, query, ...) {
 
   dbSendQuery <- function(...) {
-    suppressWarnings( RMySQL::dbSendQuery(...) )
+    suppressWarnings(RMySQL::dbSendQuery(...))
   }
 
   setNamesUtf8 <- function(con) {
@@ -81,7 +81,7 @@ sendQuery.MySQLConnection <- function(db, query, ...) {
   }
 
   checkForWarnings <- function(con) {
-    wrngs <- sendQuery(con, "SHOW WARNINGS;")
+    wrngs <- dbSendQuery(con, "SHOW WARNINGS;") %>% fetchFirstResult
     if (nrow(wrngs) > 0) warning(wrngs)
   }
 
