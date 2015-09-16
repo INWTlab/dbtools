@@ -2,17 +2,20 @@
 #'
 #' This functions sends a query to a database and fetches the result.
 #'
-#' @param db a database
-#' @param query a query
+#' @param db (Credentials) the credentials to get a connection to a database.
+#' @param query (character, length >= 1) a query.
 #' @param ... arguments passed to \code{reTry}
 #'
+#' @include helperClass.R
 #' @rdname sendQuery
 #' @export
-sendQuery <- function(db, query, ...) UseMethod("sendQuery")
+sendQuery(db, query, ...) %g% standardGeneric("sendQuery")
 
 #' @rdname sendQuery
 #' @export
-sendQuery.DBCredentials <- function(db, query, ...) {
+sendQuery(db ~ Credentials, query ~ character, ...) %m% {
+  # db: is of class 'Credentials' containing db creds
+  # query: should be a character vector
 
   query <- as.character(query)
   db <- as.list(db)
@@ -23,7 +26,7 @@ sendQuery.DBCredentials <- function(db, query, ...) {
   }
 
   iterQuery <- function(query, ...) {
-    lapply(query, function(q) reTry(sendQuery, db = db, query = q, ...))
+    lapply(query, function(q) reTry(sendQuery, db = ArgList(db), query = SingleQuery(q), ...))
   }
 
   iterQuery(query, ...) %>% doRbind
@@ -32,9 +35,9 @@ sendQuery.DBCredentials <- function(db, query, ...) {
 
 #' @rdname sendQuery
 #' @export
-sendQuery.list <- function(db, query, ...) {
+sendQuery(db ~ ArgList, query ~ SingleQuery, ...) %m% {
   # db: is a list
-  # query: is a character vector of queries
+  # query: is a single query
 
   on.exit({
     if (exists("con")) {
@@ -51,19 +54,20 @@ sendQuery.list <- function(db, query, ...) {
 
 #' @export
 #' @rdname sendQuery
-sendQuery.DBIConnection <- function(db, query, ...) {
+sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
   # db: is a connection
   # query: is a character of length 1
 
   res <- dbSendQuery(db, query)
-  dat <- fetchFirstResult(res)
-  dat
+  fetchFirstResult(res)
 
 }
 
 #' @export
 #' @rdname sendQuery
-sendQuery.MySQLConnection <- function(db, query, ...) {
+sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
+  # db: is a MySQL connection
+  # query: is a character of length 1
 
   dbSendQuery <- function(...) {
     suppressWarnings(RMySQL::dbSendQuery(...))

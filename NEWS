@@ -1,2 +1,7 @@
+Version 0.1.2
+- sendQuery is now an S4 generic
+- S3Class DBCredentials is now S4Class Credentials
+- SingleQuery and ArgList (Classes) for type checking
+
 Version 0.1.1
 - sendQuery can now handle MySql databases as connections
