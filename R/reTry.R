@@ -3,11 +3,11 @@
 #' Tries to call \code{fun}. If the call results in an error, the error is
 #' logged and after some time it is tried again.
 #'
-#' @param fun a function
+#' @param fun (function) a function
 #' @param ... arguments passed to \code{fun}
-#' @param tries number of tries
-#' @param intSleep interval in seconds between tries
-#' @param errorLogging a function which is called in case of an error with
+#' @param tries (numeric > 0) number of tries
+#' @param intSleep (numeric >= 0) interval in seconds between tries
+#' @param errorLogging (function) a function which is called in case of an error with
 #'   \code{errorLogging(<try-error>, ...)}
 #'
 #' @examples
@@ -27,12 +27,23 @@
 #'
 #' @export
 reTry <- function(fun, ..., tries = 1, intSleep = 0, errorLogging = flog.error) {
+
+  assert_that(
+    is.function(fun),
+    is.function(errorLogging),
+    is.numeric(tries),
+    is.numeric(intSleep)
+  )
+
   out <- NULL
+
   for (i in 1:tries) {
     if (i > 1) Sys.sleep(intSleep)
     out <- try(fun(...), silent = TRUE)
     if (inherits(out, "try-error")) errorLogging(out, ...)
     else break
   }
+
   out
+
 }

@@ -7,15 +7,15 @@
 reTry(fun, ..., tries = 1, intSleep = 0, errorLogging = flog.error)
 }
 \arguments{
-\item{fun}{a function}
+\item{fun}{(function) a function}
 
 \item{...}{arguments passed to \code{fun}}
 
-\item{tries}{number of tries}
+\item{tries}{(numeric > 0) number of tries}
 
-\item{intSleep}{interval in seconds between tries}
+\item{intSleep}{(numeric >= 0) interval in seconds between tries}
 
-\item{errorLogging}{a function which is called in case of an error with
+\item{errorLogging}{(function) a function which is called in case of an error with
   \code{errorLogging(<try-error>, ...)}}
 }
 \description{
