@@ -107,7 +107,3 @@ test_that("sendQuery for RMySQL DB", {
   )
 
 })
-
-
-
-
