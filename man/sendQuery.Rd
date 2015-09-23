@@ -38,4 +38,32 @@ internally.}
 \description{
 This functions sends a query to a database and fetches the result.
 }
+\examples{
+## For an example database:
+library("RSQLite")
+con <- dbConnect(SQLite(), "example.db")
+data(USArrests)
+dbWriteTable(con, "USArrests", USArrests)
+dbDisconnect(con)
+
+## Simple Query
+cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
+dat <- sendQuery(cred, "SELECT * FROM USArrests;")
+
+## Multiple Similar Queries
+queryFun <- function(state) {
+  paste0("SELECT * FROM USArrests WHERE row_names = '", state, "';")
+}
+
+sendQuery(cred, queryFun(dat$row_names))
+
+## For the Paranoid
+### be a bit more cautious with connections
+dat <- sendQuery(
+  cred,
+  "SELECT * FROM USArrest;", # wrong name for illustration
+  tries = 2,
+  intSleep = 1
+)
+}
 
