@@ -24,18 +24,7 @@ library("RSQLite")
 con <- dbConnect(SQLite(), "example.db")
 data(USArrests)
 dbWriteTable(con, "USArrests", USArrests)
-```
-
-```
-## [1] TRUE
-```
-
-```r
 dbDisconnect(con)
-```
-
-```
-## [1] TRUE
 ```
 
 This will create a database `example.db` to which we can send some queries. To
@@ -52,7 +41,8 @@ cred
 
 ```
 ## An object of class "Credentials"
-## dbname :  example.db
+## drv : SQLiteDriver 
+## dbname : example.db
 ```
 
 Opposed to the `dbSendQuery` function available from DBI, `sendQuery` needs a
@@ -139,10 +129,10 @@ dat <- sendQuery(
 ```
 
 ```
-## ERROR [2015-09-23 15:13:19] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-23 15:56:18] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ## 
-## ERROR [2015-09-23 15:13:20] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-23 15:56:19] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ```
 

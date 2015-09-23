@@ -31,5 +31,6 @@ as.list.Credentials <- function(x, ...) {
 
 show(object ~ Credentials) %m% {
   cat('An object of class "Credentials"\n')
-  lapply(names(object), function(n) cat(n, ": ", object[[n]], "\n"))
+  cat('drv :', class(object@drv()), "\n")
+  lapply(names(object), function(n) cat(n, ":", object[[n]], "\n"))
 }

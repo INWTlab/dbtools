@@ -17,7 +17,7 @@ For basic usage consider the simple case where we want to retrieve some data
 from a SQLite database. At this time we only have `sendQuery` and no `sendData`
 so we use the standard example for setting up the database:
 
-```{r}
+```{r results='hide'}
 library("RSQLite")
 con <- dbConnect(SQLite(), "example.db")
 data(USArrests)
