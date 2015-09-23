@@ -7,6 +7,9 @@ sudo: required
 services:
   - docker
 
+before_install:
+  - sudo service docker restart; sleep 10
+
 r_github_packages:
   - "wahani/aoos"
 

@@ -60,7 +60,7 @@ context("sendQuery-RMySQL")
 test_that("sendQuery for RMySQL DB", {
 
   tmp <- system(
-    'docker run --name test-mysql-db -p 127.0.0.1:3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql:5.5',
+    'docker run --name test-mysql-db -p 127.0.0.1:3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql',
     intern = TRUE
   )
 
