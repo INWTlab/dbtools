@@ -19,5 +19,4 @@ env:
 
 notifications:
   email:
-    on_success: sebastian.warnholz@inwt-statistics.de
-    on_failure: sebastian.warnholz@inwt-statistics.de
+    - sebastian.warnholz@inwt-statistics.de
