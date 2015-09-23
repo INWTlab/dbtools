@@ -1,6 +1,8 @@
 Version 0.1.3
 - sendQuery can now perform multiple requests on one connection, i.e. vectorized
 for query
+- New class CredentialsList
+- New method to support CredentialsList in sendQuery
 
 Version 0.1.2
 - sendQuery is now an S4 generic

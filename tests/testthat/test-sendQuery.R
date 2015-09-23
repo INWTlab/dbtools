@@ -56,6 +56,21 @@ test_that("Error handling and retry in sendQuery", {
 
 })
 
+test_that("sendQuery can operate on CredentialsList", {
+
+  cred <- CredentialsList(
+    drv = list(RSQLite::SQLite, RSQLite::SQLite),
+    dbname = c(":memory:", ":memory:")
+  )
+
+  dat <- sendQuery(cred, "SELECT 1 AS x;")
+  expect_is(dat, "data.frame")
+  expect_equal(NROW(dat), 2)
+  expect_equal(NCOL(dat), 1)
+  expect_equal(names(dat), "x")
+
+})
+
 context("sendQuery-RMySQL")
 test_that("sendQuery for RMySQL DB", {
 

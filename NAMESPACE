@@ -2,9 +2,11 @@
 
 S3method(as.list,Credentials)
 export(Credentials)
+export(CredentialsList)
 export(reTry)
 export(sendQuery)
 exportClasses(Credentials)
+exportClasses(CredentialsList)
 exportClasses(SingleQuery)
 exportClasses(SingleQueryList)
 exportMethods(sendQuery)

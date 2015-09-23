@@ -13,6 +13,8 @@
 #' @param ... one in:
 #'   \cr for signature (Credentials, character | SingleQueryList) arguments are
 #'   passed to \code{reTry}
+#'   \cr for signature (CredentialsList) arguments are passed to the
+#'   (Credentials) method, so implicitly to reTry
 #'   \cr else ignored
 #'
 #' @include helperClass.R
@@ -53,6 +55,15 @@ sendQuery(db, query, ...) %g% {
 
 #' @rdname sendQuery
 #' @export
+sendQuery(db ~ CredentialsList, query ~ character, ...) %m% {
+  # db: is of class 'CredentialsList'
+  # query: is probably a character or query
+  lapply(db, sendQuery, query = query, ...) %>% doRbind
+}
+
+
+#' @rdname sendQuery
+#' @export
 sendQuery(db ~ Credentials, query ~ character, ...) %m% {
   # db: is of class 'Credentials' containing db creds
   # query: should be a character vector
@@ -70,11 +81,6 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ...) %m% {
       dbDisconnect(con)
     }
   })
-
-  doRbind <- function(x) {
-    if (inherits(x[[1]], "data.frame")) x %>% bind_rows
-    else x
-  }
 
   con <- do.call(dbConnect, as.list(db))
   downloadedData <- reTry(
@@ -130,6 +136,11 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
   checkForWarnings(db)
   dat
 
+}
+
+doRbind <- function(x) {
+  if (inherits(x[[1]], "data.frame")) x %>% bind_rows
+  else x
 }
 
 fetchFirstResult <- function(res) {

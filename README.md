@@ -8,6 +8,9 @@ functions for sending queries and data to databases.
 
 
 ```r
+# currently we will rely on the development version of aoos which will change in
+# the near future
+devtools::install_github("wahani/aoos")
 devtools::install_github("INWT/dbtools")
 ```
 
@@ -105,14 +108,14 @@ sendQuery(cred, queryFun(dat$row_names))
 ## ..         ...    ...     ...      ...   ...
 ```
 
-In such a case `sendQuery` will performe all queries on one connection. A 
+In such a case `sendQuery` will perform all queries on one connection. A 
 different approach is to fetch the results of the original query in chunks,
 which we do not support yet.
 
 
 ## Unstable connections
 
-One of the problems we face on a regular basis are conncection problems to
+One of the problems we face on a regular basis are connection problems to
 external servers. To address this `sendQuery` will evaluate everything in a
 'try-catch' handler abstracted in `dbtools::reTry`. With this you can state how
 many tries a query has, how many seconds should be waited between each iteration
@@ -129,10 +132,57 @@ dat <- sendQuery(
 ```
 
 ```
-## ERROR [2015-09-23 15:56:18] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-23 18:14:41] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ## 
-## ERROR [2015-09-23 15:56:19] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-23 18:14:42] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ```
+
+
+## Multiple Databases
+
+Sometimes your data can be distributed on different servers but you want to send
+the same query to those servers. What you can do is give `sendQuery` a
+*CredentialsList*. 
+
+
+```r
+con <- dbConnect(SQLite(), "example1.db")
+data(USArrests)
+dbWriteTable(con, "USArrests", USArrests)
+dbDisconnect(con)
+```
+
+Now we want to load the data from `example1.db` and `example.db` which can be
+implemented as follows:
+
+
+```r
+cred <- CredentialsList(
+  drv = RSQLite::SQLite, 
+  dbname = c("example.db", "example1.db")
+)
+
+sendQuery(cred, "SELECT * FROM USArrests;")
+```
+
+```
+## Source: local data frame [100 x 5]
+## 
+##      row_names Murder Assault UrbanPop  Rape
+##          (chr)  (dbl)   (int)    (int) (dbl)
+## 1      Alabama   13.2     236       58  21.2
+## 2       Alaska   10.0     263       48  44.5
+## 3      Arizona    8.1     294       80  31.0
+## 4     Arkansas    8.8     190       50  19.5
+## 5   California    9.0     276       91  40.6
+## 6     Colorado    7.9     204       78  38.7
+## 7  Connecticut    3.3     110       77  11.1
+## 8     Delaware    5.9     238       72  15.8
+## 9      Florida   15.4     335       80  31.9
+## 10     Georgia   17.4     211       60  25.8
+## ..         ...    ...     ...      ...   ...
+```
+
 

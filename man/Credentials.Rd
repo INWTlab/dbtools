@@ -4,12 +4,16 @@
 \name{Credentials-class}
 \alias{Credentials}
 \alias{Credentials-class}
+\alias{CredentialsList}
+\alias{CredentialsList-class}
 \alias{as.list.Credentials}
 \title{Credentials Class}
 \usage{
 Credentials(drv, ...)
 
 \method{as.list}{Credentials}(x, ...)
+
+CredentialsList(...)
 }
 \arguments{
 \item{drv}{(function) a driver. Will be called and passed to \link[DBI]{dbConnect}}
@@ -20,5 +24,16 @@ Credentials(drv, ...)
 }
 \description{
 Use this function to store your database credentials.
+}
+\details{
+\code{CredentialsList} can be used to construct a list of Credential
+  objects. The advantage is, that all arguments can be vectors. Elements of
+  length one are replicated to match the appropriate number of credentials.
+  This is usefull whenever you run the same query on multiple databases where
+  they only differ in the port but else expect the same credentials.
+}
+\examples{
+Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+CredentialsList(drv = RSQLite::SQLite, dbname = c(":memory:", ":memory:"))
 }
 

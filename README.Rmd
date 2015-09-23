@@ -83,3 +83,30 @@ dat <- sendQuery(
 )
 ```
 
+
+## Multiple Databases
+
+Sometimes your data can be distributed on different servers but you want to send
+the same query to those servers. What you can do is give `sendQuery` a
+*CredentialsList*. 
+
+```{r results='hide'}
+con <- dbConnect(SQLite(), "example1.db")
+data(USArrests)
+dbWriteTable(con, "USArrests", USArrests)
+dbDisconnect(con)
+```
+
+Now we want to load the data from `example1.db` and `example.db` which can be
+implemented as follows:
+
+```{r}
+cred <- CredentialsList(
+  drv = RSQLite::SQLite, 
+  dbname = c("example.db", "example1.db")
+)
+
+sendQuery(cred, "SELECT * FROM USArrests;")
+```
+
+

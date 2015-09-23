@@ -5,11 +5,14 @@
 \alias{sendQuery}
 \alias{sendQuery,Credentials,SingleQueryList-method}
 \alias{sendQuery,Credentials,character-method}
+\alias{sendQuery,CredentialsList,character-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
 \title{Send query to database and fetch result}
 \usage{
 sendQuery(db, query, ...)
+
+\S4method{sendQuery}{CredentialsList,character}(db, query, ...)
 
 \S4method{sendQuery}{Credentials,character}(db, query, ...)
 
@@ -33,6 +36,8 @@ internally.}
 \item{...}{one in:
   \cr for signature (Credentials, character | SingleQueryList) arguments are
   passed to \code{reTry}
+  \cr for signature (CredentialsList) arguments are passed to the
+  (Credentials) method, so implicitly to reTry
   \cr else ignored}
 }
 \description{
