@@ -3,7 +3,7 @@
 \docType{methods}
 \name{sendQuery}
 \alias{sendQuery}
-\alias{sendQuery,ArgList,SingleQuery-method}
+\alias{sendQuery,Credentials,SingleQueryList-method}
 \alias{sendQuery,Credentials,character-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
@@ -13,18 +13,24 @@ sendQuery(db, query, ...)
 
 \S4method{sendQuery}{Credentials,character}(db, query, ...)
 
-\S4method{sendQuery}{ArgList,SingleQuery}(db, query, ...)
+\S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...)
 
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
 
 \S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...)
 }
 \arguments{
-\item{db}{(Credentials) the credentials to get a connection to a database.}
+\item{db}{\cr (\link{Credentials}) the credentials to get a connection to a database.
+\cr (DBIConnection) \link[DBI]{DBIConnection-class}
+\cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}}
 
-\item{query}{(character, length >= 1) a query.}
+\item{query}{\cr (character, length >= 1) a query
+\cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
+internally.}
 
-\item{...}{arguments passed to \code{reTry}}
+\item{...}{\cr for signature (Credentials, character | SingleQueryList) arguments are
+  passed to \code{reTry}
+  \cr else ignored}
 }
 \description{
 This functions sends a query to a database and fetches the result.

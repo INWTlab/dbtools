@@ -1,4 +1,4 @@
-context("sendQuery")
+context("sendQuery-SQLite")
 
 dummyQuery <- function(i, const) paste0("SELECT ", i + const, " AS x;")
 noErrorLogging <- function(x, ...) NULL
@@ -38,7 +38,7 @@ test_that("Error handling and retry in sendQuery", {
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
-      errorLogging = noErrorLogging)[[1]],
+      errorLogging = noErrorLogging),
     "try-error"
   )
 
@@ -48,7 +48,7 @@ test_that("Error handling and retry in sendQuery", {
       "SELECT 1 FRM Tabelle;",
       tries = 2,
       intSleep = 1,
-      errorLogging = noErrorLogging)[[1]],
+      errorLogging = noErrorLogging),
     "try-error"
   )
 
@@ -56,6 +56,7 @@ test_that("Error handling and retry in sendQuery", {
 
 })
 
+context("sendQuery-RMySQL")
 test_that("sendQuery for RMySQL DB", {
 
   tmp <- system(
@@ -95,8 +96,8 @@ test_that("sendQuery for RMySQL DB", {
   expect_equal(names(dat), "x")
   expect_true(all(dat$x == 3:4))
 
-  expect_is(sendQuery(cred, "SELECT * FRM Tabelle;", errorLogging = noErrorLogging)[[1]], "try-error")
-  expect_is(sendQuery(cred, "SELECT 1 FRM Tabelle;", tries = 2, intSleep = 1, errorLogging = noErrorLogging)[[1]],
+  expect_is(sendQuery(cred, "SELECT * FRM Tabelle;", errorLogging = noErrorLogging), "try-error")
+  expect_is(sendQuery(cred, "SELECT 1 FRM Tabelle;", tries = 2, intSleep = 1, errorLogging = noErrorLogging),
             "try-error")
 
   # End the temp db:

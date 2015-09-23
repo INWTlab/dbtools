@@ -2,40 +2,38 @@
 #'
 #' This functions sends a query to a database and fetches the result.
 #'
-#' @param db (Credentials) the credentials to get a connection to a database.
-#' @param query (character, length >= 1) a query.
-#' @param ... arguments passed to \code{reTry}
+#' @param db
+#'   \cr (\link{Credentials}) the credentials to get a connection to a database.
+#'   \cr (DBIConnection) \link[DBI]{DBIConnection-class}
+#'   \cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}
+#' @param query
+#'   \cr (character, length >= 1) a query
+#'   \cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
+#'   internally.
+#' @param ...
+#'   \cr for signature (Credentials, character | SingleQueryList) arguments are
+#'   passed to \code{reTry}
+#'   \cr else ignored
 #'
 #' @include helperClass.R
+#'
 #' @rdname sendQuery
 #' @export
-sendQuery(db, query, ...) %g% standardGeneric("sendQuery")
+sendQuery(db, query, ...) %g% {
+  standardGeneric("sendQuery")
+}
 
 #' @rdname sendQuery
 #' @export
 sendQuery(db ~ Credentials, query ~ character, ...) %m% {
   # db: is of class 'Credentials' containing db creds
   # query: should be a character vector
-
-  query <- as.character(query)
-  db <- as.list(db)
-
-  doRbind <- function(x) {
-    if (inherits(x[[1]], "data.frame")) x %>% bind_rows
-    else x
-  }
-
-  iterQuery <- function(query, ...) {
-    lapply(query, function(q) reTry(sendQuery, db = ArgList(db), query = SingleQuery(q), ...))
-  }
-
-  iterQuery(query, ...) %>% doRbind
-
+  sendQuery(db, SingleQueryList(as.list(query)), ...)
 }
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ ArgList, query ~ SingleQuery, ...) %m% {
+sendQuery(db ~ Credentials, query ~ SingleQueryList, ...) %m% {
   # db: is a list
   # query: is a single query
 
@@ -45,10 +43,18 @@ sendQuery(db ~ ArgList, query ~ SingleQuery, ...) %m% {
     }
   })
 
-  con <- do.call(dbConnect, db)
-  downloadedData <- sendQuery(con, query)
+  doRbind <- function(x) {
+    if (inherits(x[[1]], "data.frame")) x %>% bind_rows
+    else x
+  }
 
-  downloadedData
+  con <- do.call(dbConnect, as.list(db))
+  downloadedData <- reTry(
+    function(...) lapply(query, . %>% sendQuery(db = con, ...)),
+    ...
+  )
+
+  downloadedData %>% doRbind
 
 }
 

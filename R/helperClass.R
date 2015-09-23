@@ -1,13 +1,14 @@
-#' Helper-Class: Argument List
-#'
-#' Class to be used as argument in \code{do.call}. Inherits from list.
-#'
-#' @export
-list : ArgList() %type% .Object
-
 #' Helper-Class: Single Query
 #'
-#' Class which represents a single query
+#' Class which represents a single query or a list of single queries. Mostly
+#' used internally.
+#'
+#' @rdname SingleQuery
+#'
+#' @details
+#' \code{SingleQuery} inherits from \code{character} and represents a single query.
+#'
+#' \code{SingleQueryList} inherits from \code{list} and represents a list of single queries. It can be constructed with a list of character values.
 #'
 #' @export
 character : SingleQuery() %type% {
@@ -16,5 +17,14 @@ character : SingleQuery() %type% {
     length(unlist(strsplit(.Object, ";"))) == 1,
     grepl(";$", .Object)
   )
+  .Object
+}
+
+#' @export
+#' @rdname SingleQuery
+#'
+#' @export
+list : SingleQueryList() %type% {
+  S3Part(.Object) <- Map(SingleQuery, .Object)
   .Object
 }

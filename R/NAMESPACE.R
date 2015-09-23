@@ -6,3 +6,6 @@
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%
 NULL
+
+
+globalVariables(".")
