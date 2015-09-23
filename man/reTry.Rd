@@ -15,9 +15,26 @@ reTry(fun, ..., tries = 1, intSleep = 0, errorLogging = flog.error)
 
 \item{intSleep}{interval in seconds between tries}
 
-\item{errorLogging}{a function which is called in case of an error with \code{errorLogging(<try-error>, ...)}}
+\item{errorLogging}{a function which is called in case of an error with
+  \code{errorLogging(<try-error>, ...)}}
 }
 \description{
-Tries to call \code{fun}. If the call results in an error, the error is logged and after some time it is tried again.
+Tries to call \code{fun}. If the call results in an error, the error is
+logged and after some time it is tried again.
+}
+\examples{
+## Something that will fail every once in a while:
+reTry(
+  function() if (runif(1) > 0.5) stop(),
+  tries = 2,
+  intSleep = 1
+)
+
+## Disable logging
+noErrorLogging <- function(x, ...) NULL
+reTry(
+  function() stop(),
+  errorLogging = noErrorLogging
+)
 }
 
