@@ -2,15 +2,15 @@
 #'
 #' This functions sends a query to a database and fetches the result.
 #'
-#' @param db
+#' @param db one in:
 #'   \cr (\link{Credentials}) the credentials to get a connection to a database.
 #'   \cr (DBIConnection) \link[DBI]{DBIConnection-class}
 #'   \cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}
-#' @param query
+#' @param query one in:
 #'   \cr (character, length >= 1) a query
 #'   \cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
 #'   internally.
-#' @param ...
+#' @param ... one in:
 #'   \cr for signature (Credentials, character | SingleQueryList) arguments are
 #'   passed to \code{reTry}
 #'   \cr else ignored

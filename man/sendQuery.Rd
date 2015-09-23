@@ -20,15 +20,18 @@ sendQuery(db, query, ...)
 \S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...)
 }
 \arguments{
-\item{db}{\cr (\link{Credentials}) the credentials to get a connection to a database.
+\item{db}{one in:
+\cr (\link{Credentials}) the credentials to get a connection to a database.
 \cr (DBIConnection) \link[DBI]{DBIConnection-class}
 \cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}}
 
-\item{query}{\cr (character, length >= 1) a query
+\item{query}{one in:
+\cr (character, length >= 1) a query
 \cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
 internally.}
 
-\item{...}{\cr for signature (Credentials, character | SingleQueryList) arguments are
+\item{...}{one in:
+  \cr for signature (Credentials, character | SingleQueryList) arguments are
   passed to \code{reTry}
   \cr else ignored}
 }
