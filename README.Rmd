@@ -7,6 +7,9 @@ functions for sending queries and data to databases.
 ## Installation
 
 ```{r eval=FALSE}
+# currently we will rely on the development version of aoos which will change in
+# the near future
+devtools::install_github("wahani/aoos")
 devtools::install_github("INWT/dbtools")
 ```
 
@@ -58,14 +61,14 @@ queryFun <- function(state) {
 sendQuery(cred, queryFun(dat$row_names))
 ```
 
-In such a case `sendQuery` will performe all queries on one connection. A 
+In such a case `sendQuery` will perform all queries on one connection. A 
 different approach is to fetch the results of the original query in chunks,
 which we do not support yet.
 
 
 ## Unstable connections
 
-One of the problems we face on a regular basis are conncection problems to
+One of the problems we face on a regular basis are connection problems to
 external servers. To address this `sendQuery` will evaluate everything in a
 'try-catch' handler abstracted in `dbtools::reTry`. With this you can state how
 many tries a query has, how many seconds should be waited between each iteration
