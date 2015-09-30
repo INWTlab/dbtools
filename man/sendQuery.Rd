@@ -13,11 +13,12 @@
 sendQuery(db, query, ...)
 
 \S4method{sendQuery}{CredentialsList,character}(db, query, ...,
-  applyFun = lapply)
+  applyFun = lapply, simplify = TRUE)
 
 \S4method{sendQuery}{Credentials,character}(db, query, ...)
 
-\S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...)
+\S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...,
+  simplify = TRUE)
 
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
 
@@ -42,9 +43,28 @@ passed to \code{reTry}
 \cr else ignored}
 
 \item{applyFun}{(function) something like lapply or mclapply}
+
+\item{simplify}{(logical(1)) whether to simplify results. See details.}
+}
+\value{
+one in:
+\cr \code{simplify = TRUE} (list | data.frame)
+\cr \code{simplify = FALSE}: (list) with data frames or nested list of data
+frames
+\cr On error: (list) with 'try-catch' objects#'
 }
 \description{
 This functions sends a query to a database and fetches the result.
+}
+\details{
+\code{simplify} the default is to simplify results. If you send
+  multiple queries to one database it is tried to rbind the results - when
+  you have different column names this can be like a full join. If you send
+  one query to multiple databases it is tried to rbind the results. If you
+  send multiple queries to multiple databases, then first the results of the
+  same query are tried to be rbind, and if possible also the results of each
+  query. It is considered to be possible iff the names of all data frames
+  belonging to each query are the same.
 }
 \examples{
 ## For an example database:

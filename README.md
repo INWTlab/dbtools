@@ -132,10 +132,10 @@ dat <- sendQuery(
 ```
 
 ```
-## ERROR [2015-09-30 14:29:04] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-30 17:31:03] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ## 
-## ERROR [2015-09-30 14:29:05] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-30 17:31:04] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ```
 
@@ -215,6 +215,97 @@ sendQuery(
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
 ## ..         ...    ...     ...      ...   ...
+```
+
+Potentially you can send multiple queries to multiple databases. The results are tried to be simplified by default:
+
+
+```r
+sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
+```
+
+```
+## [[1]]
+## Source: local data frame [100 x 5]
+## 
+##      row_names Murder Assault UrbanPop  Rape
+##          (chr)  (dbl)   (int)    (int) (dbl)
+## 1      Alabama   13.2     236       58  21.2
+## 2       Alaska   10.0     263       48  44.5
+## 3      Arizona    8.1     294       80  31.0
+## 4     Arkansas    8.8     190       50  19.5
+## 5   California    9.0     276       91  40.6
+## 6     Colorado    7.9     204       78  38.7
+## 7  Connecticut    3.3     110       77  11.1
+## 8     Delaware    5.9     238       72  15.8
+## 9      Florida   15.4     335       80  31.9
+## 10     Georgia   17.4     211       60  25.8
+## ..         ...    ...     ...      ...   ...
+## 
+## [[2]]
+## Source: local data frame [2 x 1]
+## 
+##       x
+##   (int)
+## 1     1
+## 2     1
+```
+
+```r
+sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
+```
+
+```
+## [[1]]
+## [[1]][[1]]
+## Source: local data frame [50 x 5]
+## 
+##      row_names Murder Assault UrbanPop  Rape
+##          (chr)  (dbl)   (int)    (int) (dbl)
+## 1      Alabama   13.2     236       58  21.2
+## 2       Alaska   10.0     263       48  44.5
+## 3      Arizona    8.1     294       80  31.0
+## 4     Arkansas    8.8     190       50  19.5
+## 5   California    9.0     276       91  40.6
+## 6     Colorado    7.9     204       78  38.7
+## 7  Connecticut    3.3     110       77  11.1
+## 8     Delaware    5.9     238       72  15.8
+## 9      Florida   15.4     335       80  31.9
+## 10     Georgia   17.4     211       60  25.8
+## ..         ...    ...     ...      ...   ...
+## 
+## [[1]][[2]]
+## Source: local data frame [1 x 1]
+## 
+##       x
+##   (int)
+## 1     1
+## 
+## 
+## [[2]]
+## [[2]][[1]]
+## Source: local data frame [50 x 5]
+## 
+##      row_names Murder Assault UrbanPop  Rape
+##          (chr)  (dbl)   (int)    (int) (dbl)
+## 1      Alabama   13.2     236       58  21.2
+## 2       Alaska   10.0     263       48  44.5
+## 3      Arizona    8.1     294       80  31.0
+## 4     Arkansas    8.8     190       50  19.5
+## 5   California    9.0     276       91  40.6
+## 6     Colorado    7.9     204       78  38.7
+## 7  Connecticut    3.3     110       77  11.1
+## 8     Delaware    5.9     238       72  15.8
+## 9      Florida   15.4     335       80  31.9
+## 10     Georgia   17.4     211       60  25.8
+## ..         ...    ...     ...      ...   ...
+## 
+## [[2]][[2]]
+## Source: local data frame [1 x 1]
+## 
+##       x
+##   (int)
+## 1     1
 ```
 
 

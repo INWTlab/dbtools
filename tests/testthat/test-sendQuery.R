@@ -71,6 +71,49 @@ test_that("sendQuery can operate on CredentialsList", {
 
 })
 
+test_that("sendQuery can handle simplification", {
+
+  cred <- Credentials(
+    drv = RSQLite::SQLite,
+    dbname = ":memory:"
+  )
+
+  dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = FALSE)
+
+  # expecting a list:
+  expect_is(dat, "list")
+  expect_is(dat[[1]], "data.frame")
+  expect_is(dat[[2]], "data.frame")
+
+  cred <- Credentials(
+    drv = RSQLite::SQLite,
+    dbname = c(":memory:", ":memory:")
+  )
+
+  # expecting a nested list:
+  dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = FALSE)
+  expect_is(dat, "list")
+  lapply(dat, expect_is, "list")
+  lapply(dat[[1]], expect_is, "data.frame")
+  lapply(dat[[2]], expect_is, "data.frame")
+
+  # expecting a list because of the different names
+  dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = TRUE)
+  expect_is(dat, "list")
+  expect_is(dat[[1]], "data.frame")
+  expect_is(dat[[2]], "data.frame")
+  expect_equal(names(dat[[1]]), "x")
+  expect_equal(NROW(dat[[1]]), 2)
+
+  # expecting a data frame
+  dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS x;"), simplify = TRUE)
+  expect_is(dat, "data.frame")
+  expect_equal(names(dat), "x")
+  expect_equal(NROW(dat), 4)
+  expect_true(all(dat$x == 1))
+
+})
+
 context("sendQuery-RMySQL")
 test_that("sendQuery for RMySQL DB", {
   # Sometimes we get an error if docker has not been startet. Use:

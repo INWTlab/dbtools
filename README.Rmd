@@ -122,4 +122,11 @@ sendQuery(
 )
 ```
 
+Potentially you can send multiple queries to multiple databases. The results are tried to be simplified by default:
+
+```{r}
+sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
+sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
+```
+
 
