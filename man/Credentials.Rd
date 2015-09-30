@@ -34,6 +34,6 @@ Use this function to store your database credentials.
 }
 \examples{
 Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
-CredentialsList(drv = RSQLite::SQLite, dbname = c(":memory:", ":memory:"))
+Credentials(drv = RSQLite::SQLite, dbname = c(":memory:", ":memory:"))
 }
 

@@ -51,7 +51,7 @@ one in:
 \cr \code{simplify = TRUE} (list | data.frame)
 \cr \code{simplify = FALSE}: (list) with data frames or nested list of data
 frames
-\cr On error: (list) with 'try-catch' objects#'
+\cr On error: (list) with 'try-catch' objects
 }
 \description{
 This functions sends a query to a database and fetches the result.
