@@ -132,10 +132,10 @@ dat <- sendQuery(
 ```
 
 ```
-## ERROR [2015-09-23 18:14:41] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-30 14:07:07] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ## 
-## ERROR [2015-09-23 18:14:42] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-30 14:07:08] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ```
 
@@ -159,8 +159,8 @@ implemented as follows:
 
 
 ```r
-cred <- CredentialsList(
-  drv = RSQLite::SQLite, 
+cred <- Credentials(
+  RSQLite::SQLite, 
   dbname = c("example.db", "example1.db")
 )
 

@@ -24,7 +24,12 @@ list : Credentials(drv ~ "function") %type% {
 #' @export
 #' @rdname Credentials
 Credentials <- function(drv, ...) {
-  new("Credentials", drv = drv, list(...))
+  args <- list(...)
+  if (any(sapply(args, length) > 1)) {
+    new("CredentialsList", c(list(...), list(drv = drv)))
+  } else {
+    new("Credentials", drv = drv, list(...))
+  }
 }
 
 #' @export

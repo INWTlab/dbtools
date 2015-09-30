@@ -73,6 +73,10 @@ test_that("sendQuery can operate on CredentialsList", {
 
 context("sendQuery-RMySQL")
 test_that("sendQuery for RMySQL DB", {
+  # Sometimes we get an error if docker has not been startet. Use:
+  # sudo service docker.io start
+  # check with:
+  # sudo service docker.io status
 
   tmp <- system(
     'docker run --name test-mysql-db -p 127.0.0.1:3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql',

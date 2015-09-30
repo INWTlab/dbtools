@@ -101,8 +101,8 @@ Now we want to load the data from `example1.db` and `example.db` which can be
 implemented as follows:
 
 ```{r}
-cred <- CredentialsList(
-  drv = RSQLite::SQLite, 
+cred <- Credentials(
+  RSQLite::SQLite, 
   dbname = c("example.db", "example1.db")
 )
 

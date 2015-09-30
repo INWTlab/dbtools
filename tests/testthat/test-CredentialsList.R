@@ -8,7 +8,7 @@ test_that("Construction of CredentialsList works", {
     port = 1
   )
 
-  CL2 <- CredentialsList(
+  CL2 <- Credentials(
     drv = RMySQL::MySQL,
     username = c("root", "user"),
     dbname = "test",
