@@ -132,10 +132,10 @@ dat <- sendQuery(
 ```
 
 ```
-## ERROR [2015-09-30 14:07:07] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-30 14:29:04] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ## 
-## ERROR [2015-09-30 14:07:08] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2015-09-30 14:29:05] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ```
 
@@ -165,6 +165,38 @@ cred <- Credentials(
 )
 
 sendQuery(cred, "SELECT * FROM USArrests;")
+```
+
+```
+## Source: local data frame [100 x 5]
+## 
+##      row_names Murder Assault UrbanPop  Rape
+##          (chr)  (dbl)   (int)    (int) (dbl)
+## 1      Alabama   13.2     236       58  21.2
+## 2       Alaska   10.0     263       48  44.5
+## 3      Arizona    8.1     294       80  31.0
+## 4     Arkansas    8.8     190       50  19.5
+## 5   California    9.0     276       91  40.6
+## 6     Colorado    7.9     204       78  38.7
+## 7  Connecticut    3.3     110       77  11.1
+## 8     Delaware    5.9     238       72  15.8
+## 9      Florida   15.4     335       80  31.9
+## 10     Georgia   17.4     211       60  25.8
+## ..         ...    ...     ...      ...   ...
+```
+
+It might also be of interest to query your databases in parallel. For that it is
+possible to supply a apply/map function which in turn can be a parallel lapply
+like mclapply or something else:
+
+
+```r
+sendQuery(
+  cred, 
+  "SELECT * FROM USArrests;", 
+  mc.cores = 2, 
+  applyFun = parallel::mclapply
+)
 ```
 
 ```

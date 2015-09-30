@@ -2,6 +2,8 @@ Version 0.1.4
 - CredentialsList is absorbed by Credentials. Credentials now allows for
 arguments being vectors and automagically returns a CredentialsList if
 appropriate.
+- sendQuery has a new argument applyFun to supply an optional parallel version
+of mclapply.
 
 Version 0.1.3
 - sendQuery can now perform multiple requests on one connection, i.e. vectorized

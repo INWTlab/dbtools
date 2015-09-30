@@ -109,4 +109,17 @@ cred <- Credentials(
 sendQuery(cred, "SELECT * FROM USArrests;")
 ```
 
+It might also be of interest to query your databases in parallel. For that it is
+possible to supply a apply/map function which in turn can be a parallel lapply
+like mclapply or something else:
+
+```{r}
+sendQuery(
+  cred, 
+  "SELECT * FROM USArrests;", 
+  mc.cores = 2, 
+  applyFun = parallel::mclapply
+)
+```
+
 

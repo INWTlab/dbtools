@@ -12,7 +12,8 @@
 \usage{
 sendQuery(db, query, ...)
 
-\S4method{sendQuery}{CredentialsList,character}(db, query, ...)
+\S4method{sendQuery}{CredentialsList,character}(db, query, ...,
+  applyFun = lapply)
 
 \S4method{sendQuery}{Credentials,character}(db, query, ...)
 
@@ -34,11 +35,13 @@ sendQuery(db, query, ...)
 internally.}
 
 \item{...}{one in:
-  \cr for signature (Credentials, character | SingleQueryList) arguments are
-  passed to \code{reTry}
-  \cr for signature (CredentialsList) arguments are passed to the
-  (Credentials) method, so implicitly to reTry
-  \cr else ignored}
+\cr for signature (Credentials, character | SingleQueryList) arguments are
+passed to \code{reTry}
+\cr for signature (CredentialsList) arguments are passed to the
+(Credentials) method, so implicitly to reTry
+\cr else ignored}
+
+\item{applyFun}{(function) something like lapply or mclapply}
 }
 \description{
 This functions sends a query to a database and fetches the result.

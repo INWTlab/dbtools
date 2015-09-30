@@ -16,6 +16,7 @@
 #'   \cr for signature (CredentialsList) arguments are passed to the
 #'   (Credentials) method, so implicitly to reTry
 #'   \cr else ignored
+#' @param applyFun (function) something like lapply or mclapply
 #'
 #' @include helperClass.R
 #'
@@ -55,10 +56,10 @@ sendQuery(db, query, ...) %g% {
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ CredentialsList, query ~ character, ...) %m% {
+sendQuery(db ~ CredentialsList, query ~ character, ..., applyFun = lapply) %m% {
   # db: is of class 'CredentialsList'
-  # query: is probably a character or query
-  lapply(db, sendQuery, query = query, ...) %>% doRbind
+  # query: is probably a character
+  applyFun(db, sendQuery, query = query, ...) %>% doRbind
 }
 
 

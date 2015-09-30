@@ -8,7 +8,7 @@ Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
 Description: Some tools to work with databases.
 Depends:
     methods,
-    aoos(>= 0.3.5)
+    aoos(>= 0.3.8)
 Imports:
     assertthat,
     dplyr,
