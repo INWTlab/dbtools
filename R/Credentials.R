@@ -38,6 +38,10 @@ as.list.Credentials <- function(x, ...) {
   c(S3Part(x, TRUE), drv = x@drv())
 }
 
+as.character.Credentials <- function(x, ...) {
+  paste(as.character.default(x), collapse = "--")
+}
+
 show(object ~ Credentials) %m% {
   cat('An object of class "Credentials"\n')
   cat('drv :', class(object@drv()), "\n")
@@ -88,4 +92,3 @@ list : CredentialsList() %type% {
 CredentialsList <- function(...) {
   new("CredentialsList", list(...))
 }
-
