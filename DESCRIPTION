@@ -26,4 +26,6 @@ Collate:
     'helperClass.R'
     'reTry.R'
     'sendQuery.R'
+    'testConnection.R'
 Encoding: UTF-8
+RoxygenNote: 5.0.1
