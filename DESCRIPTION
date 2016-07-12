@@ -25,6 +25,7 @@ Collate:
     'NAMESPACE.R'
     'helperClass.R'
     'reTry.R'
+    'sendData.R'
     'sendQuery.R'
     'testConnection.R'
 Encoding: UTF-8
