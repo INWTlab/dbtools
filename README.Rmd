@@ -7,9 +7,6 @@ functions for sending queries and data to databases.
 ## Installation
 
 ```{r eval=FALSE}
-# currently we will rely on the development version of aoos which will change in
-# the near future
-devtools::install_github("wahani/aoos")
 devtools::install_github("INWT/dbtools")
 ```
 
@@ -128,5 +125,3 @@ Potentially you can send multiple queries to multiple databases. The results are
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
 ```
-
-

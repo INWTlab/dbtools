@@ -8,9 +8,6 @@ functions for sending queries and data to databases.
 
 
 ```r
-# currently we will rely on the development version of aoos which will change in
-# the near future
-devtools::install_github("wahani/aoos")
 devtools::install_github("INWT/dbtools")
 ```
 
@@ -24,6 +21,13 @@ so we use the standard example for setting up the database:
 
 ```r
 library("RSQLite")
+```
+
+```
+## Loading required package: DBI
+```
+
+```r
 con <- dbConnect(SQLite(), "example.db")
 data(USArrests)
 dbWriteTable(con, "USArrests", USArrests)
@@ -38,6 +42,13 @@ other arguments depend on the specific back-end.
 
 ```r
 library("dbtools")
+```
+
+```
+## Loading required package: aoos
+```
+
+```r
 cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
 cred
 ```
@@ -59,10 +70,9 @@ dat
 ```
 
 ```
-## Source: local data frame [50 x 5]
-## 
+## # A tibble: 50 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -73,7 +83,7 @@ dat
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 40 more rows
 ```
 
 In your normal workflow you will sometimes want to split up a complex query into
@@ -91,10 +101,9 @@ sendQuery(cred, queryFun(dat$row_names))
 ```
 
 ```
-## Source: local data frame [50 x 5]
-## 
+## # A tibble: 50 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -105,7 +114,7 @@ sendQuery(cred, queryFun(dat$row_names))
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 40 more rows
 ```
 
 In such a case `sendQuery` will perform all queries on one connection. A 
@@ -132,10 +141,10 @@ dat <- sendQuery(
 ```
 
 ```
-## ERROR [2015-09-30 17:31:03] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2016-07-15 17:39:58] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ## 
-## ERROR [2015-09-30 17:31:04] Error in sqliteSendQuery(conn, statement) : 
+## ERROR [2016-07-15 17:39:59] Error in sqliteSendQuery(conn, statement) : 
 ##   error in statement: no such table: USArrest
 ```
 
@@ -168,10 +177,9 @@ sendQuery(cred, "SELECT * FROM USArrests;")
 ```
 
 ```
-## Source: local data frame [100 x 5]
-## 
+## # A tibble: 100 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -182,7 +190,7 @@ sendQuery(cred, "SELECT * FROM USArrests;")
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 90 more rows
 ```
 
 It might also be of interest to query your databases in parallel. For that it is
@@ -200,10 +208,9 @@ sendQuery(
 ```
 
 ```
-## Source: local data frame [100 x 5]
-## 
+## # A tibble: 100 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -214,7 +221,7 @@ sendQuery(
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 90 more rows
 ```
 
 Potentially you can send multiple queries to multiple databases. The results are tried to be simplified by default:
@@ -226,10 +233,9 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 
 ```
 ## [[1]]
-## Source: local data frame [100 x 5]
-## 
+## # A tibble: 100 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -240,13 +246,12 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 90 more rows
 ## 
 ## [[2]]
-## Source: local data frame [2 x 1]
-## 
+## # A tibble: 2 x 1
 ##       x
-##   (int)
+##   <int>
 ## 1     1
 ## 2     1
 ```
@@ -258,10 +263,9 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
 ```
 ## [[1]]
 ## [[1]][[1]]
-## Source: local data frame [50 x 5]
-## 
+## # A tibble: 50 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -272,22 +276,20 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 40 more rows
 ## 
 ## [[1]][[2]]
-## Source: local data frame [1 x 1]
-## 
+## # A tibble: 1 x 1
 ##       x
-##   (int)
+##   <int>
 ## 1     1
 ## 
 ## 
 ## [[2]]
 ## [[2]][[1]]
-## Source: local data frame [50 x 5]
-## 
+## # A tibble: 50 x 5
 ##      row_names Murder Assault UrbanPop  Rape
-##          (chr)  (dbl)   (int)    (int) (dbl)
+##          <chr>  <dbl>   <int>    <int> <dbl>
 ## 1      Alabama   13.2     236       58  21.2
 ## 2       Alaska   10.0     263       48  44.5
 ## 3      Arizona    8.1     294       80  31.0
@@ -298,14 +300,11 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
 ## 8     Delaware    5.9     238       72  15.8
 ## 9      Florida   15.4     335       80  31.9
 ## 10     Georgia   17.4     211       60  25.8
-## ..         ...    ...     ...      ...   ...
+## # ... with 40 more rows
 ## 
 ## [[2]][[2]]
-## Source: local data frame [1 x 1]
-## 
+## # A tibble: 1 x 1
 ##       x
-##   (int)
+##   <int>
 ## 1     1
 ```
-
-

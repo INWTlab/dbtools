@@ -10,9 +10,6 @@ services:
 before_install:
   - sudo service docker restart; sleep 10 # fix https://github.com/travis-ci/travis-ci/issues/4778
 
-r_github_packages:
-  - "wahani/aoos"
-
 env:
  global:
    - CRAN: http://cran.rstudio.com
