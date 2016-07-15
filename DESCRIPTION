@@ -14,12 +14,12 @@ Imports:
     dplyr,
     magrittr,
     RMySQL,
+    RSQLite,
     futile.logger
 License: GPL-3 | file LICENSE
 LazyData: TRUE
 Suggests:
-    testthat,
-    RSQLite
+    testthat
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
