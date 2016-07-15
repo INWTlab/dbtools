@@ -9,3 +9,11 @@ NULL
 
 
 globalVariables(".")
+
+#' @importFrom RMySQL MySQL
+#' @export
+RMySQL::MySQL
+
+#' @importFrom RSQLite SQLite
+#' @export
+RSQLite::SQLite
