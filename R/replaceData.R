@@ -1,4 +1,4 @@
-#' Copy data to database tables
+#' Copy data to database tables, ensuring that no primary key violation occurs
 #'
 #' This functions copies data frames to database tables
 #'
@@ -12,6 +12,6 @@
 #' @inheritParams sendQuery
 #'
 #' @export
-sendData <- function(db, name, value, ...) {
-  writeData(db = db, name = name, value = value, replace = FALSE, ...)
+replaceData <- function(db, name, value, ...) {
+  writeData(db = db, name = name, value = value, replace = TRUE, ...)
 }
