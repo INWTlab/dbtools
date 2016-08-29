@@ -1,37 +1,53 @@
-#' testConnection
+#' Test a connection
 #'
-#' @param x (Credentials | CredentialsList)
-#' @param logging (logical)
+#' Test your conncection to local or remote servers. The function will return a
+#' logical of length one invisibly with \code{TRUE} for success and \code{FALSE}
+#' if any of the connection attempts fail.
+#' 
+#' @param x (Credentials | CredentialsList) a credentials object.
+#' @param logger,status (function) a logger function. Has two arguments, first is
+#'   \code{x} second is used to indicate success and failure as
+#'   \code{logical(1)}.
 #' @param ... arguments passed to \link{sendQuery}
 #'
+#' @examples
+#'
+#' workingConnection <- Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+#' testConnection(workingConnection)
+#'
+#' ## To suppress logging:
+#' testConnection(workingConnection, loggerSuppress)
+#'
 #' @export
-#' @rdname testConncection
-testConnection(x, logging = TRUE, ...) %g% standardGeneric("testConnection")
+#' @rdname testConnection
+testConnection(x, logger = loggerConnection, ...) %g% standardGeneric("testConnection")
 
 #' @export
-#' @rdname testConncection
-testConnection(x ~ Credentials, logging, ...) %m% {
-
-  logger <- function(x, status) {
-    futile.logger::flog.info(paste(x, status, collapse = " -> "))
-  }
+#' @rdname testConnection
+testConnection(x ~ Credentials, logger, ...) %m% {
 
   out <- try(sendQuery(x, "SELECT 1 AS `test`;", ...), silent = TRUE)
-
-  if (logging) {
-    if(inherits(out, "try-error")) {
-      logger(as.character(x), "FAILED")
-    } else {
-      logger(as.character(x), "OK")
-    }
-  }
-
-  invisible(!inherits(out, "try-error"))
+  status <- !inherits(out, "try-error")
+  logger(x, status)
+  invisible(status)
 
 }
 
 #' @export
-#' @rdname testConncection
-testConnection(x ~ CredentialsList, logging, ...) %m% {
-  invisible(vapply(x, testConnection, logical(1), logging = logging, ...) %>% all)
+#' @rdname testConnection
+testConnection(x ~ CredentialsList, logger, ...) %m% {
+  invisible(vapply(x, testConnection, logical(1), logger = logger, ...) %>% all)
+}
+
+#' @export
+#' @rdname testConnection
+loggerConnection <- function(x, status) {
+  statusString <- if (status) "OK" else "FAILED"
+  futile.logger::flog.info(paste(as.character(x), statusString, collapse = " -> "))
+}
+
+#' @export
+#' @rdname testConnection
+loggerSuppress <- function(x, status) {
+  invisible(NULL)
 }
