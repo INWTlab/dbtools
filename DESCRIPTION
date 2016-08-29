@@ -15,6 +15,7 @@ Imports:
     magrittr,
     RMySQL,
     RSQLite,
+    templates,
     futile.logger
 License: MIT | file LICENSE
 LazyData: TRUE
