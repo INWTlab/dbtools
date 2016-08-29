@@ -42,14 +42,15 @@ other arguments depend on the specific back-end.
 
 ```r
 library("dbtools")
+cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
+testConnection(cred)
 ```
 
 ```
-## Loading required package: aoos
+## INFO [2016-08-29 15:40:13] example.db OK
 ```
 
 ```r
-cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
 cred
 ```
 

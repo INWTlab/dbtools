@@ -33,6 +33,7 @@ other arguments depend on the specific back-end.
 ```{r}
 library("dbtools")
 cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
+testConnection(cred)
 cred
 ```
 
