@@ -16,7 +16,7 @@ Imports:
     RMySQL,
     RSQLite,
     futile.logger
-License: MIT | file LICENSE
+License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
     testthat
