@@ -3,11 +3,8 @@
 \docType{methods}
 \name{sendQuery}
 \alias{sendQuery}
-\alias{sendQuery,Credentials,SingleQueryList-method}
 \alias{sendQuery,Credentials,character-method}
 \alias{sendQuery,CredentialsList,character-method}
-\alias{sendQuery,DBIConnection,SingleQuery-method}
-\alias{sendQuery,MySQLConnection,SingleQuery-method}
 \title{Send query to database and fetch result}
 \usage{
 sendQuery(db, query, ...)
@@ -16,13 +13,6 @@ sendQuery(db, query, ...)
   applyFun = lapply, simplify = TRUE)
 
 \S4method{sendQuery}{Credentials,character}(db, query, ...)
-
-\S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...,
-  simplify = TRUE)
-
-\S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
-
-\S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...)
 }
 \arguments{
 \item{db}{one in:

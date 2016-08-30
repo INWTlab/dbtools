@@ -14,6 +14,12 @@
 ##' single queries. It can be constructed with a list of character values.
 ##'
 ##' @export
+Query <- function(.q, ..., .data, .by) {
+  ## TODO: implement this
+  SingleQueryList(as.list(templates::tmpl(.q, ...)))
+}
+
+#' @exportClass Query
 character : SingleQuery() %type% {
   assert_that(
     is.scalar(.Object),
@@ -23,20 +29,11 @@ character : SingleQuery() %type% {
   .Object
 }
 
-##' @export
-##' @rdname queries
-##'
-##' @export
+#' @exportClass QueryList
 list : SingleQueryList() %type% {
   S3Part(.Object) <- Map(SingleQuery, .Object)
   .Object
 }
 
-##' @export
-##' @rdname queries
-Query <- function(...) {
-  ## TODO: implement this
-  templates::template(...)
-}
 
 ## TODO: Some helpful assertions for 
