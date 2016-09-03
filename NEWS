@@ -1,3 +1,6 @@
+Version 0.1.6
+- lintr tests
+
 Version 0.1.5
 - Update for testConnection. Now has argument logger instead of logging. In this
   context also 'loggerConnection' and 'loggerSuppress' are supplied as 'default'
