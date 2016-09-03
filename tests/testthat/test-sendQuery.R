@@ -122,7 +122,8 @@ test_that("sendQuery for RMySQL DB", {
   # sudo service docker.io status
 
   tmp <- system(
-    'docker run --name test-mysql-db -p 127.0.0.1:3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql',
+    paste0('docker run --name test-mysql-db -p 127.0.0.1:3306:3306 ',
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
     intern = TRUE
   )
 
@@ -158,9 +159,24 @@ test_that("sendQuery for RMySQL DB", {
   expect_equal(names(dat), "x")
   expect_true(all(dat$x == 3:4))
 
-  expect_is(sendQuery(cred, "SELECT * FRM Tabelle;", errorLogging = noErrorLogging), "try-error")
-  expect_is(sendQuery(cred, "SELECT 1 FRM Tabelle;", tries = 2, intSleep = 1, errorLogging = noErrorLogging),
-            "try-error")
+  expect_is(
+    sendQuery(
+      cred,
+      "SELECT * FRM Tabelle;",
+      errorLogging = noErrorLogging
+    ),
+    "try-error"
+  )
+  expect_is(
+    sendQuery(
+      cred,
+      "SELECT 1 FRM Tabelle;",
+      tries = 2,
+      intSleep = 1,
+      errorLogging = noErrorLogging
+    ),
+    "try-error"
+  )
 
   # End the temp db:
   tmp <- system(

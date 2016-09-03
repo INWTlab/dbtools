@@ -1,7 +1,7 @@
 Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
-Version: 0.1.4
+Version: 0.1.6
 Date: 2015-07-29
 Author: INWT-Statistics GmbH
 Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
@@ -14,12 +14,13 @@ Imports:
     dplyr,
     magrittr,
     RMySQL,
+    RSQLite,
     futile.logger
-License: GPL-3 | file LICENSE
+License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
-    testthat,
-    RSQLite
+    lintr,
+    testthat
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
