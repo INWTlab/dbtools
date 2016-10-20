@@ -22,5 +22,20 @@ test_that("Construction of CredentialsList works", {
     dbname = c("t1", "t2"),
     username = paste0("user", 1:3)
   ))
+  
+})
+
+test_that("Password are suppressed in print", {
+
+  cred <- Credentials(
+    drv = RMySQL::MySQL,
+    username = "user",
+    password = "1234",
+    dbname = "..."
+  )
+
+  testthat::expect_output(print(cred), "\\*\\*\\*\\*")
+  testthat::expect_equal(as.character(cred), c("user", "****", "..."))
+  
 })
 
