@@ -49,7 +49,7 @@ as.character.Credentials <- function(x, ...) {
 show(object ~ Credentials) %m% {
   cat('An object of class "Credentials"\n', sep = "")
   cat('drv:', class(object@drv()), "\n", sep = "")
-  cat(paste0(names(object), ": ", as.character(object)), sep = "")
+  cat(paste0(names(object), ": ", as.character(object)), sep = "\n")
   invisible(object)
 }
 
