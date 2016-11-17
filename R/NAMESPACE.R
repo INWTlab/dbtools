@@ -7,7 +7,6 @@
 #' @importFrom magrittr %>%
 NULL
 
-
 globalVariables(".")
 
 #' @importFrom RMySQL MySQL
@@ -17,3 +16,15 @@ RMySQL::MySQL
 #' @importFrom RSQLite SQLite
 #' @export
 RSQLite::SQLite
+
+local({
+  # This sets all connection types for S4-dispatch
+  types <- c(
+  "file", "url", "gzfile", "bzfile", "unz", "pipe",
+  "fifo", "sockconn", "terminal", "textConnection",
+  "gzcon"
+  )
+
+  Map(function(a, b) setOldClass(c(a, b)), types, "connection")
+
+})

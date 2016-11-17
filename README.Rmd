@@ -1,3 +1,10 @@
+---
+output:
+  md_document:
+    toc: true
+    variant: markdown_github
+---
+
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
 This package abstracts typical patterns used when connecting to and retrieving

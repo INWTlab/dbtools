@@ -4,7 +4,7 @@
 \alias{Query}
 \title{SQL Query Objects}
 \usage{
-Query(.q, ..., .data, .by)
+Query(.x, ...)
 }
 \description{
 Data types to represent SQL queries. It should not be necessary to use
