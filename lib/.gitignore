@@ -1,0 +1,5 @@
+# To have a local sandbox
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
