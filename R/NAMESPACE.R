@@ -1,7 +1,9 @@
 #' @import aoos
 #' @import assertthat
 #' @import methods
-#' @importFrom RMySQL dbConnect dbDisconnect dbSendQuery dbClearResult dbHasCompleted dbListResults dbMoreResults dbNextResult dbFetch
+#' @importFrom DBI dbClearResult dbConnect dbDisconnect dbFetch dbHasCompleted
+#' dbListResults dbSendQuery dbWriteTable
+#' @importFrom RMySQL dbMoreResults dbNextResult
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%

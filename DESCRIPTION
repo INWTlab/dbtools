@@ -10,12 +10,13 @@ Depends:
     methods,
     aoos(>= 0.3.8)
 Imports:
-    assertthat,
-    dplyr,
-    magrittr,
+    DBI,
     RMySQL,
     RSQLite,
-    futile.logger
+    assertthat,
+    dplyr,
+    futile.logger,
+    magrittr
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
