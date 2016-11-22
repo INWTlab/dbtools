@@ -5,6 +5,7 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%
+#' @importFrom templates tmpl
 NULL
 
 globalVariables(".")

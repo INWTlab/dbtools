@@ -17,6 +17,8 @@ Imports:
     RSQLite,
     templates,
     futile.logger
+Remotes:
+    wahani/templates
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
