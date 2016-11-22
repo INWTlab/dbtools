@@ -1,20 +1,20 @@
 Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
-Version: 0.1.8
+Version: 0.1.9
 Date: 2015-07-29
 Author: INWT-Statistics GmbH
 Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
 Description: Some tools to work with databases.
 Depends:
     methods,
-    aoos(>= 0.3.8)
+    aoos
 Imports:
     DBI,
     RMySQL,
     RSQLite,
     templates,
-    futile.logger
+    futile.logger,
     assertthat,
     dplyr,
     futile.logger,
