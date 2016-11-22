@@ -45,7 +45,7 @@
 #' dbDisconnect(con)
 #'
 #' ## Simple Query
-#' cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
+#' cred <- Credentials(drv = SQLite, dbname = "example.db")
 #' dat <- sendQuery(cred, "SELECT * FROM USArrests;")
 #'
 #' ## Multiple Similar Queries
