@@ -1,6 +1,10 @@
 # Sample .travis.yml for R projects
 
 language: r
+r:
+  - oldrel
+  - release
+  - devel
 warnings_are_errors: true
 sudo: required
 
@@ -9,10 +13,6 @@ services:
 
 before_install:
   - sudo service docker restart; sleep 10 # fix https://github.com/travis-ci/travis-ci/issues/4778
-
-env:
- global:
-   - CRAN: http://cran.rstudio.com
 
 notifications:
   email:
