@@ -10,13 +10,15 @@ Depends:
     methods,
     aoos(>= 0.3.8)
 Imports:
-    assertthat,
-    dplyr,
-    magrittr,
+    DBI,
     RMySQL,
     RSQLite,
     templates,
     futile.logger
+    assertthat,
+    dplyr,
+    futile.logger,
+    magrittr
 Remotes:
     wahani/templates
 License: MIT + file LICENSE

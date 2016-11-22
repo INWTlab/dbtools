@@ -9,8 +9,8 @@
 #' @rdname Credentials
 #'
 #' @examples
-#' Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
-#' Credentials(drv = RSQLite::SQLite, dbname = c(":memory:", ":memory:"))
+#' Credentials(drv = SQLite, dbname = ":memory:")
+#' Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 #'
 #' @export
 list : Credentials(drv ~ "function") %type% {
