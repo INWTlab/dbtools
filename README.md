@@ -2,6 +2,7 @@
 -   [Basic usage: sendQuery](#basic-usage-sendquery)
 -   [Unstable connections](#unstable-connections)
 -   [Multiple Databases](#multiple-databases)
+-   [Parameterized Queries](#parameterized-queries)
 
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
@@ -35,15 +36,15 @@ cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
 testConnection(cred)
 ```
 
-    ## INFO [2016-11-17 18:10:53] example.db OK
+    ## INFO [2016-11-23 16:27:44] example.db OK
 
 ``` r
 cred
 ```
 
     ## An object of class "Credentials"
-    ## drv : SQLiteDriver 
-    ## dbname : example.db
+    ## drv:SQLiteDriver
+    ## dbname: example.db
 
 Opposed to the `dbSendQuery` function available from DBI, `sendQuery` needs a *Credentials* instance as argument and will take care of connecting to the database, fetching the results and closing the connection.
 
@@ -67,7 +68,7 @@ dat
     ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 40 more rows
 
-In your normal workflow you will sometimes want to split up a complex query into more tangible chunks. The approach we take here is to allow for a vector of queries as argument. The result of these queries have to be *row-bindable*. To make an example lets say we want to query each state separately:
+In your normal work-flow you will sometimes want to split up a complex query into more tangible chunks. The approach we take here is to allow for a vector of queries as argument. The result of these queries have to be *row-bindable*. To make an example lets say we want to query each state separately:
 
 ``` r
 queryFun <- function(state) {
@@ -108,10 +109,10 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2016-11-17 18:10:53] Error in sqliteSendQuery(conn, statement) : 
+    ## ERROR [2016-11-23 16:27:44] Error in sqliteSendQuery(conn, statement) : 
     ##   error in statement: no such table: USArrest
     ## 
-    ## ERROR [2016-11-17 18:10:54] Error in sqliteSendQuery(conn, statement) : 
+    ## ERROR [2016-11-23 16:27:45] Error in sqliteSendQuery(conn, statement) : 
     ##   error in statement: no such table: USArrest
 
 Multiple Databases
@@ -257,3 +258,35 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ##       x
     ##   <int>
     ## 1     1
+
+Parameterized Queries
+---------------------
+
+In many applications it is easier and more tangible to separate SQL and R code. Furthermore we oftentimes paste queries together to have something like parameterized statements. There are various solutions for this type of problem but not many for the R language. Hence `dbtools` provides an own interface to what may be understood as *template queries*. These templates solve two issues for us:
+
+1.  Put SQL code where it belongs: a `.sql` file.
+2.  Provide a simple way to pass objects to these queries, using parameters.
+
+The use of these features is simple enough. A template is defined as a character and regions in which parameters are substituted are denoted by two curly braces. Users of [Liquid templates](http://shopify.github.io/liquid/) may be familiar with this idea. Everything inside these regions is interpreted as R-expression and can contain arbitrary operations. The result of the evaluation should be a character of length one.
+
+``` r
+sqEsc <- function(x) paste0("`", x, "`")
+templateQuery <- "SELECT {{ sqEsc(fieldName) }} FROM `someTable`;"
+Query(templateQuery, fieldName = "someField")
+```
+
+    ## Query:
+    ## SELECT `someField` FROM `someTable`;
+
+When such a query lives inside a file we can use a connection object and pass it to `Query`.
+
+``` r
+sqIn <- function(x) paste0("IN (", paste(x, collapse = ", "), ")")
+otherTemplateQuery <-
+  "SELECT `someField` FROM `someTable` WHERE `primaryKey` {{ sqIn(id) }};"
+writeLines(otherTemplateQuery, tmpFile <- tempfile())
+Query(file(tmpFile), id = 1:10)
+```
+
+    ## Query:
+    ## SELECT `someField` FROM `someTable` WHERE `primaryKey` IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
