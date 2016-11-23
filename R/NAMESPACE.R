@@ -1,12 +1,13 @@
 #' @import aoos
 #' @import assertthat
 #' @import methods
-#' @importFrom RMySQL dbClearResult dbConnect dbDisconnect dbFetch
-#' dbHasCompleted dbListResults dbMoreResults dbNextResult dbSendQuery
-#' dbWriteTable
+#' @importFrom DBI dbClearResult dbConnect dbDisconnect dbFetch dbHasCompleted
+#' dbListResults dbSendQuery dbWriteTable
+#' @importFrom RMySQL dbMoreResults dbNextResult
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%
+#' @importFrom readr write_delim
 NULL
 
 
