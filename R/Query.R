@@ -97,6 +97,7 @@ character : SingleQuery() %type% {
   assert_that(
     is.scalar(.Object),
     length(unlist(strsplit(.Object, ";"))) == 1,
+    
     grepl(";$", .Object)
   )
   .Object

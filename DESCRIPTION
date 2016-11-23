@@ -10,17 +10,15 @@ Depends:
     methods,
     aoos
 Imports:
-    DBI,
-    RMySQL,
-    RSQLite,
-    templates,
-    futile.logger,
     assertthat,
+    DBI,
     dplyr,
     futile.logger,
-    magrittr
-Remotes:
-    wahani/templates
+    magrittr,
+    RMySQL,
+    RSQLite,
+    templates
+Remotes: wahani/templates
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
@@ -29,9 +27,10 @@ Suggests:
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
-    'helperClass.R'
+    'Query.R'
     'reTry.R'
     'sendQuery.R'
+    'sqAssertions.R'
     'testConnection.R'
 Encoding: UTF-8
 RoxygenNote: 5.0.1

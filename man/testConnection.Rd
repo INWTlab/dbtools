@@ -35,7 +35,7 @@ if any of the connection attempts fail.
 }
 \examples{
 
-workingConnection <- Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+workingConnection <- Credentials(drv = SQLite, dbname = ":memory:")
 testConnection(workingConnection)
 
 ## To suppress logging:
