@@ -275,7 +275,7 @@ In many applications it is easier and more tangible to separate SQL and R code. 
 The use of these features is simple enough. A template is defined as a character and regions in which parameters are substituted are denoted by two curly braces. Users of [Liquid templates](http://shopify.github.io/liquid/) may be familiar with this idea. Everything inside these regions is interpreted as R-expression and can contain arbitrary operations. The result of the evaluation should be a character of length one.
 
 ``` r
-templateQuery <- "SELECT {{ sqName(fieldName) }} FROM `someTable`;"
+templateQuery <- "SELECT {{ sqlName(fieldName) }} FROM `someTable`;"
 Query(templateQuery, fieldName = "someField")
 ```
 
@@ -286,7 +286,7 @@ When such a query lives inside a file we can use a connection object and pass it
 
 ``` r
 otherTemplateQuery <-
-  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqInNums(ids) }};"
+  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqlInNums(ids) }};"
 writeLines(otherTemplateQuery, tmpFile <- tempfile())
 Query(file(tmpFile), ids = 1:10)
 ```

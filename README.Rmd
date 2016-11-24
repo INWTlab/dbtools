@@ -155,7 +155,7 @@ R-expression and can contain arbitrary operations. The result of the evaluation
 should be a character of length one.
 
 ```{r}
-templateQuery <- "SELECT {{ sqName(fieldName) }} FROM `someTable`;"
+templateQuery <- "SELECT {{ sqlName(fieldName) }} FROM `someTable`;"
 Query(templateQuery, fieldName = "someField")
 ```
 
@@ -164,7 +164,7 @@ to `Query`.
 
 ```{r}
 otherTemplateQuery <-
-  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqInNums(ids) }};"
+  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqlInNums(ids) }};"
 writeLines(otherTemplateQuery, tmpFile <- tempfile())
 Query(file(tmpFile), ids = 1:10)
 ```

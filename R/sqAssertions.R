@@ -1,4 +1,4 @@
-#' SQ Assertions and Formats
+#' SQL Assertions and Formats
 #'
 #' These functions can be used to format and check the input of queries.
 #'
@@ -10,22 +10,22 @@
 #' @param assert (function) an assertion fuction
 #' @param with (character)
 #' 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
 #'
 #' @examples
 #' # Will format and check:
-#' sqInStrs(letters[1:2])
-#' sqInNums(1:2)
-#' sqNames(letters[1:2])
-#' sqNames("a")
+#' sqlInStrs(letters[1:2])
+#' sqlInNums(1:2)
+#' sqlNames(letters[1:2])
+#' sqlNames("a")
 #'
 #' # Only check:
-#' sqNum(1)
-#' sqNums(1:2)
-#' sqChar("a")
-#' sqChars(letters[1:2])
-sqPattern <- function(x, pattern, negate = TRUE) {
+#' sqlNum(1)
+#' sqlNums(1:2)
+#' sqlChar("a")
+#' sqlChars(letters[1:2])
+sqlPattern <- function(x, pattern, negate = TRUE) {
 
   matchesPattern <- function(x, pattern, negate) {
     reducer <- if (negate) any else all
@@ -46,74 +46,74 @@ sqPattern <- function(x, pattern, negate = TRUE) {
   
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqChar <- function(x) {
+sqlChar <- function(x) {
   stopifnot(length(x) == 1)
-  sqChars(x)
+  sqlChars(x)
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqChars <- function(x) {
+sqlChars <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\.\\?\\[\\^\\{\\|\\(\\\\]"
   pattern <- paste0("[ \n\t]|[0-9]|", punct)
-  sqPattern(x, pattern, TRUE)  
+  sqlPattern(x, pattern, TRUE)  
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqNum <- function(x) {
+sqlNum <- function(x) {
   stopifnot(length(x) == 1)
-  sqNums(x)
+  sqlNums(x)
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqNums <- function(x) {
+sqlNums <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
   pattern <- paste0("[ \n\t]|[a-z]|[A-Z]|", punct)
-  sqPattern(x, pattern, TRUE)
+  sqlPattern(x, pattern, TRUE)
 } 
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqParan <- function(x, assert = identity) {
-  paste0("(", sqComma(x, assert), ")")
+sqlParan <- function(x, assert = identity) {
+  paste0("(", sqlComma(x, assert), ")")
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqComma <- function(x, assert = identity) {
+sqlComma <- function(x, assert = identity) {
   paste0(assert(x), collapse = ", ")
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqEsc <- function(x, assert = identity, with = "`") {
-  sqComma(paste0(with, assert(x), with))
+sqlEsc <- function(x, assert = identity, with = "`") {
+  sqlComma(paste0(with, assert(x), with))
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqName <- function(x) {
-  sqEsc(x, sqChar)
+sqlName <- function(x) {
+  sqlEsc(x, sqlChar)
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqNames <- function(x) {
-  sqEsc(x, sqChars)
+sqlNames <- function(x) {
+  sqlEsc(x, sqlChars)
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqInNums <- function(x) {
-  sqParan(x, sqNums)
+sqlInNums <- function(x) {
+  sqlParan(x, sqlNums)
 }
 
-#' @rdname sqAssertions
+#' @rdname sqlAssertions
 #' @export
-sqInStrs <- function(x) {
-  sqParan(x, function(x) sqEsc(x, sqChars, "\""))
+sqlInStrs <- function(x) {
+  sqlParan(x, function(x) sqlEsc(x, sqlChars, "\""))
 }

@@ -1,24 +1,24 @@
 context("SQL Assertions")
 
-test_that("sqPattern", {
+test_that("sqlPattern", {
 
   expectError <- function(x) {
     testthat::expect_error(x)
   }
 
   expectError(
-    sqPattern("1 2", "[ ]", TRUE)
+    sqlPattern("1 2", "[ ]", TRUE)
   )
 
   expectError(
-    sqPattern("12", "[ ]", FALSE)
+    sqlPattern("12", "[ ]", FALSE)
   )
 
-  expectError(sqChar("1"))
-  expectError(sqChar(" "))
-  expectError(sqChar("!"))
-  expectError(sqNum("a1"))
-  expectError(sqNum("a"))
+  expectError(sqlChar("1"))
+  expectError(sqlChar(" "))
+  expectError(sqlChar("!"))
+  expectError(sqlNum("a1"))
+  expectError(sqlNum("a"))
   
 })
 
@@ -32,16 +32,13 @@ test_that("Formats", {
     testthat::expect_error(x)
   }
 
-  expectTrue(sqParan(1:2) == "(1, 2)")
-  expectTrue(sqEsc(1) == "`1`")
-  expectTrue(sqEsc(1:2) == "`1`, `2`")
-  expectTrue(sqName("a") == "`a`")
-  expectError(sqName("DROP TABLE"))
-  expectTrue(sqNames(letters[1:2]) == "`a`, `b`")
-  expectTrue(sqInStrs(letters[1:2]) == "(\"a\", \"b\")")
-  expectTrue(sqInNums(1:2) == "(1, 2)")  
+  expectTrue(sqlParan(1:2) == "(1, 2)")
+  expectTrue(sqlEsc(1) == "`1`")
+  expectTrue(sqlEsc(1:2) == "`1`, `2`")
+  expectTrue(sqlName("a") == "`a`")
+  expectError(sqlName("DROP TABLE"))
+  expectTrue(sqlNames(letters[1:2]) == "`a`, `b`")
+  expectTrue(sqlInStrs(letters[1:2]) == "(\"a\", \"b\")")
+  expectTrue(sqlInNums(1:2) == "(1, 2)")  
     
 })
-
-
-
