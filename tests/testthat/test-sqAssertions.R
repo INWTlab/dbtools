@@ -14,13 +14,11 @@ test_that("sqPattern", {
     sqPattern("12", "[ ]", FALSE)
   )
 
-  expectError(sqStr("1"))
-  expectError(sqStr(" "))
-  expectError(sqStr("!"))
+  expectError(sqChar("1"))
+  expectError(sqChar(" "))
+  expectError(sqChar("!"))
   expectError(sqNum("a1"))
   expectError(sqNum("a"))
-  ## expectError(sqDate("2015-01-1"))
-  ## expectError(sqDate("2015-01-01", "%y-%m-%d"))
   
 })
 

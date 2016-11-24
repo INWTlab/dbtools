@@ -8,6 +8,7 @@
 #'   the elements in x match pattern. If FALSE all elements in x must match the
 #'   pattern.
 #' @param assert (function) an assertion fuction
+#' @param with (character)
 #' 
 #' @rdname sqAssertions
 #' @export
@@ -22,11 +23,11 @@
 #' # Only check:
 #' sqNum(1)
 #' sqNums(1:2)
-#' sqStr("a")
-#' sqStrs(letters[1:2])
+#' sqChar("a")
+#' sqChars(letters[1:2])
 sqPattern <- function(x, pattern, negate = TRUE) {
 
-  matchesPattern <- function(x, matchesPattern, negate) {
+  matchesPattern <- function(x, pattern, negate) {
     reducer <- if (negate) any else all
     res <- reducer(grepl(pattern, x))
     if (negate) !res
@@ -34,24 +35,27 @@ sqPattern <- function(x, pattern, negate = TRUE) {
   }
 
   on_failure(matchesPattern) <- function(call, env) {
-    paste0("Sanity check failed. Input contains illegal character.")
+    paste0(
+      "Sanity check failed. Input contains illegal character.\n",
+      env$x, "\nshould ", if(env$negate) "not" else "", "match\n", env$pattern
+    )   
   }
 
-  assert_that(matchesPattern(x, matchesPattern, negate))
+  assert_that(matchesPattern(x, pattern, negate))
   x
   
 }
 
 #' @rdname sqAssertions
 #' @export
-sqStr <- function(x) {
+sqChar <- function(x) {
   stopifnot(length(x) == 1)
-  sqStrs(x)
+  sqChars(x)
 }
 
 #' @rdname sqAssertions
 #' @export
-sqStrs <- function(x) {
+sqChars <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\.\\?\\[\\^\\{\\|\\(\\\\]"
   pattern <- paste0("[ \n\t]|[0-9]|", punct)
   sqPattern(x, pattern, TRUE)  
@@ -93,13 +97,13 @@ sqEsc <- function(x, assert = identity, with = "`") {
 #' @rdname sqAssertions
 #' @export
 sqName <- function(x) {
-  sqEsc(x, sqStr)
+  sqEsc(x, sqChar)
 }
 
 #' @rdname sqAssertions
 #' @export
 sqNames <- function(x) {
-  sqEsc(x, sqStrs)
+  sqEsc(x, sqChars)
 }
 
 #' @rdname sqAssertions
@@ -111,5 +115,5 @@ sqInNums <- function(x) {
 #' @rdname sqAssertions
 #' @export
 sqInStrs <- function(x) {
-  sqParan(x, function(x) sqEsc(x, sqStrs, "\""))
+  sqParan(x, function(x) sqEsc(x, sqChars, "\""))
 }
