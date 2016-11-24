@@ -30,10 +30,8 @@ Collate:
     'deleteData.R'
     'helperClass.R'
     'reTry.R'
-    'replaceData.R'
     'sendData.R'
     'sendQuery.R'
     'testConnection.R'
-    'writeData.R'
 Encoding: UTF-8
 RoxygenNote: 5.0.1

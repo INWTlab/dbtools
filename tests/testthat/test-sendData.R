@@ -12,21 +12,21 @@ test_that("sendData", {
   cred <- Credentials(drv = SQLite, dbname = "test.db")
 
   # create table
-  sendQuery(cred, "DROP TABLE IF EXISTS `mtcars`;")
+  sendQuery(cred, "DROP TABLE IF EXISTS mtcars;")
 
   sendQuery(cred, "CREATE TABLE `mtcars` (
-    model TEXT PRIMARY KEY,
-    mpg REAL,
-    cyl REAL,
-    disp REAL,
-    hp REAL,
-    drat REAL,
-    wt REAL,
-    qsec REAL,
-    vs REAL,
-    am REAL,
-    gear REAL,
-    carb REAL);"
+    `model` TEXT PRIMARY KEY,
+    `mpg` REAL,
+    `cyl` REAL,
+    `disp` REAL,
+    `hp` REAL,
+    `drat` REAL,
+    `wt` REAL,
+    `qsec` REAL,
+    `vs` REAL,
+    `am` REAL,
+    `gear` REAL,
+    `carb` REAL);"
   )
 
   # send data to database
@@ -60,18 +60,18 @@ test_that("sendQuery can operate on CredentialsList", {
   sendQuery(cred, "DROP TABLE IF EXISTS `mtcars`;")
 
   sendQuery(cred, "CREATE TABLE `mtcars` (
-    model TEXT PRIMARY KEY,
-    mpg REAL,
-    cyl REAL,
-    disp REAL,
-    hp REAL,
-    drat REAL,
-    wt REAL,
-    qsec REAL,
-    vs REAL,
-    am REAL,
-    gear REAL,
-    carb REAL);"
+    `model` TEXT PRIMARY KEY,
+    `mpg` REAL,
+    `cyl` REAL,
+    `disp` REAL,
+    `hp` REAL,
+    `drat` REAL,
+    `wt` REAL,
+    `qsec` REAL,
+    `vs` REAL,
+    `am` REAL,
+    `gear` REAL,
+    `carb` REAL);"
   )
 
   # send data to database
@@ -90,18 +90,6 @@ test_that("sendQuery can operate on CredentialsList", {
 
 context("sendQuery-RMySQL")
 test_that("sendQuery for RMySQL DB", {
-  # Sometimes we get an error if docker has not been startet. Use:
-  # sudo service docker.io start
-  # check with:
-  # sudo service docker.io status
-
-  tmp <- system(
-    paste0('docker run --name test-mysql-db -p 127.0.0.1:3306:3306 ',
-           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
-    intern = TRUE
-  )
-
-  Sys.sleep(15) # Takes some time to fire up db:
 
   # prepare data
   data(mtcars)
@@ -118,25 +106,23 @@ test_that("sendQuery for RMySQL DB", {
     port = 3306
   )
 
-  # set up connection
-  cred <- Credentials(drv = SQLite, dbname = "test.db")
-
   # create table
   sendQuery(cred, "DROP TABLE IF EXISTS `mtcars`;")
 
   sendQuery(cred, "CREATE TABLE `mtcars` (
-    model TEXT PRIMARY KEY,
-    mpg REAL,
-    cyl REAL,
-    disp REAL,
-    hp REAL,
-    drat REAL,
-    wt REAL,
-    qsec REAL,
-    vs REAL,
-    am REAL,
-    gear REAL,
-    carb REAL);"
+    `model` VARCHAR(20) NOT NULL,
+    `mpg` DOUBLE NOT NULL,
+    `cyl` DOUBLE NOT NULL,
+    `disp` DOUBLE NOT NULL,
+    `hp` DOUBLE NOT NULL,
+    `drat` DOUBLE NOT NULL,
+    `wt` DOUBLE NOT NULL,
+    `qsec` DOUBLE NOT NULL,
+    `vs` DOUBLE NOT NULL,
+    `am` DOUBLE NOT NULL,
+    `gear` DOUBLE NOT NULL,
+    `carb` DOUBLE NOT NULL,
+    PRIMARY KEY (`model`));"
   )
 
   # send data to database
@@ -146,7 +132,26 @@ test_that("sendQuery for RMySQL DB", {
   res <- sendQuery(cred, "SELECT * FROM mtcars;")
 
   # objects should be equal
-  expect_identical(res, mtcars %>% tibble::as_data_frame())
+  expect_identical (
+    res,
+    mtcars %>% tibble::as_data_frame() %>% dplyr::arrange(model)
+  )
+
+  # duplicates in case of insert
+  expect_warning (
+    sendData(cred, mtcars, mode = "insert"),
+    regexp = "Duplicate entry"
+  )
+
+  # duplicates in case of replace
+  expect_null(sendData(cred, mtcars, mode = "replace"))
+
+  # truncate
+  sendData(cred, mtcars %>% dplyr::slice(1:5), table = "mtcars", mode = "truncate")
+
+  # retrieve data
+  res <- sendQuery(cred, "SELECT * FROM mtcars;")
+  expect_identical(nrow(res), 5L)
 
   # End the temp db:
   tmp <- system(

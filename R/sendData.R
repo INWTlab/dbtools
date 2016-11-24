@@ -40,6 +40,7 @@ sendData(db ~ CredentialsList, data ~ data.frame, table, ..., applyFun = lapply)
 #' @rdname sendData
 #' @export
 sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
+
   con <- do.call(dbConnect, as.list(db))
 
   on.exit ({
@@ -76,7 +77,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 }
 
 truncateTable <- function(db, table) {
-  sendQuery(db, paste0("TRUNCATE TABLE ", table, ";"))
+  sendQuery(db, SingleQuery(paste0("TRUNCATE TABLE ", table, ";")))
 }
 
 cacheTable <- function(data, path) {
@@ -88,18 +89,21 @@ writeTable <- function(db, path, table, mode) {
 }
 
 sqlLoadData <- function(path, table, mode) {
-  paste0 (
-    "LOAD DATA LOCAL INFILE '",
-    path,
-    "' ",
-    if (mode == "replace")
-      "REPLACE ",
-    "INTO TABLE `",
-    table,
-    "` ",
-    "CHARACTER SET UTF8 ",
-    "FIELDS TERMINATED BY ',' ENCLOSED BY '\"' ",
-    "LINES TERMINATED BY '\r\n' ",
-    "IGNORE 1 LINES;"
+  SingleQuery (
+    paste0 (
+      "LOAD DATA LOCAL INFILE '",
+      path,
+      "' ",
+      if (mode == "replace")
+        "REPLACE ",
+      "INTO TABLE `",
+      table,
+      "` ",
+      "CHARACTER SET UTF8 ",
+      "FIELDS TERMINATED BY ',' ",
+      "OPTIONALLY ENCLOSED BY '\"' ",
+      "LINES TERMINATED BY '\n' ",
+      "IGNORE 1 LINES;"
+    )
   )
 }
