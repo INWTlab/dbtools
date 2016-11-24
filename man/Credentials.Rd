@@ -6,12 +6,15 @@
 \alias{Credentials-class}
 \alias{CredentialsList}
 \alias{CredentialsList-class}
+\alias{as.character.Credentials}
 \alias{as.list.Credentials}
 \title{Credentials Class}
 \usage{
 Credentials(drv, ...)
 
 \method{as.list}{Credentials}(x, ...)
+
+\method{as.character}{Credentials}(x, ...)
 
 CredentialsList(...)
 }

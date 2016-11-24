@@ -5,7 +5,7 @@ noErrorLogging <- function(x, ...) NULL
 
 test_that("sendQuery", {
 
-  cred <- Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+  cred <- Credentials(drv = SQLite, dbname = ":memory:")
 
   dat <- sendQuery(cred, "SELECT 1 AS x;")
 
@@ -32,7 +32,7 @@ test_that("sendQuery", {
 
 test_that("Error handling and retry in sendQuery", {
 
-  cred <- Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+  cred <- Credentials(drv = SQLite, dbname = ":memory:")
 
   expect_is(
     sendQuery(
@@ -59,7 +59,7 @@ test_that("Error handling and retry in sendQuery", {
 test_that("sendQuery can operate on CredentialsList", {
 
   cred <- CredentialsList(
-    drv = list(RSQLite::SQLite, RSQLite::SQLite),
+    drv = list(SQLite, SQLite),
     dbname = c(":memory:", ":memory:")
   )
 
@@ -74,7 +74,7 @@ test_that("sendQuery can operate on CredentialsList", {
 test_that("sendQuery can handle simplification", {
 
   cred <- Credentials(
-    drv = RSQLite::SQLite,
+    drv = SQLite,
     dbname = ":memory:"
   )
 
@@ -86,7 +86,7 @@ test_that("sendQuery can handle simplification", {
   expect_is(dat[[2]], "data.frame")
 
   cred <- Credentials(
-    drv = RSQLite::SQLite,
+    drv = SQLite,
     dbname = c(":memory:", ":memory:")
   )
 
@@ -130,7 +130,7 @@ test_that("sendQuery for RMySQL DB", {
   Sys.sleep(15) # Takes some time to fire up db:
 
   cred <- Credentials(
-    drv = RMySQL::MySQL,
+    drv = MySQL,
     user = "root",
     password = "root",
     dbname = "test",

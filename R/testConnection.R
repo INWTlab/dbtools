@@ -3,7 +3,7 @@
 #' Test your conncection to local or remote servers. The function will return a
 #' logical of length one invisibly with \code{TRUE} for success and \code{FALSE}
 #' if any of the connection attempts fail.
-#' 
+#'
 #' @param x (Credentials | CredentialsList) a credentials object.
 #' @param logger,status (function) a logger function. Has two arguments, first is
 #'   \code{x} second is used to indicate success and failure as
@@ -12,7 +12,7 @@
 #'
 #' @examples
 #'
-#' workingConnection <- Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+#' workingConnection <- Credentials(drv = SQLite, dbname = ":memory:")
 #' testConnection(workingConnection)
 #'
 #' ## To suppress logging:
@@ -43,7 +43,8 @@ testConnection(x ~ CredentialsList, logger, ...) %m% {
 #' @rdname testConnection
 loggerConnection <- function(x, status) {
   statusString <- if (status) "OK" else "FAILED"
-  futile.logger::flog.info(paste(as.character(x), statusString, collapse = " -> "))
+  msgString <- paste(as.character(x), collapse = "--")
+  futile.logger::flog.info(paste(msgString, statusString, collapse = " -> "))
 }
 
 #' @export

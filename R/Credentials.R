@@ -9,8 +9,8 @@
 #' @rdname Credentials
 #'
 #' @examples
-#' Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
-#' Credentials(drv = RSQLite::SQLite, dbname = c(":memory:", ":memory:"))
+#' Credentials(drv = SQLite, dbname = ":memory:")
+#' Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 #'
 #' @export
 list : Credentials(drv ~ "function") %type% {
@@ -38,14 +38,18 @@ as.list.Credentials <- function(x, ...) {
   c(S3Part(x, TRUE), drv = x@drv())
 }
 
+#' @export
+#' @rdname Credentials
 as.character.Credentials <- function(x, ...) {
-  paste(as.character.default(x), collapse = "--")
+  passphrases <- grepl("^(pswd|pwd|pass|password)$", names(x))
+  if (any(passphrases)) x[passphrases] <- "****"
+  as.character.default(x)
 }
 
 show(object ~ Credentials) %m% {
-  cat('An object of class "Credentials"\n')
-  cat('drv :', class(object@drv()), "\n")
-  lapply(names(object), function(n) cat(n, ":", object[[n]], "\n"))
+  cat('An object of class "Credentials"\n', sep = "")
+  cat('drv:', class(object@drv()), "\n", sep = "")
+  cat(paste0(names(object), ": ", as.character(object)), sep = "\n")
   invisible(object)
 }
 
