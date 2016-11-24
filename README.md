@@ -22,6 +22,11 @@ For basic usage consider the simple case where we want to retrieve some data fro
 
 ``` r
 library("RSQLite")
+```
+
+    ## Loading required package: DBI
+
+``` r
 con <- dbConnect(SQLite(), "example.db")
 data(USArrests)
 dbWriteTable(con, "USArrests", USArrests)
@@ -36,7 +41,7 @@ cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
 testConnection(cred)
 ```
 
-    ## INFO [2016-11-23 16:27:44] example.db OK
+    ## INFO [2016-11-24 16:14:21] example.db OK
 
 ``` r
 cred
@@ -109,10 +114,10 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2016-11-23 16:27:44] Error in sqliteSendQuery(conn, statement) : 
+    ## ERROR [2016-11-24 16:14:21] Error in sqliteSendQuery(conn, statement) : 
     ##   error in statement: no such table: USArrest
     ## 
-    ## ERROR [2016-11-23 16:27:45] Error in sqliteSendQuery(conn, statement) : 
+    ## ERROR [2016-11-24 16:14:22] Error in sqliteSendQuery(conn, statement) : 
     ##   error in statement: no such table: USArrest
 
 Multiple Databases
@@ -270,8 +275,7 @@ In many applications it is easier and more tangible to separate SQL and R code. 
 The use of these features is simple enough. A template is defined as a character and regions in which parameters are substituted are denoted by two curly braces. Users of [Liquid templates](http://shopify.github.io/liquid/) may be familiar with this idea. Everything inside these regions is interpreted as R-expression and can contain arbitrary operations. The result of the evaluation should be a character of length one.
 
 ``` r
-sqEsc <- function(x) paste0("`", x, "`")
-templateQuery <- "SELECT {{ sqEsc(fieldName) }} FROM `someTable`;"
+templateQuery <- "SELECT {{ sqName(fieldName) }} FROM `someTable`;"
 Query(templateQuery, fieldName = "someField")
 ```
 
@@ -281,11 +285,10 @@ Query(templateQuery, fieldName = "someField")
 When such a query lives inside a file we can use a connection object and pass it to `Query`.
 
 ``` r
-sqIn <- function(x) paste0("IN (", paste(x, collapse = ", "), ")")
 otherTemplateQuery <-
-  "SELECT `someField` FROM `someTable` WHERE `primaryKey` {{ sqIn(id) }};"
+  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqInNums(ids) }};"
 writeLines(otherTemplateQuery, tmpFile <- tempfile())
-Query(file(tmpFile), id = 1:10)
+Query(file(tmpFile), ids = 1:10)
 ```
 
     ## Query:

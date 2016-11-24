@@ -1,22 +1,115 @@
+#' SQ Assertions and Formats
+#'
+#' These functions can be used to format and check the input of queries.
+#'
+#' @param x (ANY) input
+#' @param pattern (character) a regular expression used in \link{grepl}
+#' @param negate (logical) if TRUE then an error is thrown if at least one of
+#'   the elements in x match pattern. If FALSE all elements in x must match the
+#'   pattern.
+#' @param assert (function) an assertion fuction
+#' 
+#' @rdname sqAssertions
+#' @export
+#'
+#' @examples
+#' # Will format and check:
+#' sqInStrs(letters[1:2])
+#' sqInNums(1:2)
+#' sqNames(letters[1:2])
+#' sqNames("a")
+#'
+#' # Only check:
+#' sqNum(1)
+#' sqNums(1:2)
+#' sqStr("a")
+#' sqStrs(letters[1:2])
+sqPattern <- function(x, pattern, negate = TRUE) {
 
-# Assertions:
+  matchesPattern <- function(x, matchesPattern, negate) {
+    reducer <- if (negate) any else all
+    res <- reducer(grepl(pattern, x))
+    if (negate) !res
+    else res
+  }
 
-sqStr <- function(x) sqPattern(x)
+  on_failure(matchesPattern) <- function(call, env) {
+    paste0("Sanity check failed. Input contains illegal character.")
+  }
 
-sqNum <- function(x) sqPattern(x)
+  assert_that(matchesPattern(x, matchesPattern, negate))
+  x
+  
+}
 
-sqDate <- function(x) sqPattern(x)
+#' @rdname sqAssertions
+#' @export
+sqStr <- function(x) {
+  stopifnot(length(x) == 1)
+  sqStrs(x)
+}
 
-sqPattern <- function(x) x
+#' @rdname sqAssertions
+#' @export
+sqStrs <- function(x) {
+  punct <- "[\\!\\`\\$\\*\\+\\.\\?\\[\\^\\{\\|\\(\\\\]"
+  pattern <- paste0("[ \n\t]|[0-9]|", punct)
+  sqPattern(x, pattern, TRUE)  
+}
 
+#' @rdname sqAssertions
+#' @export
+sqNum <- function(x) {
+  stopifnot(length(x) == 1)
+  sqNums(x)
+}
 
-# Formats:
+#' @rdname sqAssertions
+#' @export
+sqNums <- function(x) {
+  punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
+  pattern <- paste0("[ \n\t]|[a-z]|[A-Z]|", punct)
+  sqPattern(x, pattern, TRUE)
+} 
 
-sqParan <- function(x) x
+#' @rdname sqAssertions
+#' @export
+sqParan <- function(x, assert = identity) {
+  paste0("(", sqComma(x, assert), ")")
+}
 
-sqEsc <- function(x) sqPattern(x)
+#' @rdname sqAssertions
+#' @export
+sqComma <- function(x, assert = identity) {
+  paste0(assert(x), collapse = ", ")
+}
 
-sqName <- function(x) sqStr(x)
+#' @rdname sqAssertions
+#' @export
+sqEsc <- function(x, assert = identity, with = "`") {
+  sqComma(paste0(with, assert(x), with))
+}
 
-sqComma <- function(x) x
+#' @rdname sqAssertions
+#' @export
+sqName <- function(x) {
+  sqEsc(x, sqStr)
+}
 
+#' @rdname sqAssertions
+#' @export
+sqNames <- function(x) {
+  sqEsc(x, sqStrs)
+}
+
+#' @rdname sqAssertions
+#' @export
+sqInNums <- function(x) {
+  sqParan(x, sqNums)
+}
+
+#' @rdname sqAssertions
+#' @export
+sqInStrs <- function(x) {
+  sqParan(x, function(x) sqEsc(x, sqStrs, "\""))
+}

@@ -155,8 +155,7 @@ R-expression and can contain arbitrary operations. The result of the evaluation
 should be a character of length one.
 
 ```{r}
-sqEsc <- function(x) paste0("`", x, "`")
-templateQuery <- "SELECT {{ sqEsc(fieldName) }} FROM `someTable`;"
+templateQuery <- "SELECT {{ sqName(fieldName) }} FROM `someTable`;"
 Query(templateQuery, fieldName = "someField")
 ```
 
@@ -164,9 +163,8 @@ When such a query lives inside a file we can use a connection object and pass it
 to `Query`.
 
 ```{r}
-sqIn <- function(x) paste0("IN (", paste(x, collapse = ", "), ")")
 otherTemplateQuery <-
-  "SELECT `someField` FROM `someTable` WHERE `primaryKey` {{ sqIn(id) }};"
+  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqInNums(ids) }};"
 writeLines(otherTemplateQuery, tmpFile <- tempfile())
-Query(file(tmpFile), id = 1:10)
+Query(file(tmpFile), ids = 1:10)
 ```
