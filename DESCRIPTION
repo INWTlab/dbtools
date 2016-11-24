@@ -30,7 +30,7 @@ Collate:
     'Query.R'
     'reTry.R'
     'sendQuery.R'
-    'sqAssertions.R'
+    'sqlAssertions.R'
     'testConnection.R'
 Encoding: UTF-8
 RoxygenNote: 5.0.1
