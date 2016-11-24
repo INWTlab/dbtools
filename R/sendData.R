@@ -70,7 +70,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
   on.exit(unlink(path))
 
   cacheTable(data, path)
-  if (mode == "replace")
+  if (mode == "truncate")
     truncateTable(db, table)
   writeTable(db, path, table, mode)
 }
@@ -92,7 +92,7 @@ sqlLoadData <- function(path, table, mode) {
     "LOAD DATA LOCAL INFILE '",
     path,
     "' ",
-    if (mode == "update")
+    if (mode == "replace")
       "REPLACE ",
     "INTO TABLE `",
     table,
