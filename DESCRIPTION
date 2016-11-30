@@ -16,17 +16,21 @@ Imports:
     assertthat,
     dplyr,
     futile.logger,
-    magrittr
+    magrittr,
+    readr
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
     lintr,
-    testthat
+    testthat,
+    tibble
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
+    'deleteData.R'
     'helperClass.R'
     'reTry.R'
+    'sendData.R'
     'sendQuery.R'
     'testConnection.R'
 Encoding: UTF-8

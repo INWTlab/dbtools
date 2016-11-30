@@ -1,8 +1,8 @@
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
-This package abstracts typical patterns used when connecting to and retrieving
-data from databases in R. It aims to provide very few, simple and reliable
-functions for sending queries and data to databases.
+This package abstracts typical patterns used when connecting to and 
+communicating with databases in R. It aims to provide very few, simple and 
+reliable functions for sending queries and data to databases.
 
 ## Installation
 
@@ -10,40 +10,94 @@ functions for sending queries and data to databases.
 devtools::install_github("INWT/dbtools")
 ```
 
+## Introductory example
 
-## Basic usage: sendQuery
+Sometimes it is best to start with a simple example before digging deeper into 
+the details. The example will introduce the *Credentials* class as well as 
+the main functions `sendQuery` and `sendData`.
 
-For basic usage consider the simple case where we want to retrieve some data
-from a SQLite database. At this time we only have `sendQuery` and no `sendData`
-so we use the standard example for setting up the database:
 
-```{r results='hide'}
-library("RSQLite")
-con <- dbConnect(SQLite(), "example.db")
+To this end, we will make use of the USArrests dataset. 
+Unfortunately, the USArrests dataset contains information in its row names, 
+namely the information regarding the respective state. Since the package does
+not support row names, we have to convert them to a variable.
+
+```{r results = 'hide'}
+library("magrittr")
 data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
-dbDisconnect(con)
+USArrests <- USArrests %>% 
+  tibble::rownames_to_column("state") %>% 
+  dplyr::select(state, Murder, Assault, UrbanPop, Rape)
+tibble::as_data_frame(USArrests)
 ```
 
-This will create a database `example.db` to which we can send some queries. To
-begin with, we have to define an object of class *Credentials* which will store
-all necessary information to connect to a database. The driver is mandatory, all
-other arguments depend on the specific back-end.
+We want to send the data frame to a SQLite database table. Therefore, we need to
+set up a database and create the target table.
 
 ```{r}
 library("dbtools")
-cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
-testConnection(cred)
+cred <- Credentials(drv = SQLite, dbname = "example.db")
+
+sendQuery (
+  cred, 
+  c("DROP TABLE IF EXISTS `USArrests`;",
+    "CREATE TABLE `USArrests` (
+  state TEXT PRIMARY KEY, 
+  Murder INTEGER,
+  Assault REAL,
+  UrbanPop REAL,
+  Rape INTEGER);"
+  )
+)
+```
+
+Now, we can send the data to the USArrests table.
+
+```{r}
+sendData(cred, USArrests)
+```
+
+And, of course, we can get the data back.
+
+```{r}
+sendQuery(cred, "SELECT * FROM USArrests;")
+```
+
+After this short introductory eample, we want to introduce *Credentials*, 
+`sendQuery`, and `sendData` in more detail.
+
+## Credentials class
+
+The primary ingredient of the dbtools package is the *Credentials* class. 
+Instances from this class store all necessary information to connect to a 
+database. While the driver is mandatory, all other arguments depend on the 
+specific back-end. 
+
+Opposed to the functions available from DBI, `sendQuery` and `sendData` need a
+*Credentials* instance as argument and will take care of connecting and 
+communicating to the database and, eventually, closing the connection.
+
+A *Credentails* objects can be created by calling the dedicated constructor 
+function.
+
+```{r}
+cred <- Credentials(drv = SQLite, dbname = "example.db")
 cred
 ```
 
-Opposed to the `dbSendQuery` function available from DBI, `sendQuery` needs a
-*Credentials* instance as argument and will take care of connecting to the
-database, fetching the results and closing the connection.
+You can use `testConnection` to, of course, test the connection established by
+the *Credentials* object. 
+
+```{r}
+testConnection(cred)
+```
+  
+## Basic usage: sendQuery
+
+To retrieve data from a database, you need to pass at least two arguments to `sendQuery`: *Credentials* and a query. 
 
 ```{r}
 dat <- sendQuery(cred, "SELECT * FROM USArrests;")
-dat
 ```
 
 In your normal workflow you will sometimes want to split up a complex query into
@@ -53,10 +107,10 @@ make an example lets say we want to query each state separately:
 
 ```{r}
 queryFun <- function(state) {
-  paste0("SELECT * FROM USArrests WHERE row_names = '", state, "';")
+  paste0("SELECT * FROM USArrests WHERE state = '", state, "';")
 }
 
-sendQuery(cred, queryFun(dat$row_names))
+sendQuery(cred, queryFun(dat$state))
 ```
 
 In such a case `sendQuery` will perform all queries on one connection. A 
@@ -89,10 +143,8 @@ the same query to those servers. What you can do is give `sendQuery` a
 *CredentialsList*. 
 
 ```{r results='hide'}
-con <- dbConnect(SQLite(), "example1.db")
-data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
-dbDisconnect(con)
+cred1 <- Credentials(drv = SQLite, dbname = "example1.db")
+sendData(cred1, USArrests)
 ```
 
 Now we want to load the data from `example1.db` and `example.db` which can be
@@ -100,7 +152,7 @@ implemented as follows:
 
 ```{r}
 cred <- Credentials(
-  RSQLite::SQLite, 
+  SQLite, 
   dbname = c("example.db", "example1.db")
 )
 
@@ -125,4 +177,49 @@ Potentially you can send multiple queries to multiple databases. The results are
 ```{r}
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
+```
+
+## Basic usage: sendData
+To send data to a database, you need to pass at least two arguments to sendData: 
+*Credentials* and a data frame.
+
+```{r}
+cred <- Credentials(drv = SQLite, dbname = "example.db")
+
+sendQuery (
+  cred, 
+  c("DROP TABLE IF EXISTS `USArrests`;",
+    "CREATE TABLE `USArrests` (
+  state TEXT PRIMARY KEY, 
+  Murder INTEGER,
+  Assault REAL,
+  UrbanPop REAL,
+  Rape INTEGER);"
+  )
+)
+
+sendData(cred, USArrests)
+```
+
+## Multiple Databases
+
+Sometimes you may want to send data to different servers. Analogously to 
+`sendQuery`, you may give `sendQuery` a *CredentialsList*. 
+
+```{r}
+cred <- Credentials(drv = SQLite, dbname = "example.db")
+
+sendQuery (
+  cred, 
+  c("DROP TABLE IF EXISTS `USArrests`;",
+    "CREATE TABLE `USArrests` (
+  state TEXT PRIMARY KEY, 
+  Murder INTEGER,
+  Assault REAL,
+  UrbanPop REAL,
+  Rape INTEGER);"
+  )
+)
+
+sendData(cred, USArrests)
 ```
