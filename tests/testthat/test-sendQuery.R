@@ -115,6 +115,18 @@ test_that("sendQuery can handle simplification", {
 })
 
 context("sendQuery-RMySQL")
+
+test_that("sendQuery for failing RMySQL DB", {
+
+  cred <- Credentials(drv = MySQL, dbname = "Nirvana")
+
+  expect_is(
+    sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging),
+    "try-error"
+  )
+  
+})
+  
 test_that("sendQuery for RMySQL DB", {
   # Sometimes we get an error if docker has not been startet. Use:
   # sudo service docker.io start

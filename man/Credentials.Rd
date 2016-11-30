@@ -36,8 +36,8 @@ Use this function to store your database credentials.
   they only differ in the port but else expect the same credentials.
 }
 \examples{
-Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
-Credentials(drv = RSQLite::SQLite, dbname = c(":memory:", ":memory:"))
+Credentials(drv = SQLite, dbname = ":memory:")
+Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 
 }
 

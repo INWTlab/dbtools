@@ -20,8 +20,8 @@ so we use the standard example for setting up the database:
 ```{r results='hide'}
 library("RSQLite")
 con <- dbConnect(SQLite(), "example.db")
-data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
+USArrests$State <- rownames(USArrests)
+dbWriteTable(con, "USArrests", USArrests, row.names = FALSE)
 dbDisconnect(con)
 ```
 
@@ -53,10 +53,10 @@ make an example lets say we want to query each state separately:
 
 ```{r}
 queryFun <- function(state) {
-  paste0("SELECT * FROM USArrests WHERE row_names = '", state, "';")
+  paste0("SELECT * FROM USArrests WHERE State = '", state, "';")
 }
 
-sendQuery(cred, queryFun(dat$row_names))
+sendQuery(cred, queryFun(dat$State))
 ```
 
 In such a case `sendQuery` will perform all queries on one connection. A 
@@ -89,10 +89,7 @@ the same query to those servers. What you can do is give `sendQuery` a
 *CredentialsList*. 
 
 ```{r results='hide'}
-con <- dbConnect(SQLite(), "example1.db")
-data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
-dbDisconnect(con)
+file.copy("example.db", "example1.db")
 ```
 
 Now we want to load the data from `example1.db` and `example.db` which can be
