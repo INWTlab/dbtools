@@ -95,15 +95,16 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
   # query: is a single query
 
   on.exit({
-    if (exists("con")) {
+    if (exists("con") && inherits(con, "DBIConnection")) {
       dbDisconnect(con)
     }
   })
 
-  con <- do.call(dbConnect, as.list(db))
+  con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
+  if (inherits(con, "try-error")) return(con)
+
   downloadedData <- reTry(
-    function(...) lapply(query, . %>% sendQuery(db = con, ...)),
-    ...
+    function(...) lapply(query, . %>% sendQuery(db = con, ...)), ...
   )
 
   downloadedData %>% { simplifyMe(simplify, doRbind)(.) }

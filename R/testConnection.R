@@ -26,7 +26,7 @@ testConnection(x, logger = loggerConnection, ...) %g% standardGeneric("testConne
 #' @rdname testConnection
 testConnection(x ~ Credentials, logger, ...) %m% {
 
-  out <- try(sendQuery(x, "SELECT 1 AS `test`;", ...), silent = TRUE)
+  out <- sendQuery(x, "SELECT 1 AS `test`;", ..., errorLogging = function(...) NULL)
   status <- !inherits(out, "try-error")
   logger(x, status)
   invisible(status)
