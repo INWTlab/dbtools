@@ -34,22 +34,20 @@ test_that("Error handling and retry in sendQuery", {
 
   cred <- Credentials(drv = SQLite, dbname = ":memory:")
 
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
-      errorLogging = noErrorLogging),
-    "try-error"
+      errorLogging = noErrorLogging)
   )
 
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT 1 FRM Tabelle;",
       tries = 2,
       intSleep = 1,
-      errorLogging = noErrorLogging),
-    "try-error"
+      errorLogging = noErrorLogging)
   )
 
   expect_error(sendQuery(cred, "SELECT 1; SELECT 2"))
@@ -120,9 +118,8 @@ test_that("sendQuery for failing RMySQL DB", {
 
   cred <- Credentials(drv = MySQL, dbname = "Nirvana")
 
-  expect_is(
-    sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging),
-    "try-error"
+  expect_error(
+    sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging)
   )
   
 })
@@ -171,23 +168,21 @@ test_that("sendQuery for RMySQL DB", {
   expect_equal(names(dat), "x")
   expect_true(all(dat$x == 3:4))
 
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
       errorLogging = noErrorLogging
-    ),
-    "try-error"
+    )
   )
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT 1 FRM Tabelle;",
       tries = 2,
       intSleep = 1,
       errorLogging = noErrorLogging
-    ),
-    "try-error"
+    )
   )
 
   # End the temp db:

@@ -20,22 +20,23 @@ reTry(fun, ..., tries = 1, intSleep = 0, errorLogging = flog.error)
 }
 \description{
 Tries to call \code{fun}. If the call results in an error, the error is
-logged and after some time it is tried again.
+logged and after some time it is tried again. If the final try results in an
+error the function throws an error. Otherwise th result of fun is returned.
 }
 \examples{
 ## Something that will fail every once in a while:
-reTry(
+try(reTry(
   function() if (runif(1) > 0.5) stop(),
   tries = 2,
   intSleep = 1
-)
+))
 
 ## Disable logging
 noErrorLogging <- function(x, ...) NULL
-reTry(
+try(reTry(
   function() stop(),
   errorLogging = noErrorLogging
-)
+))
 
 }
 

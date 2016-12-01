@@ -40,8 +40,8 @@
 #' ## For an example database:
 #' library("RSQLite")
 #' con <- dbConnect(SQLite(), "example.db")
-#' data(USArrests)
-#' dbWriteTable(con, "USArrests", USArrests)
+#' USArrests$State <- rownames(USArrests)
+#' dbWriteTable(con, "USArrests", USArrests, row.names = FALSE)
 #' dbDisconnect(con)
 #'
 #' ## Simple Query
@@ -50,19 +50,19 @@
 #'
 #' ## Multiple Similar Queries
 #' queryFun <- function(state) {
-#'   paste0("SELECT * FROM USArrests WHERE row_names = '", state, "';")
+#'   paste0("SELECT * FROM USArrests WHERE State = '", state, "';")
 #' }
 #'
 #' sendQuery(cred, queryFun(dat$row_names))
 #'
 #' ## For the Paranoid
 #' ### be a bit more cautious with connections
-#' dat <- sendQuery(
+#' dat <- try(sendQuery(
 #'   cred,
 #'   "SELECT * FROM USArrest;", # wrong name for illustration
 #'   tries = 2,
 #'   intSleep = 1
-#' )
+#' ))
 #'
 #' @rdname sendQuery
 #' @export
@@ -101,7 +101,6 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
   })
 
   con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
-  if (inherits(con, "try-error")) return(con)
 
   downloadedData <- reTry(
     function(...) lapply(query, . %>% sendQuery(db = con, ...)), ...
