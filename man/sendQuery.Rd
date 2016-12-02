@@ -70,8 +70,8 @@ This functions sends a query to a database and fetches the result.
 ## For an example database:
 library("RSQLite")
 con <- dbConnect(SQLite(), "example.db")
-data(USArrests)
-dbWriteTable(con, "USArrests", USArrests)
+USArrests$State <- rownames(USArrests)
+dbWriteTable(con, "USArrests", USArrests, row.names = FALSE)
 dbDisconnect(con)
 
 ## Simple Query
@@ -80,19 +80,19 @@ dat <- sendQuery(cred, "SELECT * FROM USArrests;")
 
 ## Multiple Similar Queries
 queryFun <- function(state) {
-  paste0("SELECT * FROM USArrests WHERE row_names = '", state, "';")
+  paste0("SELECT * FROM USArrests WHERE State = '", state, "';")
 }
 
 sendQuery(cred, queryFun(dat$row_names))
 
 ## For the Paranoid
 ### be a bit more cautious with connections
-dat <- sendQuery(
+dat <- try(sendQuery(
   cred,
   "SELECT * FROM USArrest;", # wrong name for illustration
   tries = 2,
   intSleep = 1
-)
+))
 
 }
 
