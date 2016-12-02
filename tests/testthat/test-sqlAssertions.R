@@ -38,7 +38,7 @@ test_that("Formats", {
   expectTrue(sqlName("a") == "`a`")
   expectError(sqlName("DROP TABLE"))
   expectTrue(sqlNames(letters[1:2]) == "`a`, `b`")
-  expectTrue(sqlInStrs(letters[1:2]) == "(\"a\", \"b\")")
+  expectTrue(sqlInChars(letters[1:2]) == "(\"a\", \"b\")")
   expectTrue(sqlInNums(1:2) == "(1, 2)")  
     
 })

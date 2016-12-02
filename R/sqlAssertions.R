@@ -7,7 +7,7 @@
 #' @param negate (logical) if TRUE then an error is thrown if at least one of
 #'   the elements in x match pattern. If FALSE all elements in x must match the
 #'   pattern.
-#' @param assert (function) an assertion fuction
+#' @param assert (function) an assertion function
 #' @param with (character)
 #' 
 #' @rdname sqlAssertions
@@ -15,17 +15,17 @@
 #'
 #' @examples
 #' # Will format and check:
-#' sqlInStrs(letters[1:2])
+#' sqlInChars(letters[1:2])
 #' sqlInNums(1:2)
 #' sqlNames(letters[1:2])
-#' sqlNames("a")
+#' sqlName("a")
 #'
 #' # Only check:
-#' sqlNum(1)
-#' sqlNums(1:2)
-#' sqlChar("a")
-#' sqlChars(letters[1:2])
-sqlPattern <- function(x, pattern, negate = TRUE) {
+#' sqlAssertNum(1)
+#' sqlAssertNums(1:2)
+#' sqlAssertChar("a")
+#' sqlAssertChars(letters[1:2])
+sqlAssertPattern <- function(x, pattern, negate = TRUE) {
 
   matchesPattern <- function(x, pattern, negate) {
     reducer <- if (negate) any else all
@@ -48,32 +48,32 @@ sqlPattern <- function(x, pattern, negate = TRUE) {
 
 #' @rdname sqlAssertions
 #' @export
-sqlChar <- function(x) {
+sqlAssertChar <- function(x) {
   stopifnot(length(x) == 1)
-  sqlChars(x)
+  sqlAssertChars(x)
 }
 
 #' @rdname sqlAssertions
 #' @export
-sqlChars <- function(x) {
+sqlAssertChars <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\.\\?\\[\\^\\{\\|\\(\\\\]"
   pattern <- paste0("[ \n\t]|[0-9]|", punct)
-  sqlPattern(x, pattern, TRUE)  
+  sqlAssertPattern(x, pattern, TRUE)  
 }
 
 #' @rdname sqlAssertions
 #' @export
-sqlNum <- function(x) {
+sqlAssertNum <- function(x) {
   stopifnot(length(x) == 1)
-  sqlNums(x)
+  sqlAssertNums(x)
 }
 
 #' @rdname sqlAssertions
 #' @export
-sqlNums <- function(x) {
+sqlAssertNums <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
   pattern <- paste0("[ \n\t]|[a-z]|[A-Z]|", punct)
-  sqlPattern(x, pattern, TRUE)
+  sqlAssertPattern(x, pattern, TRUE)
 } 
 
 #' @rdname sqlAssertions
@@ -97,23 +97,23 @@ sqlEsc <- function(x, assert = identity, with = "`") {
 #' @rdname sqlAssertions
 #' @export
 sqlName <- function(x) {
-  sqlEsc(x, sqlChar)
+  sqlEsc(x, sqlAssertChar)
 }
 
 #' @rdname sqlAssertions
 #' @export
 sqlNames <- function(x) {
-  sqlEsc(x, sqlChars)
+  sqlEsc(x, sqlAssertChars)
 }
 
 #' @rdname sqlAssertions
 #' @export
 sqlInNums <- function(x) {
-  sqlParan(x, sqlNums)
+  sqlParan(x, sqlAssertNums)
 }
 
 #' @rdname sqlAssertions
 #' @export
-sqlInStrs <- function(x) {
-  sqlParan(x, function(x) sqlEsc(x, sqlChars, "\""))
+sqlInChars <- function(x) {
+  sqlParan(x, function(x) sqlEsc(x, sqlAssertChars, "\""))
 }
