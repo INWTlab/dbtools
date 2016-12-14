@@ -178,4 +178,10 @@ test_that("sendQuery for RMySQL DB", {
     "try-error"
   )
 
+  # End the temp db:
+  tmp <- system(
+    'docker kill test-mysql-db; docker rm test-mysql-db',
+    intern = TRUE
+  )
+
 })

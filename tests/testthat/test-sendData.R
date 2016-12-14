@@ -42,7 +42,7 @@ test_that("sendData", {
   unlink("test.db")
 })
 
-test_that("sendQuery can operate on CredentialsList", {
+test_that("sendData can operate on CredentialsList", {
 
   # prepare data
   data(mtcars)
@@ -88,8 +88,16 @@ test_that("sendQuery can operate on CredentialsList", {
   unlink(c("db1.db", "db2.db"))
 })
 
-context("sendQuery-RMySQL")
-test_that("sendQuery for RMySQL DB", {
+context("sendData-RMySQL")
+test_that("sendData for RMySQL DB", {
+
+  tmp <- system(
+    paste0('docker run --name test-mysql-db -p 127.0.0.1:3306:3306 ',
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
+    intern = TRUE
+  )
+
+  Sys.sleep(15) # Takes some time to fire up db:
 
   # prepare data
   data(mtcars)
@@ -107,8 +115,6 @@ test_that("sendQuery for RMySQL DB", {
   )
 
   # create table
-  sendQuery(cred, "DROP TABLE IF EXISTS `mtcars`;")
-
   sendQuery(cred, "CREATE TABLE `mtcars` (
     `model` VARCHAR(20) NOT NULL,
     `mpg` DOUBLE NOT NULL,
