@@ -1,3 +1,6 @@
+Version 0.1.7
+- Fix for password in as.character and print method for credentials.
+
 Version 0.1.6
 - lintr tests
 

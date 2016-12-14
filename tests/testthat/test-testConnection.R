@@ -2,13 +2,13 @@ context("Test connections")
 
 test_that("testConnection", {
 
-  workingConnection <- Credentials(drv = RSQLite::SQLite, dbname = ":memory:")
+  workingConnection <- Credentials(drv = SQLite, dbname = ":memory:")
   testthat::expect_true(testConnection(workingConnection, function(...) NULL))
 
-  nonWorkingConnection <- Credentials(drv = RMySQL::MySQL, dbname = "Nirvana")
+  nonWorkingConnection <- Credentials(drv = MySQL, dbname = "Nirvana")
   testthat::expect_false(testConnection(nonWorkingConnection, function(...) NULL))
 
-  defunctConnections <- Credentials(drv = RMySQL::MySQL, dbname = c("Nirvana", "Walhalla"))
+  defunctConnections <- Credentials(drv = MySQL, dbname = c("Nirvana", "Walhalla"))
   testthat::expect_false(testConnection(defunctConnections, loggerSuppress))
 
   testthat::expect_match(
