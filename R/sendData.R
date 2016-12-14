@@ -81,7 +81,7 @@ truncateTable <- function(db, table) {
 }
 
 cacheTable <- function(data, path) {
-  write_delim(data, path, delim = ",", na = "\\N")
+  fwrite(data, path, eol = "\n", na = "\\N")
 }
 
 writeTable <- function(db, path, table, mode) {

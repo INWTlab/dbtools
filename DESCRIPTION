@@ -14,10 +14,10 @@ Imports:
     RMySQL,
     RSQLite,
     assertthat,
+    data.table,
     dplyr,
     futile.logger,
-    magrittr,
-    readr
+    magrittr
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
