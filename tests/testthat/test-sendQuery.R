@@ -34,22 +34,20 @@ test_that("Error handling and retry in sendQuery", {
 
   cred <- Credentials(drv = SQLite, dbname = ":memory:")
 
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
-      errorLogging = noErrorLogging),
-    "try-error"
+      errorLogging = noErrorLogging)
   )
 
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT 1 FRM Tabelle;",
       tries = 2,
       intSleep = 1,
-      errorLogging = noErrorLogging),
-    "try-error"
+      errorLogging = noErrorLogging)
   )
 
   expect_error(sendQuery(cred, "SELECT 1; SELECT 2"))
@@ -115,6 +113,17 @@ test_that("sendQuery can handle simplification", {
 })
 
 context("sendQuery-RMySQL")
+
+test_that("sendQuery for failing RMySQL DB", {
+
+  cred <- Credentials(drv = MySQL, dbname = "Nirvana")
+
+  expect_error(
+    sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging)
+  )
+  
+})
+  
 test_that("sendQuery for RMySQL DB", {
   # Sometimes we get an error if docker has not been startet. Use:
   # sudo service docker.io start
@@ -122,7 +131,7 @@ test_that("sendQuery for RMySQL DB", {
   # sudo service docker.io status
 
   tmp <- system(
-    paste0('docker run --name test-mysql-db -p 127.0.0.1:3306:3306 ',
+    paste0('docker run --name test-mysql-db -p 127.0.0.1:3307:3306 ',
            '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
     intern = TRUE
   )
@@ -135,7 +144,7 @@ test_that("sendQuery for RMySQL DB", {
     password = "root",
     dbname = "test",
     host = "127.0.0.1",
-    port = 3306
+    port = 3307
   )
 
   dat <- sendQuery(cred, "SELECT 1 AS x;")
@@ -159,28 +168,26 @@ test_that("sendQuery for RMySQL DB", {
   expect_equal(names(dat), "x")
   expect_true(all(dat$x == 3:4))
 
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
       errorLogging = noErrorLogging
-    ),
-    "try-error"
+    )
   )
-  expect_is(
+  expect_error(
     sendQuery(
       cred,
       "SELECT 1 FRM Tabelle;",
       tries = 2,
       intSleep = 1,
       errorLogging = noErrorLogging
-    ),
-    "try-error"
+    )
   )
 
   # End the temp db:
   tmp <- system(
-    'docker kill test-mysql-db; docker rm test-mysql-db',
+    'docker kill test-mysql-db; docker rm -v test-mysql-db',
     intern = TRUE
   )
 

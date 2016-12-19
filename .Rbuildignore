@@ -4,3 +4,5 @@
 prepareRepo.R
 README.Rmd
 ^.*\.db$
+\.Rprofile
+lib

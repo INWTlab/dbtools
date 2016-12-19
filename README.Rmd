@@ -16,19 +16,12 @@ Sometimes it is best to start with a simple example before digging deeper into
 the details. The example will introduce the *Credentials* class as well as 
 the main functions `sendQuery` and `sendData`.
 
-
-To this end, we will make use of the USArrests dataset. 
-Unfortunately, the USArrests dataset contains information in its row names, 
-namely the information regarding the respective state. Since the package does
-not support row names, we have to convert them to a variable.
-
-```{r results = 'hide'}
-library("magrittr")
-data(USArrests)
-USArrests <- USArrests %>% 
-  tibble::rownames_to_column("state") %>% 
-  dplyr::select(state, Murder, Assault, UrbanPop, Rape)
-tibble::as_data_frame(USArrests)
+```{r results='hide'}
+library("RSQLite")
+con <- dbConnect(SQLite(), "example.db")
+USArrests$State <- rownames(USArrests)
+dbWriteTable(con, "USArrests", USArrests, row.names = FALSE)
+dbDisconnect(con)
 ```
 
 We want to send the data frame to a SQLite database table. Therefore, we need to
@@ -107,10 +100,10 @@ make an example lets say we want to query each state separately:
 
 ```{r}
 queryFun <- function(state) {
-  paste0("SELECT * FROM USArrests WHERE state = '", state, "';")
+  paste0("SELECT * FROM USArrests WHERE State = '", state, "';")
 }
 
-sendQuery(cred, queryFun(dat$state))
+sendQuery(cred, queryFun(dat$State))
 ```
 
 In such a case `sendQuery` will perform all queries on one connection. A 
@@ -143,8 +136,7 @@ the same query to those servers. What you can do is give `sendQuery` a
 *CredentialsList*. 
 
 ```{r results='hide'}
-cred1 <- Credentials(drv = SQLite, dbname = "example1.db")
-sendData(cred1, USArrests)
+file.copy("example.db", "example1.db")
 ```
 
 Now we want to load the data from `example1.db` and `example.db` which can be

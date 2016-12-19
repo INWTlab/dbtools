@@ -1,7 +1,8 @@
 #' Re-try the call to a function
 #'
 #' Tries to call \code{fun}. If the call results in an error, the error is
-#' logged and after some time it is tried again.
+#' logged and after some time it is tried again. If the final try results in an
+#' error the function throws an error. Otherwise th result of fun is returned.
 #'
 #' @param fun (function) a function
 #' @param ... arguments passed to \code{fun}
@@ -12,18 +13,18 @@
 #'
 #' @examples
 #' ## Something that will fail every once in a while:
-#' reTry(
+#' try(reTry(
 #'   function() if (runif(1) > 0.5) stop(),
 #'   tries = 2,
 #'   intSleep = 1
-#' )
+#' ))
 #'
 #' ## Disable logging
 #' noErrorLogging <- function(x, ...) NULL
-#' reTry(
+#' try(reTry(
 #'   function() stop(),
 #'   errorLogging = noErrorLogging
-#' )
+#' ))
 #'
 #' @export
 reTry <- function(fun, ..., tries = 1, intSleep = 0, errorLogging = flog.error) {
@@ -44,6 +45,7 @@ reTry <- function(fun, ..., tries = 1, intSleep = 0, errorLogging = flog.error) 
     else break
   }
 
-  out
+  if (inherits(out, "try-error")) stop(out)
+  else out
 
 }
