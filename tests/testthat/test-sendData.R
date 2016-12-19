@@ -92,7 +92,7 @@ context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
 
   tmp <- system(
-    paste0('docker run --name test-mysql-db -p 127.0.0.1:3306:3306 ',
+    paste0('docker run --name test-mysql-db -p 127.0.0.1:3307:3306 ',
            '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
     intern = TRUE
   )
@@ -111,7 +111,7 @@ test_that("sendData for RMySQL DB", {
     password = "root",
     dbname = "test",
     host = "127.0.0.1",
-    port = 3306
+    port = 3307
   )
 
   # create table
