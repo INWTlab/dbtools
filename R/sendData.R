@@ -23,8 +23,8 @@
 #' @inheritParams sendQuery
 #' @param data A data.frame (or coercible to data.frame)
 #' @param table A character string specifying a DBMS table name
-#' @param mode One of "replace", "append", or "update"
-#' @param ... later...
+#' @param mode One of "insert", "replace", or "truncate"
+#' @param ... ignored
 #' @rdname sendData
 #' @export
 sendData(db, data, table = deparse(substitute(data)), ...) %g% {

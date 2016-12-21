@@ -33,11 +33,11 @@ sendData(db, data, table = deparse(substitute(data)), ...)
 
 \item{table}{A character string specifying a DBMS table name}
 
-\item{...}{later...}
+\item{...}{ignored}
 
 \item{applyFun}{(function) something like lapply or mclapply}
 
-\item{mode}{One of "replace", "append", or "update"}
+\item{mode}{One of "insert", "replace", or "truncate"}
 }
 \description{
 These functions copy data frames to database tables
