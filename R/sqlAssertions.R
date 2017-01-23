@@ -36,8 +36,8 @@ sqlAssertPattern <- function(x, pattern, negate = TRUE) {
 
   on_failure(matchesPattern) <- function(call, env) {
     paste0(
-      "Sanity check failed. Input contains illegal character.\n",
-      env$x, "\nshould ", if(env$negate) "not" else "", "match\n", env$pattern
+      "Plausibility check failed. Input contains illegal character.\n",
+      env$x, "\nshould ", if(env$negate) "not " else "", "match\n", env$pattern
     )   
   }
 
