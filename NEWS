@@ -1,9 +1,13 @@
+Version 0.2.2
+- new function: sendData
+- new feature: parameterized queries
+
 Version 0.2.1
 - Bugfix for use with Rscript: not-correctly recognizing the relationship
   between DBIConnection and RMySQLConnection
 
 Version 0.2.0
-- reTry and thus sendQuery will throw an error when failing to cennect or send
+- reTry and thus sendQuery will throw an error when failing to connect or send
   queries to a database.
 
 Version 0.1.9
