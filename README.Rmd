@@ -1,3 +1,9 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
 This package abstracts typical patterns used when connecting to and retrieving
@@ -46,7 +52,7 @@ dat <- sendQuery(cred, "SELECT * FROM USArrests;")
 dat
 ```
 
-In your normal workflow you will sometimes want to split up a complex query into
+In your normal work-flow you will sometimes want to split up a complex query into
 more tangible chunks. The approach we take here is to allow for a vector of
 queries as argument. The result of these queries have to be *row-bindable*. To
 make an example lets say we want to query each state separately:
@@ -72,7 +78,7 @@ external servers. To address this `sendQuery` will evaluate everything in a
 many tries a query has, how many seconds should be waited between each iteration
 and how the error messages should be logged:
 
-```{r}
+```{r error=TRUE}
 dat <- sendQuery(
   cred, 
   "SELECT * FROM USArrest;", # wrong name for illustration
@@ -122,4 +128,39 @@ Potentially you can send multiple queries to multiple databases. The results are
 ```{r}
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
+```
+
+
+## Parameterized Queries ##
+
+In many applications it is easier and more tangible to separate SQL and R
+code. Furthermore we oftentimes paste queries together to have something like
+parameterized statements. There are various solutions for this type of problem
+but not many for the R language. Hence `dbtools` provides an own interface to
+what may be understood as *template queries*. These templates solve two issues
+for us:
+
+1. Put SQL code where it belongs: a `.sql` file.
+2. Provide a simple way to pass objects to these queries, using parameters.
+
+The use of these features is simple enough. A template is defined as a character
+and regions in which parameters are substituted are denoted by two curly
+braces. Users of [Liquid templates](http://shopify.github.io/liquid/) may be
+familiar with this idea. Everything inside these regions is interpreted as
+R-expression and can contain arbitrary operations. The result of the evaluation
+should be a character of length one.
+
+```{r}
+templateQuery <- "SELECT {{ sqlName(fieldName) }} FROM `someTable`;"
+Query(templateQuery, fieldName = "someField")
+```
+
+When such a query lives inside a file we can use a connection object and pass it
+to `Query`.
+
+```{r}
+otherTemplateQuery <-
+  "SELECT `someField` FROM `someTable` WHERE `primaryKey` IN {{ sqlInNums(ids) }};"
+writeLines(otherTemplateQuery, tmpFile <- tempfile())
+Query(file(tmpFile), ids = 1:10)
 ```

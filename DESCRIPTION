@@ -10,14 +10,15 @@ Depends:
     methods,
     aoos(>= 0.4.0)
 Imports:
-    DBI,
-    RMySQL,
-    RSQLite,
     assertthat,
     data.table,
+    DBI,
     dplyr,
     futile.logger,
-    magrittr
+    magrittr,
+    RMySQL,
+    RSQLite,
+    templates
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
@@ -27,10 +28,11 @@ Suggests:
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
-    'helperClass.R'
+    'Query.R'
     'reTry.R'
     'sendData.R'
     'sendQuery.R'
+    'sqlAssertions.R'
     'testConnection.R'
 Encoding: UTF-8
 RoxygenNote: 5.0.1
