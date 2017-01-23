@@ -14,6 +14,7 @@ Imports:
     RMySQL,
     RSQLite,
     assertthat,
+    data.table,
     dplyr,
     futile.logger,
     magrittr
@@ -21,12 +22,14 @@ License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
     lintr,
-    testthat
+    testthat,
+    tibble
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
     'helperClass.R'
     'reTry.R'
+    'sendData.R'
     'sendQuery.R'
     'testConnection.R'
 Encoding: UTF-8
