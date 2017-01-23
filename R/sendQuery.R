@@ -95,7 +95,7 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
   # query: is a single query
 
   on.exit({
-    if (exists("con") && inherits(con, "DBIConnection")) {
+    if (exists("con")) {
       dbDisconnect(con)
     }
   })

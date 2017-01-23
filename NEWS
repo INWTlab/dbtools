@@ -1,3 +1,7 @@
+Version 0.2.1
+- Bugfix for use with Rscript: not-correctly recognizing the relationship
+  between DBIConnection and RMySQLConnection
+
 Version 0.2.0
 - reTry and thus sendQuery will throw an error when failing to cennect or send
   queries to a database.

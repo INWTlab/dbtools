@@ -4,6 +4,7 @@
 #' @importFrom DBI dbClearResult dbConnect dbDisconnect dbFetch dbHasCompleted
 #' dbListResults dbSendQuery dbWriteTable
 #' @importFrom RMySQL dbMoreResults dbNextResult
+#' @importFrom data.table fwrite
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%
