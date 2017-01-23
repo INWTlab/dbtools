@@ -3,7 +3,7 @@ context("sendData-SQLite")
 test_that("sendData", {
 
   # prepare data
-  data(mtcars)
+  data(mtcars, envir = environment())
   mtcars <- mtcars %>%
     tibble::rownames_to_column("model") %>%
     dplyr::select(model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb)
@@ -45,7 +45,7 @@ test_that("sendData", {
 test_that("sendData can operate on CredentialsList", {
 
   # prepare data
-  data(mtcars)
+  data(mtcars, envir = environment())
   mtcars <- mtcars %>%
     tibble::rownames_to_column("model") %>%
     dplyr::select(model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb)
@@ -100,7 +100,7 @@ test_that("sendData for RMySQL DB", {
   Sys.sleep(15) # Takes some time to fire up db:
 
   # prepare data
-  data(mtcars)
+  data(mtcars, envir = environment())
   mtcars <- mtcars %>%
     tibble::rownames_to_column("model") %>%
     dplyr::select(model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb)

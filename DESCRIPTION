@@ -27,7 +27,6 @@ Suggests:
 Collate:
     'Credentials.R'
     'NAMESPACE.R'
-    'deleteData.R'
     'helperClass.R'
     'reTry.R'
     'sendData.R'
