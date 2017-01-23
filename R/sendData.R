@@ -43,13 +43,13 @@ sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
 
   con <- do.call(dbConnect, as.list(db))
 
-  on.exit ({
+  on.exit({
     if (exists("con")) {
       dbDisconnect(con)
     }
   })
 
-  sendData (
+  sendData(
     db = con,
     data = data,
     table = table,

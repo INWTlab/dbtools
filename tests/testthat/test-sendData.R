@@ -138,13 +138,13 @@ test_that("sendData for RMySQL DB", {
   res <- sendQuery(cred, "SELECT * FROM mtcars;")
 
   # objects should be equal
-  expect_identical (
+  expect_identical(
     res,
     mtcars %>% tibble::as_data_frame() %>% dplyr::arrange(model)
   )
 
   # duplicates in case of insert
-  expect_warning (
+  expect_warning(
     sendData(cred, mtcars, mode = "insert"),
     regexp = "Duplicate entry"
   )
