@@ -78,6 +78,21 @@ sqlAssertNums <- function(x) {
 
 #' @rdname sqlAssertions
 #' @export
+sqlAssertAlnum <- function(x) {
+  stopifnot(length(x) == 1)
+  sqlAssertAlnums(x)
+}
+
+#' @rdname sqlAssertions
+#' @export
+sqlAssertAlnums <- function(x) {
+  punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
+  pattern <- paste0("[ \n\t]|", punct)
+  sqlAssertPattern(x, pattern, TRUE)
+} 
+
+#' @rdname sqlAssertions
+#' @export
 sqlParan <- function(x, assert = identity) {
   paste0("(", sqlComma(x, assert), ")")
 }
@@ -97,13 +112,13 @@ sqlEsc <- function(x, assert = identity, with = "`") {
 #' @rdname sqlAssertions
 #' @export
 sqlName <- function(x) {
-  sqlEsc(x, sqlAssertChar)
+  sqlEsc(x, sqlAssertAlnum)
 }
 
 #' @rdname sqlAssertions
 #' @export
 sqlNames <- function(x) {
-  sqlEsc(x, sqlAssertChars)
+  sqlEsc(x, sqlAssertAlnums)
 }
 
 #' @rdname sqlAssertions

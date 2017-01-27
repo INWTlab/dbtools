@@ -1,3 +1,7 @@
+Version 0.2.3
+- new function: sqlAssertAlnum
+- changed behaviour: sqlName[s] accept alnums
+
 Version 0.2.2
 - new function: sendData
 - new feature: parameterized queries
