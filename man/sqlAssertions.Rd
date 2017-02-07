@@ -17,7 +17,7 @@
 \alias{sqlParan}
 \title{SQL Assertions and Formats}
 \usage{
-sqlAssertPattern(x, pattern, negate = TRUE)
+sqlAssertPattern(x, pattern, negate = FALSE)
 
 sqlAssertChar(x)
 
