@@ -56,7 +56,7 @@ sqlAssertChar <- function(x) {
 #' @rdname sqlAssertions
 #' @export
 sqlAssertChars <- function(x) {
-  pattern <- "^[[:alpha:]]+$"
+  pattern <- "^[-[:alpha:]_]+$"
   sqlAssertPattern(x, pattern)
 }
 
@@ -84,7 +84,7 @@ sqlAssertAlnum <- function(x) {
 #' @rdname sqlAssertions
 #' @export
 sqlAssertAlnums <- function(x) {
-  pattern <- "^[[:alnum:].]+$"
+  pattern <- "^[[:alnum:]]+$"
   sqlAssertPattern(x, pattern)
 }
 
