@@ -5,8 +5,7 @@ test_that("sendData", {
   # prepare data
   data(mtcars, envir = environment())
   mtcars <- mtcars %>%
-    tibble::rownames_to_column("model") %>%
-    dplyr::select(model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb)
+    tibble::rownames_to_column("model")
 
   # set up connection
   cred <- Credentials(drv = SQLite, dbname = "test.db")
@@ -36,7 +35,7 @@ test_that("sendData", {
   res <- sendQuery(cred, "SELECT * FROM mtcars;")
 
   # objects should be equal
-  expect_identical(res, mtcars %>% tibble::as_data_frame())
+  expect_identical(res, tibble::as_data_frame(mtcars))
 
   # delete database
   unlink("test.db")
@@ -47,8 +46,7 @@ test_that("sendData can operate on CredentialsList", {
   # prepare data
   data(mtcars, envir = environment())
   mtcars <- mtcars %>%
-    tibble::rownames_to_column("model") %>%
-    dplyr::select(model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb)
+    tibble::rownames_to_column("model")
 
   # set up connection
   cred <- CredentialsList(
@@ -82,7 +80,7 @@ test_that("sendData can operate on CredentialsList", {
 
   # there should be two identical instances of mtcars in the result set
   expect_identical(res[[2]][[1]], res[[1]][[1]])
-  expect_identical(res[[1]][[1]], mtcars %>% tibble::as_data_frame())
+  expect_identical(res[[1]][[1]], tibble::as_data_frame(mtcars))
 
   # delete database
   unlink(c("db1.db", "db2.db"))
@@ -102,8 +100,7 @@ test_that("sendData for RMySQL DB", {
   # prepare data
   data(mtcars, envir = environment())
   mtcars <- mtcars %>%
-    tibble::rownames_to_column("model") %>%
-    dplyr::select(model, mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb)
+    tibble::rownames_to_column("model")
 
   cred <- Credentials(
     drv = MySQL,
@@ -132,16 +129,13 @@ test_that("sendData for RMySQL DB", {
   )
 
   # send data to database
-  sendData(cred, mtcars)
+  expect_true(sendData(cred, mtcars))
 
   # retrieve data
   res <- sendQuery(cred, "SELECT * FROM mtcars;")
 
   # objects should be equal
-  expect_identical(
-    res,
-    mtcars %>% tibble::as_data_frame() %>% dplyr::arrange(model)
-  )
+  expect_identical(res, tibble::as_data_frame(mtcars) %>% dplyr::arrange(model))
 
   # duplicates in case of insert
   expect_warning(
@@ -150,10 +144,10 @@ test_that("sendData for RMySQL DB", {
   )
 
   # duplicates in case of replace
-  expect_null(sendData(cred, mtcars, mode = "replace"))
+  expect_true(sendData(cred, mtcars, mode = "replace"))
 
   # truncate
-  sendData(cred, mtcars %>% dplyr::slice(1:5), table = "mtcars", mode = "truncate")
+  sendData(cred, dplyr::slice(mtcars, 1:5), table = "mtcars", mode = "truncate")
 
   # retrieve data
   res <- sendQuery(cred, "SELECT * FROM mtcars;")
