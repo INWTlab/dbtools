@@ -1,16 +1,17 @@
-# Sample .travis.yml for R projects
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
 
 language: r
-warnings_are_errors: true
-sudo: required
+sudo: true
+cache: packages
 
 services:
   - docker
 
 before_install:
   - sudo service docker restart; sleep 10 # fix https://github.com/travis-ci/travis-ci/issues/4778
-  - Rscript -e "install.packages('devtools')"
 
 notifications:
   email:
     - sebastian.warnholz@inwt-statistics.de
+    - jonathan.bob@inwt-statistics.de
+

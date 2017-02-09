@@ -34,7 +34,7 @@
 #' frames
 #' \cr On error: (list) with 'try-catch' objects
 #'
-#' @include helperClass.R
+#' @include Query.R
 #'
 #' @examples
 #' ## For an example database:
