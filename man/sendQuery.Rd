@@ -22,29 +22,30 @@ sendQuery(db, query, ...)
 
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
 
-\S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...)
+\S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...,
+  encoding = "utf8")
 }
 \arguments{
-\item{db}{one in:
-\cr (\link{Credentials}) the credentials to get a connection to a database.
-\cr (DBIConnection) \link[DBI]{DBIConnection-class}
-\cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}}
+\item{db}{one in: \cr (\link{Credentials}) the credentials to get a
+connection to a database.  \cr (DBIConnection)
+\link[DBI]{DBIConnection-class} \cr (MySQLConnection)
+\link[RMySQL]{MySQLConnection-class}}
 
-\item{query}{one in:
-\cr (character, length >= 1) a query
-\cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
-internally.}
+\item{query}{one in: \cr (character, length >= 1) a query \cr (SingleQuery |
+SingleQeuryList) \link{SingleQuery-class} is mostly used internally.}
 
-\item{...}{one in:
-\cr for signature (Credentials, character | SingleQueryList) arguments are
-passed to \code{reTry}
-\cr for signature (CredentialsList) arguments are passed to the
-(Credentials) method, so implicitly to reTry
-\cr else ignored}
+\item{...}{one in: \cr for signature (Credentials, character |
+SingleQueryList) arguments are passed to \code{reTry} \cr for signature
+(CredentialsList) arguments are passed to the (Credentials) method, so
+implicitly to reTry \cr else ignored}
 
 \item{applyFun}{(function) something like lapply or mclapply}
 
 \item{simplify}{(logical(1)) whether to simplify results. See details.}
+
+\item{encoding}{(character | NULL) the encoding used in a \code{SET NAMES}
+statement. Currently only implemented for MySQL connections. The
+default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.}
 }
 \value{
 one in:

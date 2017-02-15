@@ -24,10 +24,10 @@ sendData(db, data, table = deparse(substitute(data)), ...)
   mode = "insert")
 }
 \arguments{
-\item{db}{one in:
-\cr (\link{Credentials}) the credentials to get a connection to a database.
-\cr (DBIConnection) \link[DBI]{DBIConnection-class}
-\cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}}
+\item{db}{one in: \cr (\link{Credentials}) the credentials to get a
+connection to a database.  \cr (DBIConnection)
+\link[DBI]{DBIConnection-class} \cr (MySQLConnection)
+\link[RMySQL]{MySQLConnection-class}}
 
 \item{data}{A data.frame (or coercible to data.frame)}
 

@@ -2,22 +2,21 @@
 #'
 #' This functions sends a query to a database and fetches the result.
 #'
-#' @param db one in:
-#'   \cr (\link{Credentials}) the credentials to get a connection to a database.
-#'   \cr (DBIConnection) \link[DBI]{DBIConnection-class}
-#'   \cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}
-#' @param query one in:
-#'   \cr (character, length >= 1) a query
-#'   \cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
-#'   internally.
-#' @param ... one in:
-#'   \cr for signature (Credentials, character | SingleQueryList) arguments are
-#'   passed to \code{reTry}
-#'   \cr for signature (CredentialsList) arguments are passed to the
-#'   (Credentials) method, so implicitly to reTry
-#'   \cr else ignored
+#' @param db one in: \cr (\link{Credentials}) the credentials to get a
+#'   connection to a database.  \cr (DBIConnection)
+#'   \link[DBI]{DBIConnection-class} \cr (MySQLConnection)
+#'   \link[RMySQL]{MySQLConnection-class}
+#' @param query one in: \cr (character, length >= 1) a query \cr (SingleQuery |
+#'   SingleQeuryList) \link{SingleQuery-class} is mostly used internally.
+#' @param ... one in: \cr for signature (Credentials, character |
+#'   SingleQueryList) arguments are passed to \code{reTry} \cr for signature
+#'   (CredentialsList) arguments are passed to the (Credentials) method, so
+#'   implicitly to reTry \cr else ignored
 #' @param applyFun (function) something like lapply or mclapply
 #' @param simplify (logical(1)) whether to simplify results. See details.
+#' @param encoding (character | NULL) the encoding used in a \code{SET NAMES}
+#'   statement. Currently only implemented for MySQL connections. The
+#'   default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.
 #'
 #' @details \code{simplify} the default is to simplify results. If you send
 #'   multiple queries to one database it is tried to rbind the results - when
@@ -123,7 +122,7 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
+sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
 
@@ -131,8 +130,9 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
     suppressWarnings(RMySQL::dbSendQuery(...))
   }
 
-  setNamesUtf8 <- function(con) {
-    dbSendQuery(con, "SET NAMES 'utf8';")
+  setNamesEncoding <- function(con, encoding) {
+    if (is.null(encoding)) return(NULL)
+    dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
   }
 
   dumpRemainingResults <- function(con) {
@@ -147,7 +147,7 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
     if (nrow(wrngs) > 0) warning(wrngs)
   }
 
-  setNamesUtf8(db)
+  setNamesEncoding(db, encoding)
   res <- dbSendQuery(db, query)
   dat <- fetchFirstResult(res)
   dumpRemainingResults(db)
