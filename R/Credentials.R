@@ -5,6 +5,7 @@
 #' @param ... named arguments which can be passed to \link[DBI]{dbConnect}
 #' @param drv (function) a driver. Will be called and passed to \link[DBI]{dbConnect}
 #' @param x (Credentials) an instance
+#' @param i,j,drop passed to S3 extract method
 #'
 #' @rdname Credentials
 #'
@@ -96,3 +97,10 @@ list : CredentialsList() %type% {
 CredentialsList <- function(...) {
   new("CredentialsList", list(...))
 }
+
+#' @export
+#' @rdname Credentials
+setMethod("[", c("CredentialsList", "ANY", "missing"), function(x, i, j, ..., drop) {
+  x@.Data <- S3Part(x, TRUE)[i]
+  x
+})

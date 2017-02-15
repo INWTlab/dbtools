@@ -2,11 +2,11 @@
 % Please edit documentation in R/testConnection.R
 \docType{methods}
 \name{testConnection}
-\alias{loggerConnection}
-\alias{loggerSuppress}
 \alias{testConnection}
 \alias{testConnection,Credentials-method}
 \alias{testConnection,CredentialsList-method}
+\alias{loggerConnection}
+\alias{loggerSuppress}
 \title{Test a connection}
 \usage{
 testConnection(x, logger = loggerConnection, ...)
@@ -42,4 +42,3 @@ testConnection(workingConnection)
 testConnection(workingConnection, loggerSuppress)
 
 }
-

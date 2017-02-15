@@ -3,8 +3,8 @@
 \docType{methods}
 \name{sendData}
 \alias{sendData}
-\alias{sendData,Credentials,data.frame-method}
 \alias{sendData,CredentialsList,data.frame-method}
+\alias{sendData,Credentials,data.frame-method}
 \alias{sendData,DBIConnection,data.frame-method}
 \alias{sendData,MySQLConnection,data.frame-method}
 \title{Copy data to database tables}
@@ -61,4 +61,3 @@ There are three different modes for sending data to the database:
   table is truncated before sending the data}
 }
 }
-
