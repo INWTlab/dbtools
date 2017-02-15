@@ -74,6 +74,8 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
   if (mode == "truncate")
     truncateTable(db, table)
   writeTable(db, path, table, mode)
+
+  TRUE
 }
 
 truncateTable <- function(db, table) {
