@@ -61,10 +61,10 @@ Next, we will create the database table by sending a `CREATE TABLE` query to
 the database.
 
 ```{r results = 'hide'}
-sendQuery (
+sendQuery(
   cred, 
   "CREATE TABLE `USArrests` (
-  state TEXT PRIMARY KEY, 
+  State TEXT PRIMARY KEY, 
   Murder INTEGER,
   Assault REAL,
   UrbanPop REAL,

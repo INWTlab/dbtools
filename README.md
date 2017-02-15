@@ -36,7 +36,7 @@ Now, let's check whether we can actually access the database example.db.
 testConnection(cred)
 ```
 
-    ## INFO [2017-02-09 11:24:08] example.db OK
+    ## INFO [2017-02-15 13:12:50] example.db OK
 
 ``` r
 cred
@@ -57,10 +57,10 @@ USArrests
 Next, we will create the database table by sending a `CREATE TABLE` query to the database.
 
 ``` r
-sendQuery (
+sendQuery(
   cred, 
   "CREATE TABLE `USArrests` (
-  state TEXT PRIMARY KEY, 
+  State TEXT PRIMARY KEY, 
   Murder INTEGER,
   Assault REAL,
   UrbanPop REAL,
@@ -73,8 +73,6 @@ Now, we can write the USArrests data to the USArrests database table by using th
 ``` r
 sendData(cred, USArrests)
 ```
-
-    ## Warning: Column names will be matched ignoring character case
 
 If we want to read data from the database, we can do this by using `sendQuery`, the same function we used for creating the database table.
 
@@ -100,10 +98,20 @@ queryFun <- function(state) {
 sendQuery(cred, queryFun(dat$State))
 ```
 
-    ## Warning: Unknown column 'State'
-
-    ## [[1]]
-    ## NULL
+    ## # A tibble: 50 × 5
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
+    ## # ... with 40 more rows
 
 In such a case `sendQuery` will perform all queries on one connection. A different approach is to fetch the results of the original query in chunks, which we do not support yet.
 
@@ -128,9 +136,9 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2017-02-09 11:24:08] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-15 13:12:50] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
     ## 
-    ## ERROR [2017-02-09 11:24:09] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-15 13:12:51] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
     ## Error in reTry(function(...) lapply(query, . %>% sendQuery(db = con, ...)), : Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
@@ -155,7 +163,7 @@ sendQuery(cred, "SELECT * FROM USArrests;")
 ```
 
     ## # A tibble: 100 × 5
-    ##          state Murder Assault UrbanPop  Rape
+    ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
     ## 1      Alabama   13.2     236       58  21.2
     ## 2       Alaska   10.0     263       48  44.5
@@ -181,7 +189,7 @@ sendQuery(
 ```
 
     ## # A tibble: 100 × 5
-    ##          state Murder Assault UrbanPop  Rape
+    ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
     ## 1      Alabama   13.2     236       58  21.2
     ## 2       Alaska   10.0     263       48  44.5
@@ -203,7 +211,7 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 
     ## [[1]]
     ## # A tibble: 100 × 5
-    ##          state Murder Assault UrbanPop  Rape
+    ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
     ## 1      Alabama   13.2     236       58  21.2
     ## 2       Alaska   10.0     263       48  44.5
@@ -231,7 +239,7 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ## [[1]]
     ## [[1]][[1]]
     ## # A tibble: 50 × 5
-    ##          state Murder Assault UrbanPop  Rape
+    ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
     ## 1      Alabama   13.2     236       58  21.2
     ## 2       Alaska   10.0     263       48  44.5
@@ -255,7 +263,7 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ## [[2]]
     ## [[2]][[1]]
     ## # A tibble: 50 × 5
-    ##          state Murder Assault UrbanPop  Rape
+    ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
     ## 1      Alabama   13.2     236       58  21.2
     ## 2       Alaska   10.0     263       48  44.5
@@ -306,3 +314,7 @@ Query(file(tmpFile), ids = 1:10)
 
     ## Query:
     ## SELECT `someField` FROM `someTable` WHERE `primaryKey` IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+``` r
+unlink(c("example.db", "example1.db"))
+```

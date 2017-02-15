@@ -9,7 +9,7 @@
 #'   pattern.
 #' @param assert (function) an assertion function
 #' @param with (character)
-#' 
+#'
 #' @rdname sqlAssertions
 #' @export
 #'
@@ -37,13 +37,13 @@ sqlAssertPattern <- function(x, pattern, negate = TRUE) {
   on_failure(matchesPattern) <- function(call, env) {
     paste0(
       "Plausibility check failed. Input contains illegal character.\n",
-      env$x, "\nshould ", if(env$negate) "not " else "", "match\n", env$pattern
-    )   
+      env$x, "\nshould ", if (env$negate) "not " else "", "match\n", env$pattern
+    )
   }
 
   assert_that(matchesPattern(x, pattern, negate))
   x
-  
+
 }
 
 #' @rdname sqlAssertions
@@ -58,7 +58,7 @@ sqlAssertChar <- function(x) {
 sqlAssertChars <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\.\\?\\[\\^\\{\\|\\(\\\\]"
   pattern <- paste0("[ \n\t]|[0-9]|", punct)
-  sqlAssertPattern(x, pattern, TRUE)  
+  sqlAssertPattern(x, pattern, TRUE)
 }
 
 #' @rdname sqlAssertions
@@ -74,7 +74,7 @@ sqlAssertNums <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
   pattern <- paste0("[ \n\t]|[a-z]|[A-Z]|", punct)
   sqlAssertPattern(x, pattern, TRUE)
-} 
+}
 
 #' @rdname sqlAssertions
 #' @export
@@ -89,7 +89,7 @@ sqlAssertAlnums <- function(x) {
   punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
   pattern <- paste0("[ \n\t]|", punct)
   sqlAssertPattern(x, pattern, TRUE)
-} 
+}
 
 #' @rdname sqlAssertions
 #' @export
