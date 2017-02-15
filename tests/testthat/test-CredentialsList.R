@@ -39,3 +39,23 @@ test_that("Password are suppressed in print", {
 
 })
 
+test_that("Extract credentials from CredentialsList", {
+
+  credList <- dbtools::Credentials(drv = dbtools::SQLite, user = 1:2)
+
+  testthat::expect_is(
+    credList[1],
+    "CredentialsList"
+  )
+
+  testthat::expect_identical(
+    credList[TRUE],
+    credList
+  )
+
+  testthat::expect_identical(
+    credList[1:2],
+    credList
+  )
+
+})

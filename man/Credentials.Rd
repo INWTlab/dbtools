@@ -2,12 +2,13 @@
 % Please edit documentation in R/Credentials.R
 \docType{class}
 \name{Credentials-class}
-\alias{Credentials}
 \alias{Credentials-class}
-\alias{CredentialsList}
-\alias{CredentialsList-class}
-\alias{as.character.Credentials}
+\alias{Credentials}
 \alias{as.list.Credentials}
+\alias{as.character.Credentials}
+\alias{CredentialsList-class}
+\alias{CredentialsList}
+\alias{[,CredentialsList,ANY,missing-method}
 \title{Credentials Class}
 \usage{
 Credentials(drv, ...)
@@ -17,6 +18,8 @@ Credentials(drv, ...)
 \method{as.character}{Credentials}(x, ...)
 
 CredentialsList(...)
+
+\S4method{[}{CredentialsList,ANY,missing}(x, i, j, ..., drop = TRUE)
 }
 \arguments{
 \item{drv}{(function) a driver. Will be called and passed to \link[DBI]{dbConnect}}
@@ -24,6 +27,8 @@ CredentialsList(...)
 \item{...}{named arguments which can be passed to \link[DBI]{dbConnect}}
 
 \item{x}{(Credentials) an instance}
+
+\item{i, j, drop}{passed to S3 extract method}
 }
 \description{
 Use this function to store your database credentials.
@@ -40,4 +45,3 @@ Credentials(drv = SQLite, dbname = ":memory:")
 Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 
 }
-
