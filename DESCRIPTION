@@ -34,4 +34,4 @@ Collate:
     'sqlAssertions.R'
     'testConnection.R'
 Encoding: UTF-8
-RoxygenNote: 6.0.0
+RoxygenNote: 5.0.1

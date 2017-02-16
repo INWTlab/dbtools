@@ -73,7 +73,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
   cacheTable(data, path)
   if (mode == "truncate")
     truncateTable(db, table)
-  writeTable(db, path, table, mode)
+  writeTable(db, path, table, names(data), mode)
 
   TRUE
 }
@@ -86,11 +86,11 @@ cacheTable <- function(data, path) {
   fwrite(data, path, eol = "\n", na = "\\N")
 }
 
-writeTable <- function(db, path, table, mode) {
-  sendQuery(db, sqlLoadData(path, table, mode))
+writeTable <- function(db, path, table, names, mode) {
+  sendQuery(db, sqlLoadData(path, table, names, mode))
 }
 
-sqlLoadData <- function(path, table, mode) {
+sqlLoadData <- function(path, table, names, mode) {
   SingleQuery (
     paste0 (
       "LOAD DATA LOCAL INFILE '",
@@ -105,7 +105,9 @@ sqlLoadData <- function(path, table, mode) {
       "FIELDS TERMINATED BY ',' ",
       "OPTIONALLY ENCLOSED BY '\"' ",
       "LINES TERMINATED BY '\n' ",
-      "IGNORE 1 LINES;"
+      "IGNORE 1 LINES ",
+      sqlParan(sqlEsc(names)),
+      ";"
     )
   )
 }

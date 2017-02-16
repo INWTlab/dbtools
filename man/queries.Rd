@@ -39,3 +39,4 @@ tmpFile <- tempfile()
 writeLines(c(query1, query2), tmpFile)
 Query(file(tmpFile))
 }
+

@@ -3,9 +3,9 @@
 \docType{methods}
 \name{sendQuery}
 \alias{sendQuery}
-\alias{sendQuery,CredentialsList,character-method}
-\alias{sendQuery,Credentials,character-method}
 \alias{sendQuery,Credentials,SingleQueryList-method}
+\alias{sendQuery,Credentials,character-method}
+\alias{sendQuery,CredentialsList,character-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
 \title{Send query to database and fetch result}
@@ -95,3 +95,4 @@ dat <- try(sendQuery(
 ))
 
 }
+
