@@ -2,12 +2,10 @@
 % Please edit documentation in R/NAMESPACE.R
 \docType{import}
 \name{reexports}
-\alias{reexports}
 \alias{MySQL}
-\alias{reexports}
 \alias{SQLite}
+\alias{reexports}
 \title{Objects exported from other packages}
-\keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
 below to see their documentation.
@@ -17,4 +15,5 @@ below to see their documentation.
 
   \item{RSQLite}{\code{\link[RSQLite]{SQLite}}}
 }}
+\keyword{internal}
 
