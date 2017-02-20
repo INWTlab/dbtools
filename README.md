@@ -36,7 +36,7 @@ Now, let's check whether we can actually access the database example.db.
 testConnection(cred)
 ```
 
-    ## INFO [2017-02-15 13:12:50] example.db OK
+    ## INFO [2017-02-20 15:54:24] example.db OK
 
 ``` r
 cred
@@ -136,11 +136,11 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2017-02-15 13:12:50] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-20 15:54:25] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
     ## 
-    ## ERROR [2017-02-15 13:12:51] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-20 15:54:26] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
-    ## Error in reTry(function(...) lapply(query, . %>% sendQuery(db = con, ...)), : Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## Error in reTry(function(...) sendQuery(db = con, query, ...), ...): Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
 Multiple Databases
 ------------------
@@ -209,28 +209,20 @@ Potentially you can send multiple queries to multiple databases. The results are
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 ```
 
-    ## [[1]]
-    ## # A tibble: 100 × 5
-    ##          State Murder Assault UrbanPop  Rape
-    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
-    ## 1      Alabama   13.2     236       58  21.2
-    ## 2       Alaska   10.0     263       48  44.5
-    ## 3      Arizona    8.1     294       80  31.0
-    ## 4     Arkansas    8.8     190       50  19.5
-    ## 5   California    9.0     276       91  40.6
-    ## 6     Colorado    7.9     204       78  38.7
-    ## 7  Connecticut    3.3     110       77  11.1
-    ## 8     Delaware    5.9     238       72  15.8
-    ## 9      Florida   15.4     335       80  31.9
-    ## 10     Georgia   17.4     211       60  25.8
-    ## # ... with 90 more rows
-    ## 
-    ## [[2]]
-    ## # A tibble: 2 × 1
-    ##       x
-    ##   <int>
-    ## 1     1
-    ## 2     1
+    ## # A tibble: 102 × 6
+    ##          State Murder Assault UrbanPop  Rape     x
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl> <int>
+    ## 1      Alabama   13.2     236       58  21.2    NA
+    ## 2       Alaska   10.0     263       48  44.5    NA
+    ## 3      Arizona    8.1     294       80  31.0    NA
+    ## 4     Arkansas    8.8     190       50  19.5    NA
+    ## 5   California    9.0     276       91  40.6    NA
+    ## 6     Colorado    7.9     204       78  38.7    NA
+    ## 7  Connecticut    3.3     110       77  11.1    NA
+    ## 8     Delaware    5.9     238       72  15.8    NA
+    ## 9      Florida   15.4     335       80  31.9    NA
+    ## 10     Georgia   17.4     211       60  25.8    NA
+    ## # ... with 92 more rows
 
 ``` r
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
@@ -254,14 +246,6 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ## # ... with 40 more rows
     ## 
     ## [[1]][[2]]
-    ## # A tibble: 1 × 1
-    ##       x
-    ##   <int>
-    ## 1     1
-    ## 
-    ## 
-    ## [[2]]
-    ## [[2]][[1]]
     ## # A tibble: 50 × 5
     ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
@@ -276,6 +260,14 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ## 9      Florida   15.4     335       80  31.9
     ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 40 more rows
+    ## 
+    ## 
+    ## [[2]]
+    ## [[2]][[1]]
+    ## # A tibble: 1 × 1
+    ##       x
+    ##   <int>
+    ## 1     1
     ## 
     ## [[2]][[2]]
     ## # A tibble: 1 × 1

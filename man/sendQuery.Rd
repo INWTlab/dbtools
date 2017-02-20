@@ -16,7 +16,7 @@ sendQuery(db, query, ...)
 \S4method{sendQuery}{CredentialsListOrCredentials,character}(db, query, ...)
 
 \S4method{sendQuery}{CredentialsListOrCredentials,SingleQueryList}(db, query,
-  ..., simplify = TRUE)
+  ...)
 
 \S4method{sendQuery}{CredentialsList,SingleQuery}(db, query, ...,
   applyFun = lapply, simplify = TRUE)
@@ -45,9 +45,9 @@ passed to \code{reTry}
 (Credentials) method, so implicitly to reTry
 \cr else ignored}
 
-\item{simplify}{(logical(1)) whether to simplify results. See details.}
-
 \item{applyFun}{(function) something like lapply or mclapply}
+
+\item{simplify}{(logical(1)) whether to simplify results. See details.}
 }
 \value{
 one in:
