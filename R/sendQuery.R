@@ -72,28 +72,35 @@ sendQuery(db, query, ...) %g% {
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ CredentialsList, query ~ character, ..., applyFun = lapply, simplify = TRUE) %m% {
-  # db: is of class 'CredentialsList'
-  # query: is probably a character
-  applyFun(db, sendQuery, query = query, ..., simplify = FALSE) %>%
+sendQuery(db ~ CredentialsList|Credentials, query ~ character, ...) %m% {
+  # db: either CredentialsList or Credentials
+  # query: character
+  sendQuery(db, queryConst(query), ...)
+}
+
+#' @rdname sendQuery
+#' @export
+sendQuery(db ~ CredentialsList|Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
+  # db: either CredentialsList or Credentials
+  # query: singleQueryList
+  lapply(query, sendQuery, db = db, ..., simplify = simplify) %>%
     { simplifyMe(simplify, doRbind)(.) }
 }
 
-
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ Credentials, query ~ character, ...) %m% {
-  # db: is of class 'Credentials' containing db creds
-  # query: should be a character vector
-  sendQuery(db, SingleQueryList(as.list(query)), ...)
+sendQuery(db ~ CredentialsList, query ~ SingleQuery, ..., applyFun = lapply, simplify = TRUE) %m% {
+  # db: CredentialsList
+  # query: SingleQuery
+  applyFun(db, sendQuery, query = query, ..., simplify = FALSE) %>%
+  { simplifyMe(simplify, doRbind)(.) }
 }
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
-  # db: is a list
-  # query: is a single query
-
+sendQuery(db ~ Credentials, query ~ SingleQuery, ...) %m% {
+  # db: Credentials
+  # query: SingleQuery
   on.exit({
     if (exists("con")) {
       dbDisconnect(con)
@@ -102,20 +109,17 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
 
   con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
 
-  downloadedData <- reTry(
-    function(...) lapply(query, . %>% sendQuery(db = con, ...)), ...
+  reTry(
+    function(...) sendQuery(db = con, query, ...), ...
   )
-
-  downloadedData %>% { simplifyMe(simplify, doRbind)(.) }
 
 }
 
 #' @export
 #' @rdname sendQuery
 sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
-  # db: is a connection
-  # query: is a character of length 1
-
+  # db: DBIConnection
+  # query: SingleQuery
   res <- dbSendQuery(db, query)
   fetchFirstResult(res)
 
@@ -124,9 +128,8 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 #' @export
 #' @rdname sendQuery
 sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
-  # db: is a MySQL connection
-  # query: is a character of length 1
-
+  # db: MySQLConnection
+  # query: SingleQuery
   dbSendQuery <- function(...) {
     suppressWarnings(RMySQL::dbSendQuery(...))
   }

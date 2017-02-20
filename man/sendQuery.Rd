@@ -3,22 +3,25 @@
 \docType{methods}
 \name{sendQuery}
 \alias{sendQuery}
-\alias{sendQuery,Credentials,SingleQueryList-method}
-\alias{sendQuery,Credentials,character-method}
-\alias{sendQuery,CredentialsList,character-method}
+\alias{sendQuery,Credentials,SingleQuery-method}
+\alias{sendQuery,CredentialsList,SingleQuery-method}
+\alias{sendQuery,CredentialsListORCredentials,SingleQueryList-method}
+\alias{sendQuery,CredentialsListORCredentials,character-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
 \title{Send query to database and fetch result}
 \usage{
 sendQuery(db, query, ...)
 
-\S4method{sendQuery}{CredentialsList,character}(db, query, ...,
+\S4method{sendQuery}{CredentialsListORCredentials,character}(db, query, ...)
+
+\S4method{sendQuery}{CredentialsListORCredentials,SingleQueryList}(db, query,
+  ..., simplify = TRUE)
+
+\S4method{sendQuery}{CredentialsList,SingleQuery}(db, query, ...,
   applyFun = lapply, simplify = TRUE)
 
-\S4method{sendQuery}{Credentials,character}(db, query, ...)
-
-\S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...,
-  simplify = TRUE)
+\S4method{sendQuery}{Credentials,SingleQuery}(db, query, ...)
 
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
 
@@ -42,9 +45,9 @@ passed to \code{reTry}
 (Credentials) method, so implicitly to reTry
 \cr else ignored}
 
-\item{applyFun}{(function) something like lapply or mclapply}
-
 \item{simplify}{(logical(1)) whether to simplify results. See details.}
+
+\item{applyFun}{(function) something like lapply or mclapply}
 }
 \value{
 one in:
