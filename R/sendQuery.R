@@ -72,7 +72,7 @@ sendQuery(db, query, ...) %g% {
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ CredentialsList|Credentials, query ~ character, ...) %m% {
+sendQuery(db ~ CredentialsListOrCredentials, query ~ character, ...) %m% {
   # db: either CredentialsList or Credentials
   # query: character
   sendQuery(db, queryConst(query), ...)
@@ -80,7 +80,7 @@ sendQuery(db ~ CredentialsList|Credentials, query ~ character, ...) %m% {
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ CredentialsList|Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
+sendQuery(db ~ CredentialsListOrCredentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
   # db: either CredentialsList or Credentials
   # query: singleQueryList
   lapply(query, sendQuery, db = db, ..., simplify = simplify) %>%

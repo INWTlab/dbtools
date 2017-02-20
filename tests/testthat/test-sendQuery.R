@@ -108,11 +108,10 @@ testthat::test_that("sendQuery can handle simplification", {
     cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"),
     simplify = TRUE
   )
-  # expect_is(dat, "list")
-  # expect_is(dat[[1]], "data.frame")
-  # expect_is(dat[[2]], "data.frame")
-  # expect_equal(names(dat[[1]]), "x")
-  # expect_equal(NROW(dat[[1]]), 2)
+  testthat::expect_is(dat, "data.frame")
+  testthat::expect_equal(names(dat), c("x", "y"))
+  testthat::expect_equal(NROW(dat), 4)
+  testthat::expect_true(all(dat$x %in% c(NA, 1)))
 
   # expecting a data frame
   dat <- dbtools::sendQuery(

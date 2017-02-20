@@ -104,3 +104,8 @@ setMethod("[", c("CredentialsList", "ANY", "missing"), function(x, i, j, ..., dr
   x@.Data <- S3Part(x, TRUE)[i]
   x
 })
+
+setClassUnion(
+  name = "CredentialsListOrCredentials",
+  members = c("CredentialsList", "Credentials")
+)
