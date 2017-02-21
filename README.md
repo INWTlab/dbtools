@@ -36,7 +36,7 @@ Now, let's check whether we can actually access the database example.db.
 testConnection(cred)
 ```
 
-    ## INFO [2017-02-15 13:12:50] example.db OK
+    ## INFO [2017-02-21 11:39:08] example.db OK
 
 ``` r
 cred
@@ -136,11 +136,11 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2017-02-15 13:12:50] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-21 11:39:09] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
     ## 
-    ## ERROR [2017-02-15 13:12:51] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-21 11:39:10] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
-    ## Error in reTry(function(...) lapply(query, . %>% sendQuery(db = con, ...)), : Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## Error in reTry(function(...) sendQuery(db = con, queryConst(query), ...), : Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
 Multiple Databases
 ------------------
