@@ -9,7 +9,7 @@ testthat::test_that("Package Style", {
     e = lintr::line_length_linter(100),
     f = lintr::no_tab_linter,
     # g = lintr::snake_case_linter, # detects only testthat functions
-    h = lintr::object_length_linter(28)
+    h = lintr::object_length_linter()
     # i = lintr::spaces_left_parentheses_linter #has problems with x@fun()
   ))
 })
