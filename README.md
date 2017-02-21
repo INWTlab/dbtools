@@ -36,9 +36,7 @@ Now, let's check whether we can actually access the database example.db.
 testConnection(cred)
 ```
 
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## INFO [2017-02-21 11:38:34] example.db OK
+    ## INFO [2017-02-21 11:39:08] example.db OK
 
 ``` r
 cred
@@ -100,59 +98,6 @@ queryFun <- function(state) {
 sendQuery(cred, queryFun(dat$State))
 ```
 
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQueryList
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-
     ## # A tibble: 50 × 5
     ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
@@ -191,12 +136,9 @@ dat <- sendQuery(
 )
 ```
 
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## ERROR [2017-02-21 11:38:35] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-21 11:39:09] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
     ## 
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## ERROR [2017-02-21 11:38:36] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
+    ## ERROR [2017-02-21 11:39:10] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
     ## Error in reTry(function(...) sendQuery(db = con, queryConst(query), ...), : Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
@@ -219,12 +161,6 @@ cred <- Credentials(
 
 sendQuery(cred, "SELECT * FROM USArrests;")
 ```
-
-    ## db ~ CredentialsList, query ~ character
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQuery
 
     ## # A tibble: 100 × 5
     ##          State Murder Assault UrbanPop  Rape
@@ -252,8 +188,6 @@ sendQuery(
 )
 ```
 
-    ## db ~ CredentialsList, query ~ character
-
     ## # A tibble: 100 × 5
     ##          State Murder Assault UrbanPop  Rape
     ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
@@ -274,16 +208,6 @@ Potentially you can send multiple queries to multiple databases. The results are
 ``` r
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 ```
-
-    ## db ~ CredentialsList, query ~ character
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQueryList
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQueryList
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
 
     ## [[1]]
     ## # A tibble: 100 × 5
@@ -311,16 +235,6 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 ``` r
 sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALSE)
 ```
-
-    ## db ~ CredentialsList, query ~ character
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQueryList
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ Credentials, query ~ character
-    ## db ~ DBIConnection, query ~ SingleQueryList
-    ## db ~ DBIConnection, query ~ SingleQuery
-    ## db ~ DBIConnection, query ~ SingleQuery
 
     ## [[1]]
     ## [[1]][[1]]
