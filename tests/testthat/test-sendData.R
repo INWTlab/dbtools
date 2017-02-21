@@ -1,4 +1,4 @@
-testthat::context("sendData-SQLite")
+context("sendData-SQLite")
 
 testthat::test_that("sendData", {
 
@@ -84,7 +84,7 @@ test_that("sendData can operate on CredentialsList", {
   unlink(c("db1.db", "db2.db"))
 })
 
-testthat::context("sendData-RMySQL")
+context("sendData-RMySQL")
 testthat::test_that("sendData for RMySQL DB", {
 
   tmp <- system(

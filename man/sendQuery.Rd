@@ -3,27 +3,28 @@
 \docType{methods}
 \name{sendQuery}
 \alias{sendQuery}
-\alias{sendQuery,Credentials,SingleQuery-method}
-\alias{sendQuery,CredentialsList,SingleQuery-method}
-\alias{sendQuery,CredentialsListOrCredentials,SingleQueryList-method}
-\alias{sendQuery,CredentialsListOrCredentials,character-method}
+\alias{sendQuery,Credentials,character-method}
+\alias{sendQuery,CredentialsList,character-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
+\alias{sendQuery,DBIConnection,SingleQueryList-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
+\alias{sendQuery,MySQLConnection,SingleQueryList-method}
 \title{Send query to database and fetch result}
 \usage{
 sendQuery(db, query, ...)
 
-\S4method{sendQuery}{CredentialsListOrCredentials,character}(db, query, ...)
-
-\S4method{sendQuery}{CredentialsListOrCredentials,SingleQueryList}(db, query,
-  ...)
-
-\S4method{sendQuery}{CredentialsList,SingleQuery}(db, query, ...,
+\S4method{sendQuery}{CredentialsList,character}(db, query, ...,
   applyFun = lapply, simplify = TRUE)
 
-\S4method{sendQuery}{Credentials,SingleQuery}(db, query, ...)
+\S4method{sendQuery}{Credentials,character}(db, query, ...)
+
+\S4method{sendQuery}{DBIConnection,SingleQueryList}(db, query, ...,
+  simplify = TRUE)
 
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
+
+\S4method{sendQuery}{MySQLConnection,SingleQueryList}(db, query, ...,
+  simplify = TRUE)
 
 \S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...)
 }
