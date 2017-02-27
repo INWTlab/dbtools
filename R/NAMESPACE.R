@@ -1,6 +1,7 @@
 #' @import methods
 #' @importFrom aoos %g% %m% %type%
 #' @importFrom assertthat assert_that %has_attr% "on_failure<-" is.scalar
+#' @importFrom dat flatmap
 #' @importFrom DBI dbClearResult dbConnect dbDisconnect dbFetch dbHasCompleted
 #' dbListResults dbSendQuery dbWriteTable
 #' @importFrom RMySQL dbMoreResults dbNextResult

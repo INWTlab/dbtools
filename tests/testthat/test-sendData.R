@@ -78,10 +78,11 @@ test_that("sendData can operate on CredentialsList", {
 
   # there should be two identical instances of mtcars in the result set
   testthat::expect_identical(res[[2]][[1]], res[[1]][[1]])
-  testthat::expect_identical(res[[1]][[1]], tibble::as_data_frame(mtcars))
+  testthat::expect_identical(res[[1]], tibble::as_data_frame(mtcars))
 
   # delete database
   unlink(c("db1.db", "db2.db"))
+  
 })
 
 testthat::context("sendData-RMySQL")
