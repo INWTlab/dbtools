@@ -94,7 +94,14 @@ test_that("sendQuery can handle simplification", {
   lapply(dat, expect_is, "list")
   lapply(dat[[1]], expect_is, "data.frame")
   lapply(dat[[2]], expect_is, "data.frame")
+  lapply(dat[[1]], function(df) expect_equal(names(df), "x"))
+  lapply(dat[[2]], function(df) expect_equal(names(df), "y"))
 
+  # expecting a list with dfs
+  dat <- sendQuery(cred, c("SELECT 1 AS x;"), simplify = FALSE)
+  expect_is(dat, "list")
+  lapply(dat, expect_is, "data.frame")
+  
   # expecting a list because of the different names
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = TRUE)
   expect_is(dat, "list")
@@ -103,7 +110,9 @@ test_that("sendQuery can handle simplification", {
   expect_equal(names(dat[[1]]), "x")
   expect_equal(NROW(dat[[1]]), 2)
 
-  # expecting a data frame
+  # expecting a data frame -- maybe we use multiple querys with different WHERE
+  # clauses and want to use the same connection. Then this is a convenient
+  # simplification.
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS x;"), simplify = TRUE)
   expect_is(dat, "data.frame")
   expect_equal(names(dat), "x")

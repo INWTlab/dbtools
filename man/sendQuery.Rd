@@ -4,18 +4,18 @@
 \name{sendQuery}
 \alias{sendQuery}
 \alias{sendQuery,Credentials,SingleQueryList-method}
-\alias{sendQuery,Credentials,character-method}
-\alias{sendQuery,CredentialsList,character-method}
+\alias{sendQuery,CredentialsList,SingleQueryList-method}
+\alias{sendQuery,CredentialsORCredentialsList,character-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
 \title{Send query to database and fetch result}
 \usage{
 sendQuery(db, query, ...)
 
-\S4method{sendQuery}{CredentialsList,character}(db, query, ...,
+\S4method{sendQuery}{CredentialsList,SingleQueryList}(db, query, ...,
   applyFun = lapply, simplify = TRUE)
 
-\S4method{sendQuery}{Credentials,character}(db, query, ...)
+\S4method{sendQuery}{CredentialsORCredentialsList,character}(db, query, ...)
 
 \S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...,
   simplify = TRUE)
