@@ -89,7 +89,7 @@ sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
 
   res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
   res <- insideOut(res)
-  simplifyIfPossible(res, skip = !simplify)
+  simplifyIfPossible(res, skipBindRows = !simplify)
   
 }
 
@@ -118,7 +118,7 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
     function(...) lapply(query, . %>% sendQuery(db = con, ...)), ...
   )
 
-  simplifyIfPossible(downloadedData, skip = !simplify)
+  simplifyIfPossible(downloadedData, skipBindRows = !simplify)
 
 }
 
@@ -178,7 +178,7 @@ simplifyMe <- function(simplify, fun) {
   }
 }
 
-simplifyIfPossible <- function(x, skipCase4 = FALSE, skip = FALSE) {
+simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
 
   # skipCase4 (logical) case 4 can lead (however unlikely) to an infinite
   # recursion. This parameter is used so this can never happen.
@@ -207,8 +207,8 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skip = FALSE) {
 
   isCase1 <- function(x) isCase2(x) && (length(x) == 1)
   isCase2 <- function(x) is.list(x) && allDataFrames(x)
-  isCase3 <- function(x) !skip && isCase2(x) && haveEqualNames(x)
-  isCase4 <- function(x) !skip && !skipCase4 && is.list(x) && allLists(x)
+  isCase3 <- function(x) !skipBindRows && isCase2(x) && haveEqualNames(x)
+  isCase4 <- function(x) !skipBindRows && !skipCase4 && is.list(x) && allLists(x)
 
   if (isCase4(x)) {
     simplifyIfPossible(lapply(x, simplifyIfPossible, TRUE), TRUE)
