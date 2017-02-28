@@ -24,7 +24,7 @@
 #' @param data A data.frame (or coercible to data.frame)
 #' @param table A character string specifying a DBMS table name
 #' @param mode One of "insert", "replace", or "truncate"
-#' @param ... ignored
+#' @param ... arguments passed to methods and to \link[dbtools]{reTry}
 #' @rdname sendData
 #' @export
 sendData(db, data, table = deparse(substitute(data)), ...) %g% {
@@ -41,20 +41,17 @@ sendData(db ~ CredentialsList, data ~ data.frame, table, ..., applyFun = lapply)
 #' @export
 sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
 
-  con <- do.call(dbConnect, as.list(db))
-
   on.exit({
-    if (exists("con")) {
-      dbDisconnect(con)
-    }
+    if (exists("con")) dbDisconnect(con)
   })
 
-  sendData(
-    db = con,
-    data = data,
-    table = table,
+  con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
+
+  reTry(
+    function(...) sendData(db = con, data = data, table = table, ...),
     ...
   )
+  
 }
 
 #' @rdname sendData
@@ -67,9 +64,14 @@ sendData(db ~ DBIConnection, data ~ data.frame, table, ...) %m% {
 #' @export
 sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
 
-  path <- normalizePath(tempfile("dbtools"), "/", FALSE)
-  on.exit(unlink(path))
+  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
 
+  on.exit({
+    if (exists("path")) unlink(path)
+  })
+  
+  path <- normalizePath(tempfile("dbtools"), "/", FALSE)
+  
   cacheTable(data, path)
   if (mode == "truncate")
     truncateTable(db, table)
