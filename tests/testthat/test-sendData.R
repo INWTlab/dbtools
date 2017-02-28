@@ -1,5 +1,7 @@
 testthat::context("sendData-SQLite")
 
+noErrorLogging <- function(x, ...) NULL
+
 testthat::test_that("sendData", {
 
   # prepare data
@@ -85,6 +87,37 @@ test_that("sendData can operate on CredentialsList", {
   
 })
 
+test_that("Error handling and retry in sendData", {
+
+  data(mtcars, envir = environment())
+  cred <- Credentials(drv = MySQL, dbname = "Nirvana")
+
+  expect_error(
+    sendData(
+      cred,
+      mtcars,
+      tries = 2,
+      intSleep = 1,
+      errorLogging = noErrorLogging
+    )
+  )
+
+  
+  cred <- dbtools::Credentials(
+    drv = dbtools::SQLite,
+    dbname = "db1.db"
+  )
+  
+  # Just to make sure, that the arguments are not confused inside sendData:
+  expect_true({
+    dbtools::sendData(cred, mtcars, mode = "truncate", tries = 2, intSleep = 1)
+  })
+
+  unlink("db1.db")
+
+})
+
+
 testthat::context("sendData-RMySQL")
 testthat::test_that("sendData for RMySQL DB", {
 
@@ -161,6 +194,16 @@ testthat::test_that("sendData for RMySQL DB", {
       dplyr::select(mtcars, dplyr::one_of(rev(names(mtcars)))),
       table = "mtcars",
       mode = "truncate"
+    )
+  )
+
+  # errors
+  expect_error(
+    sendData(
+      cred,
+      mtcars,
+      mode = "wrong spelling",
+      errorLogging = noErrorLogging
     )
   )
 
