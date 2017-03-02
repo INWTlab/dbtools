@@ -90,14 +90,14 @@ sqlAssertAlnums <- function(x) {
 
 #' @rdname sqlAssertions
 #' @export
-sqlAssertWord <- function(x) {
+sqlAssertWordChar <- function(x) {
   stopifnot(length(x) == 1)
-  sqlAssertWords(x)
+  sqlAssertWordChars(x)
 }
 
 #' @rdname sqlAssertions
 #' @export
-sqlAssertWords <- function(x) {
+sqlAssertWordChars <- function(x) {
   pattern <- "^\\w+$"
   sqlAssertPattern(x, pattern)
 }

@@ -8,8 +8,8 @@
 \alias{sqlAssertNums}
 \alias{sqlAssertAlnum}
 \alias{sqlAssertAlnums}
-\alias{sqlAssertWord}
-\alias{sqlAssertWords}
+\alias{sqlAssertWordChar}
+\alias{sqlAssertWordChars}
 \alias{sqlParan}
 \alias{sqlComma}
 \alias{sqlEsc}
@@ -33,9 +33,9 @@ sqlAssertAlnum(x)
 
 sqlAssertAlnums(x)
 
-sqlAssertWord(x)
+sqlAssertWordChar(x)
 
-sqlAssertWords(x)
+sqlAssertWordChars(x)
 
 sqlParan(x, assert = identity)
 

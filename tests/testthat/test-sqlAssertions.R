@@ -25,10 +25,10 @@ test_that("sqlPattern", {
   expectEqual(sqlAssertAlnum(1L), 1L)
   expectEqual(sqlAssertAlnum("a1"), "a1")
 
-  expectError(sqlAssertWord("a-1"))
-  expectError(sqlAssertWord("a1!"))
-  expectEqual(sqlAssertWord("a1"), "a1")
-  expectEqual(sqlAssertWord("a_1"), "a_1")
+  expectError(sqlAssertWordChar("a-1"))
+  expectError(sqlAssertWordChar("a1!"))
+  expectEqual(sqlAssertWordChar("a1"), "a1")
+  expectEqual(sqlAssertWordChar("a_1"), "a_1")
 })
 
 test_that("Formats", {
