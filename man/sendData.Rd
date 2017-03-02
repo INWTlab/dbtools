@@ -3,8 +3,8 @@
 \docType{methods}
 \name{sendData}
 \alias{sendData}
-\alias{sendData,Credentials,data.frame-method}
 \alias{sendData,CredentialsList,data.frame-method}
+\alias{sendData,Credentials,data.frame-method}
 \alias{sendData,DBIConnection,data.frame-method}
 \alias{sendData,MySQLConnection,data.frame-method}
 \title{Copy data to database tables}
@@ -24,16 +24,16 @@ sendData(db, data, table = deparse(substitute(data)), ...)
   mode = "insert")
 }
 \arguments{
-\item{db}{one in:
-\cr (\link{Credentials}) the credentials to get a connection to a database.
-\cr (DBIConnection) \link[DBI]{DBIConnection-class}
-\cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}}
+\item{db}{one in: \cr (\link{Credentials}) the credentials to get a
+connection to a database.  \cr (DBIConnection)
+\link[DBI]{DBIConnection-class} \cr (MySQLConnection)
+\link[RMySQL]{MySQLConnection-class}}
 
 \item{data}{A data.frame (or coercible to data.frame)}
 
 \item{table}{A character string specifying a DBMS table name}
 
-\item{...}{ignored}
+\item{...}{arguments passed to methods and to \link[dbtools]{reTry}}
 
 \item{applyFun}{(function) something like lapply or mclapply}
 
@@ -61,4 +61,3 @@ There are three different modes for sending data to the database:
   table is truncated before sending the data}
 }
 }
-

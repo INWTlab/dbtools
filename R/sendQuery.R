@@ -2,22 +2,21 @@
 #'
 #' This functions sends a query to a database and fetches the result.
 #'
-#' @param db one in:
-#'   \cr (\link{Credentials}) the credentials to get a connection to a database.
-#'   \cr (DBIConnection) \link[DBI]{DBIConnection-class}
-#'   \cr (MySQLConnection) \link[RMySQL]{MySQLConnection-class}
-#' @param query one in:
-#'   \cr (character, length >= 1) a query
-#'   \cr (SingleQuery | SingleQeuryList) \link{SingleQuery-class} is mostly used
-#'   internally.
-#' @param ... one in:
-#'   \cr for signature (Credentials, character | SingleQueryList) arguments are
-#'   passed to \code{reTry}
-#'   \cr for signature (CredentialsList) arguments are passed to the
-#'   (Credentials) method, so implicitly to reTry
-#'   \cr else ignored
+#' @param db one in: \cr (\link{Credentials}) the credentials to get a
+#'   connection to a database.  \cr (DBIConnection)
+#'   \link[DBI]{DBIConnection-class} \cr (MySQLConnection)
+#'   \link[RMySQL]{MySQLConnection-class}
+#' @param query one in: \cr (character, length >= 1) a query \cr (SingleQuery |
+#'   SingleQeuryList) \link{SingleQuery-class} is mostly used internally.
+#' @param ... one in: \cr for signature (Credentials, character |
+#'   SingleQueryList) arguments are passed to \code{reTry} \cr for signature
+#'   (CredentialsList) arguments are passed to the (Credentials) method, so
+#'   implicitly to reTry \cr else ignored
 #' @param applyFun (function) something like lapply or mclapply
 #' @param simplify (logical(1)) whether to simplify results. See details.
+#' @param encoding (character | NULL) the encoding used in a \code{SET NAMES}
+#'   statement. Currently only implemented for MySQL connections. The
+#'   default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.
 #'
 #' @details \code{simplify} the default is to simplify results. If you send
 #'   multiple queries to one database it is tried to rbind the results - when
@@ -72,19 +71,31 @@ sendQuery(db, query, ...) %g% {
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ CredentialsList, query ~ character, ..., applyFun = lapply, simplify = TRUE) %m% {
-  # db: is of class 'CredentialsList'
-  # query: is probably a character
-  applyFun(db, sendQuery, query = query, ..., simplify = FALSE) %>%
-    { simplifyMe(simplify, doRbind)(.) }
+sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
+          applyFun = lapply, simplify = TRUE) %m% {
+
+  insideOut <- function(x) {
+    if (isNestedList(x)) {
+      do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
+    } else {
+      x
+    }    
+  }
+
+  isNestedList <- function(x) {
+    is.list(x) && all(flatmap(x, is, class2 = "list"))
+  }
+
+  res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
+  res <- insideOut(res)
+  simplifyIfPossible(res, skipBindRows = !simplify)
+  
 }
 
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ Credentials, query ~ character, ...) %m% {
-  # db: is of class 'Credentials' containing db creds
-  # query: should be a character vector
+sendQuery(db ~ Credentials | CredentialsList, query ~ character, ...) %m% {
   sendQuery(db, SingleQueryList(as.list(query)), ...)
 }
 
@@ -106,7 +117,7 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
     function(...) lapply(query, . %>% sendQuery(db = con, ...)), ...
   )
 
-  downloadedData %>% { simplifyMe(simplify, doRbind)(.) }
+  simplifyIfPossible(downloadedData, skipBindRows = !simplify)
 
 }
 
@@ -123,7 +134,7 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
+sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
 
@@ -131,8 +142,9 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
     suppressWarnings(RMySQL::dbSendQuery(...))
   }
 
-  setNamesUtf8 <- function(con) {
-    dbSendQuery(con, "SET NAMES 'utf8';")
+  setNamesEncoding <- function(con, encoding) {
+    if (is.null(encoding)) return(NULL)
+    dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
   }
 
   dumpRemainingResults <- function(con) {
@@ -147,7 +159,7 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ...) %m% {
     if (nrow(wrngs) > 0) warning(wrngs)
   }
 
-  setNamesUtf8(db)
+  setNamesEncoding(db, encoding)
   res <- dbSendQuery(db, query)
   dat <- fetchFirstResult(res)
   dumpRemainingResults(db)
@@ -166,47 +178,47 @@ simplifyMe <- function(simplify, fun) {
   }
 }
 
-doRbind <- function(x) {
-  # This gets more and more complicated. Basically this is a simplify function.
-  # We need some type checking of x, thats what makes this function tricky.
-  # Helpers:
-  nestedMap <- function(fun, x) do.call(function(...) Map(fun, ...), x)
-  sapply <- function(...) unlist(lapply(...))
+simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
 
-  check <- function(x, checkFun, ...) {
-    if (class(x)[1] == "list") sapply(x, check, checkFun = checkFun, ...)
-    else checkFun(x, ...)
+  # skipCase4 (logical) case 4 can lead (however unlikely) to an infinite
+  # recursion. This parameter is used so this can never happen.
+
+  # Cases:
+  # 1. Single Credentials + SingleQuery: list[df] -> df
+  # 2. Single Credentials + Multiple Queries: list[dfs] -> df (same as case 3) | list[dfs]
+  # 3. Multiple Credentials + Single Query: list[dfs] -> df
+  # 4. Multiple Credentials + Multiple Queries: list[lists[dfs]] -> df | list[dfs]
+
+  allEqual <- function(x) {
+    all(flatmap(x, y ~ all(y == x[[1]])))
   }
 
-  checkDF <- function(x) {
-    # x: list
-    # Checks if all elements are data frames
-    all(check(x, inherits, what = "data.frame"))
+  haveEqualNames <- function(x) {
+    allEqual(lapply(x, names))
   }
 
-  checkNames <- function(x) {
-    # x : list
-    # Check if all elements have same names as attribute
-    compareFun <- function(x, compare) all(compare %in% names(x))
-    all(check(x, compareFun, compare = check(x, names)))
+  allDataFrames <- function(x) {
+    all(flatmap(x, is, class2 = "data.frame"))
   }
 
-  simplifyOutput <- function(x) {
-    # x:list
-
-    # reduce to element if list has length equal to 1
-    if (length(x) == 1) return(x[[1]])
-
-    # reduce recursively if names of all dfs are equal
-    else if (checkNames(x)) return(doRbind(x))
-
-    else return(x)
-
+  allLists <- function(x) {
+    all(flatmap(x, is, class2 = "list"))
   }
 
-  if (inherits(x[[1]], "data.frame")) x %>% bind_rows
-  else if (checkDF(x)) nestedMap(bind_rows, x) %>% simplifyOutput
-  else x
+  isCase1 <- function(x) isCase2(x) && (length(x) == 1)
+  isCase2 <- function(x) is.list(x) && allDataFrames(x)
+  isCase3 <- function(x) !skipBindRows && isCase2(x) && haveEqualNames(x)
+  isCase4 <- function(x) !skipBindRows && !skipCase4 && is.list(x) && allLists(x)
+
+  if (isCase4(x)) {
+    simplifyIfPossible(lapply(x, simplifyIfPossible, TRUE), TRUE)
+  } else if (isCase1(x)) {
+    x[[1]]
+  } else if (isCase3(x)) {
+    bind_rows(x)
+  } else {
+    x
+  }
 
 }
 

@@ -37,7 +37,7 @@ sqlAssertPattern <- function(x, pattern, negate = FALSE) {
   on_failure(matchesPattern) <- function(call, env) {
     paste0(
       "Plausibility check failed. Input contains illegal character.\n",
-      env$x, "\nshould ", if(env$negate) "not " else "", "match\n", env$pattern
+      env$x, "\nshould ", if (env$negate) "not " else "", "match\n", env$pattern
     )
   }
 
@@ -56,7 +56,7 @@ sqlAssertChar <- function(x) {
 #' @rdname sqlAssertions
 #' @export
 sqlAssertChars <- function(x) {
-  pattern <- "^[-[:alpha:]_]+$"
+  pattern <- "^[[:alpha:]]+$"
   sqlAssertPattern(x, pattern)
 }
 
@@ -85,6 +85,20 @@ sqlAssertAlnum <- function(x) {
 #' @export
 sqlAssertAlnums <- function(x) {
   pattern <- "^[[:alnum:]]+$"
+  sqlAssertPattern(x, pattern)
+}
+
+#' @rdname sqlAssertions
+#' @export
+sqlAssertWord <- function(x) {
+  stopifnot(length(x) == 1)
+  sqlAssertWords(x)
+}
+
+#' @rdname sqlAssertions
+#' @export
+sqlAssertWords <- function(x) {
+  pattern <- "^\\w+$"
   sqlAssertPattern(x, pattern)
 }
 

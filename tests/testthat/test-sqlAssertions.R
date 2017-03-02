@@ -13,11 +13,22 @@ test_that("sqlPattern", {
   expectError(sqlAssertChar("1"))
   expectError(sqlAssertChar(" "))
   expectError(sqlAssertChar("!"))
+  expectEqual(sqlAssertAlnum("a"), "a")
+
   expectError(sqlAssertNum("a1"))
   expectError(sqlAssertNum("a"))
+  expectEqual(sqlAssertNum(1L), 1L)
+  expectEqual(sqlAssertNum(pi), pi)
+
   expectError(sqlAssertAlnum("a1!"))
+  expectEqual(sqlAssertAlnum("a"), "a")
+  expectEqual(sqlAssertAlnum(1L), 1L)
   expectEqual(sqlAssertAlnum("a1"), "a1")
 
+  expectError(sqlAssertWord("a-1"))
+  expectError(sqlAssertWord("a1!"))
+  expectEqual(sqlAssertWord("a1"), "a1")
+  expectEqual(sqlAssertWord("a_1"), "a_1")
 })
 
 test_that("Formats", {

@@ -1,6 +1,6 @@
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
-This package abstracts typical patterns used when connecting to and retrieving data from databases in R. It aims to provide very few, simple and reliable functions for sending queries and data to databases.
+This package abstracts typical patterns used when connecting to and communicating with databases in R. It aims to provide very few, simple and reliable functions for sending queries and data to databases.
 
 Installation
 ------------
@@ -9,28 +9,34 @@ Installation
 devtools::install_github("INWT/dbtools")
 ```
 
-Basic usage: sendQuery
-----------------------
+We will start with a simple example showing how to use `dbtools` to send queries and data to a database. The example will introduce the main parts of the package, namely the *Credentials* class as well as both `sendQuery` and `sendData`.
 
-For basic usage consider the simple case where we want to retrieve some data from a SQLite database. At this time we only have `sendQuery` and no `sendData` so we use the standard example for setting up the database:
+Introductory example
+--------------------
 
-``` r
-library("RSQLite")
-con <- dbConnect(SQLite(), "example.db")
-USArrests$State <- rownames(USArrests)
-dbWriteTable(con, "USArrests", USArrests, row.names = FALSE)
-dbDisconnect(con)
-```
+In this example we show how to connect to a database, how to communicate with the database, how to set up a database table, and finally how to send and retrieve data.
 
-This will create a database `example.db` to which we can send some queries. To begin with, we have to define an object of class *Credentials* which will store all necessary information to connect to a database. The driver is mandatory, all other arguments depend on the specific back-end.
+To begin with, we have to define an object of class *Credentials* which will store all necessary information to connect to a database. The driver is mandatory, all other arguments depend on the specific back-end.
 
 ``` r
 library("dbtools")
+```
+
+    ## Loading required package: aoos
+
+``` r
 cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
+```
+
+Opposed to the functions available from DBI, functions from `dbtools` need a *Credentials* instance as argument that takes care of connecting to the database, communicating with the database and closing the connection.
+
+Now, let's check whether we can actually access the database example.db.
+
+``` r
 testConnection(cred)
 ```
 
-    ## INFO [2016-12-02 11:57:36] example.db OK
+    ## INFO [2017-02-15 13:12:50] example.db OK
 
 ``` r
 cred
@@ -40,27 +46,47 @@ cred
     ## drv:SQLiteDriver
     ## dbname: example.db
 
-Opposed to the `dbSendQuery` function available from DBI, `sendQuery` needs a *Credentials* instance as argument and will take care of connecting to the database, fetching the results and closing the connection.
+For the remainder of this example, we make use of the USArrests dataset. Unfortunately, the data contains some information in its row names, namely the respective state. Since `dbtools` does not support row names, we have to convert them to a variable.
 
 ``` r
-dat <- sendQuery(cred, "SELECT * FROM USArrests;")
+data(USArrests, envir = environment())
+USArrests <- tibble::rownames_to_column(USArrests, "State")
+USArrests
+```
+
+Next, we will create the database table by sending a `CREATE TABLE` query to the database.
+
+``` r
+sendQuery(
+  cred, 
+  "CREATE TABLE `USArrests` (
+  State TEXT PRIMARY KEY, 
+  Murder INTEGER,
+  Assault REAL,
+  UrbanPop REAL,
+  Rape INTEGER);"
+)
+```
+
+Now, we can write the USArrests data to the USArrests database table by using the `sendData` function.
+
+``` r
+sendData(cred, USArrests)
+```
+
+If we want to read data from the database, we can do this by using `sendQuery`, the same function we used for creating the database table.
+
+``` r
+dat <- sendQuery(cred, "SELECT * FROM `USArrests`;")
 dat
 ```
 
-    ## # A tibble: 50 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
-    ## # ... with 40 more rows
+Now we will dig a bit deeper into the functionality of `dbtools`.
+
+sendQuery
+---------
+
+Basically, you already know how to use `sendQuery`. In our introductory example we used it to create a database table and to query some data.
 
 In your normal work-flow you will sometimes want to split up a complex query into more tangible chunks. The approach we take here is to allow for a vector of queries as argument. The result of these queries have to be *row-bindable*. To make an example lets say we want to query each state separately:
 
@@ -73,21 +99,28 @@ sendQuery(cred, queryFun(dat$State))
 ```
 
     ## # A tibble: 50 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 40 more rows
 
 In such a case `sendQuery` will perform all queries on one connection. A different approach is to fetch the results of the original query in chunks, which we do not support yet.
+
+sendData
+--------
+
+As with `sendQuery`, you basically already know how to use `sendData`. In the introductory example we used it to send the USArrests data to the USArrests database table.
+
+When using `sendData` you might be interesting in how to handle possible primary key violations. By default, `sendData` will keep old rows and ignore any duplicates. But you may use the mode argument and set it to "replace" (replace old rows) or "truncate" (delete old rows from database table before writing data). If you are using a non MySQL connection, you may notice that this feature is not available yet.
 
 Unstable connections
 --------------------
@@ -103,14 +136,11 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2016-12-02 11:57:36] Error in rsqlite_send_query(conn@ptr, statement) : 
-    ##   no such table: USArrest
+    ## ERROR [2017-02-15 13:12:50] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
     ## 
-    ## ERROR [2016-12-02 11:57:37] Error in rsqlite_send_query(conn@ptr, statement) : 
-    ##   no such table: USArrest
+    ## ERROR [2017-02-15 13:12:51] Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
-    ## Error in reTry(function(...) lapply(query, . %>% sendQuery(db = con, ...)), : Error in rsqlite_send_query(conn@ptr, statement) : 
-    ##   no such table: USArrest
+    ## Error in reTry(function(...) lapply(query, . %>% sendQuery(db = con, ...)), : Error in eval(substitute(expr), envir, enclos) : no such table: USArrest
 
 Multiple Databases
 ------------------
@@ -133,18 +163,18 @@ sendQuery(cred, "SELECT * FROM USArrests;")
 ```
 
     ## # A tibble: 100 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 90 more rows
 
 It might also be of interest to query your databases in parallel. For that it is possible to supply a apply/map function which in turn can be a parallel lapply like mclapply or something else:
@@ -159,18 +189,18 @@ sendQuery(
 ```
 
     ## # A tibble: 100 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 90 more rows
 
 Potentially you can send multiple queries to multiple databases. The results are tried to be simplified by default:
@@ -181,18 +211,18 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"))
 
     ## [[1]]
     ## # A tibble: 100 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 90 more rows
     ## 
     ## [[2]]
@@ -209,18 +239,18 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ## [[1]]
     ## [[1]][[1]]
     ## # A tibble: 50 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 40 more rows
     ## 
     ## [[1]][[2]]
@@ -233,18 +263,18 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ## [[2]]
     ## [[2]][[1]]
     ## # A tibble: 50 × 5
-    ##    Murder Assault UrbanPop  Rape       State
-    ##     <dbl>   <int>    <int> <dbl>       <chr>
-    ## 1    13.2     236       58  21.2     Alabama
-    ## 2    10.0     263       48  44.5      Alaska
-    ## 3     8.1     294       80  31.0     Arizona
-    ## 4     8.8     190       50  19.5    Arkansas
-    ## 5     9.0     276       91  40.6  California
-    ## 6     7.9     204       78  38.7    Colorado
-    ## 7     3.3     110       77  11.1 Connecticut
-    ## 8     5.9     238       72  15.8    Delaware
-    ## 9    15.4     335       80  31.9     Florida
-    ## 10   17.4     211       60  25.8     Georgia
+    ##          State Murder Assault UrbanPop  Rape
+    ##          <chr>  <dbl>   <dbl>    <dbl> <dbl>
+    ## 1      Alabama   13.2     236       58  21.2
+    ## 2       Alaska   10.0     263       48  44.5
+    ## 3      Arizona    8.1     294       80  31.0
+    ## 4     Arkansas    8.8     190       50  19.5
+    ## 5   California    9.0     276       91  40.6
+    ## 6     Colorado    7.9     204       78  38.7
+    ## 7  Connecticut    3.3     110       77  11.1
+    ## 8     Delaware    5.9     238       72  15.8
+    ## 9      Florida   15.4     335       80  31.9
+    ## 10     Georgia   17.4     211       60  25.8
     ## # ... with 40 more rows
     ## 
     ## [[2]][[2]]
@@ -252,6 +282,8 @@ sendQuery(cred, c("SELECT * FROM USArrests;", "SELECT 1 AS x;"), simplify = FALS
     ##       x
     ##   <int>
     ## 1     1
+
+Both functionalities are available for `sendData`, too.
 
 Parameterized Queries
 ---------------------
@@ -282,3 +314,7 @@ Query(file(tmpFile), ids = 1:10)
 
     ## Query:
     ## SELECT `someField` FROM `someTable` WHERE `primaryKey` IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+``` r
+unlink(c("example.db", "example1.db"))
+```
