@@ -105,17 +105,18 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
   # db: is a list
   # query: is a single query
 
-  on.exit({
-    if (exists("con")) {
-      dbDisconnect(con)
-    }
+  downloadedData <- reTry(..., fun = function(...) {
+
+    on.exit({
+      if (exists("con")) {
+        dbDisconnect(con)
+      }
+    })
+
+    con <- do.call(dbConnect, as.list(db))
+    lapply(query, . %>% sendQuery(db = con, ...))
+    
   })
-
-  con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
-
-  downloadedData <- reTry(
-    function(...) lapply(query, . %>% sendQuery(db = con, ...)), ...
-  )
 
   simplifyIfPossible(downloadedData, skipBindRows = !simplify)
 

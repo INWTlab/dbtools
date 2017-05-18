@@ -1,3 +1,7 @@
+Version 0.2.9
+- fix for reTry within sendQuery. In case of an error the connection is now
+  properly disconnected and reconnected.
+
 Version 0.2.3
 - new function: sqlAssertAlnum
 - changed behaviour: sqlName[s] accept alnums
