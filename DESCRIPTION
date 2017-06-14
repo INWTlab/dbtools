@@ -1,7 +1,7 @@
 Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
-Version: 0.2.9
+Version: 0.2.10
 Author: INWT-Statistics GmbH
 Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
 Description: Some tools to work with databases.
