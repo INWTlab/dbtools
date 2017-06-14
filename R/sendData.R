@@ -83,9 +83,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 
 convertDateTimes <- function(data) {
   data[] <- lapply(data, function(col) {
-    if (inherits(col, "POSIXt"))
-      col <- as.character(col)
-    col
+    if (inherits(col, "POSIXt")) as.character(col) else col
   })
   data
 }
