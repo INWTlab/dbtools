@@ -70,7 +70,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
     if (exists("path")) unlink(path)
   })
 
-  data <- convertDateTimes(data)
+  data <- convertToCharacter(data)
   path <- normalizePath(tempfile("dbtools"), "/", FALSE)
 
   cacheTable(data, path)
@@ -81,10 +81,8 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
   TRUE
 }
 
-convertDateTimes <- function(data) {
-  data[] <- lapply(data, function(col) {
-    if (inherits(col, "POSIXt")) as.character(col) else col
-  })
+convertToCharacter <- function(data) {
+  data[] <- lapply(data, as.character)
   data
 }
 
