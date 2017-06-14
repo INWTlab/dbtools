@@ -82,6 +82,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 }
 
 convertToCharacter <- function(data) {
+  data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
   data[] <- lapply(data, as.character)
   data
 }

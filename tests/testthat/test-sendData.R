@@ -206,6 +206,15 @@ testthat::test_that("sendData for RMySQL DB", {
     dbtools::sendData(cred, data.frame(dtm = Sys.time()), table = "dtm")
   )
 
+  # NaN
+  dbtools::sendQuery(cred, "CREATE TABLE `nan` (
+    `nan` INT NULL);"
+  )
+
+  testthat::expect_silent(
+    dbtools::sendData(cred, data.frame(nan = NaN), table = "nan")
+  )
+
   # errors
   expect_error(
     sendData(
