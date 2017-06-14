@@ -84,7 +84,7 @@ test_that("sendData can operate on CredentialsList", {
 
   # delete database
   unlink(c("db1.db", "db2.db"))
-  
+
 })
 
 test_that("Error handling and retry in sendData", {
@@ -102,12 +102,12 @@ test_that("Error handling and retry in sendData", {
     )
   )
 
-  
+
   cred <- dbtools::Credentials(
     drv = dbtools::SQLite,
     dbname = "db1.db"
   )
-  
+
   # Just to make sure, that the arguments are not confused inside sendData:
   expect_true({
     dbtools::sendData(cred, mtcars, mode = "truncate", tries = 2, intSleep = 1)
@@ -195,6 +195,15 @@ testthat::test_that("sendData for RMySQL DB", {
       table = "mtcars",
       mode = "truncate"
     )
+  )
+
+  # datetime fields
+  dbtools::sendQuery(cred, "CREATE TABLE `dtm` (
+    `dtm` DATETIME NOT NULL);"
+  )
+
+  testthat::expect_silent(
+    dbtools::sendData(cred, data.frame(dtm = Sys.time()), table = "dtm")
   )
 
   # errors

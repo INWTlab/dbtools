@@ -51,7 +51,7 @@ sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
     function(...) sendData(db = con, data = data, table = table, ...),
     ...
   )
-  
+
 }
 
 #' @rdname sendData
@@ -69,15 +69,25 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
   on.exit({
     if (exists("path")) unlink(path)
   })
-  
+
+  data <- convertDateTimes(data)
   path <- normalizePath(tempfile("dbtools"), "/", FALSE)
-  
+
   cacheTable(data, path)
   if (mode == "truncate")
     truncateTable(db, table)
   writeTable(db, path, table, names(data), mode)
 
   TRUE
+}
+
+convertDateTimes <- function(data) {
+  data[] <- lapply(data, function(col) {
+    if (inherits(col, "POSIXt"))
+      col <- as.character(col)
+    col
+  })
+  data
 }
 
 truncateTable <- function(db, table) {
