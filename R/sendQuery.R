@@ -169,16 +169,6 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
 
 }
 
-simplifyMe <- function(simplify, fun) {
-  function(x) {
-    if (simplify) {
-      fun(x)
-    } else {
-      x
-    }
-  }
-}
-
 simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
 
   # skipCase4 (logical) case 4 can lead (however unlikely) to an infinite
