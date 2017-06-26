@@ -29,10 +29,10 @@
 #' writeLines(c(query1, query2), tmpFile)
 #' Query(file(tmpFile))
 #' @export
-Query <- function(.x, ..., .data = NULL) {
+Query <- function(.x, ..., .data = NULL, .envir = parent.frame()) {
 
   query <- queryRead(.x)
-  query <- queryEvalTemplate(query, .data, ...)
+  query <- queryEvalTemplate(query, .data, .envir = .envir, ...)
   
   queryConst(query)
 
