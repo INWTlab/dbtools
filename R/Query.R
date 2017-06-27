@@ -8,6 +8,8 @@
 #'   query.
 #' @param ... Parameters to be substituted in .x
 #' @param .data (list)
+#' @param .envir (environment) Should be left with the default. Sets the
+#'   environment in which to evaluate code chunks in queries.
 #'
 #' @rdname queries
 #'

@@ -7,7 +7,7 @@
 \alias{SingleQueryList-class}
 \title{SQL Query Objects}
 \usage{
-Query(.x, ..., .data = NULL)
+Query(.x, ..., .data = NULL, .envir = parent.frame())
 }
 \arguments{
 \item{.x}{(character | connection) A character or connection containing a
@@ -16,6 +16,9 @@ query.}
 \item{...}{Parameters to be substituted in .x}
 
 \item{.data}{(list)}
+
+\item{.envir}{(environment) Should be left with the default. Sets the
+environment in which to evaluate code chunks in queries.}
 }
 \description{
 Data types to represent SQL queries. It should not be necessary to use
@@ -39,4 +42,3 @@ tmpFile <- tempfile()
 writeLines(c(query1, query2), tmpFile)
 Query(file(tmpFile))
 }
-

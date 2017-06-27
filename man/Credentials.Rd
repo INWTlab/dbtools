@@ -2,13 +2,13 @@
 % Please edit documentation in R/Credentials.R
 \docType{class}
 \name{Credentials-class}
-\alias{Credentials}
 \alias{Credentials-class}
-\alias{CredentialsList}
-\alias{CredentialsList-class}
-\alias{[,CredentialsList,ANY,missing-method}
-\alias{as.character.Credentials}
+\alias{Credentials}
 \alias{as.list.Credentials}
+\alias{as.character.Credentials}
+\alias{CredentialsList-class}
+\alias{CredentialsList}
+\alias{[,CredentialsList,ANY,missing-method}
 \title{Credentials Class}
 \usage{
 Credentials(drv, ...)
@@ -45,4 +45,3 @@ Credentials(drv = SQLite, dbname = ":memory:")
 Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 
 }
-
