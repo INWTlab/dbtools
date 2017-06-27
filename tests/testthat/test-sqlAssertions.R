@@ -10,22 +10,25 @@ test_that("sqlPattern", {
     testthat::expect_equal(x, y)
   }
 
-  expectError(
-    sqlPattern("1 2", "[ ]", TRUE)
-  )
-
-  expectError(
-    sqlPattern("12", "[ ]", FALSE)
-  )
-
   expectError(sqlAssertChar("1"))
   expectError(sqlAssertChar(" "))
   expectError(sqlAssertChar("!"))
+  expectEqual(sqlAssertAlnum("a"), "a")
+
   expectError(sqlAssertNum("a1"))
   expectError(sqlAssertNum("a"))
+  expectEqual(sqlAssertNum(1L), 1L)
+  expectEqual(sqlAssertNum(pi), pi)
+
   expectError(sqlAssertAlnum("a1!"))
+  expectEqual(sqlAssertAlnum("a"), "a")
+  expectEqual(sqlAssertAlnum(1L), 1L)
   expectEqual(sqlAssertAlnum("a1"), "a1")
-  
+
+  expectError(sqlAssertWordChar("a-1"))
+  expectError(sqlAssertWordChar("a1!"))
+  expectEqual(sqlAssertWordChar("a1"), "a1")
+  expectEqual(sqlAssertWordChar("a_1"), "a_1")
 })
 
 test_that("Formats", {
@@ -45,6 +48,6 @@ test_that("Formats", {
   expectError(sqlName("DROP TABLE"))
   expectTrue(sqlNames(letters[1:2]) == "`a`, `b`")
   expectTrue(sqlInChars(letters[1:2]) == "(\"a\", \"b\")")
-  expectTrue(sqlInNums(1:2) == "(1, 2)")  
-    
+  expectTrue(sqlInNums(1:2) == "(1, 2)")
+
 })

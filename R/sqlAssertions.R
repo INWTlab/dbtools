@@ -25,7 +25,7 @@
 #' sqlAssertNums(1:2)
 #' sqlAssertChar("a")
 #' sqlAssertChars(letters[1:2])
-sqlAssertPattern <- function(x, pattern, negate = TRUE) {
+sqlAssertPattern <- function(x, pattern, negate = FALSE) {
 
   matchesPattern <- function(x, pattern, negate) {
     reducer <- if (negate) any else all
@@ -56,9 +56,8 @@ sqlAssertChar <- function(x) {
 #' @rdname sqlAssertions
 #' @export
 sqlAssertChars <- function(x) {
-  punct <- "[\\!\\`\\$\\*\\+\\.\\?\\[\\^\\{\\|\\(\\\\]"
-  pattern <- paste0("[ \n\t]|[0-9]|", punct)
-  sqlAssertPattern(x, pattern, TRUE)
+  pattern <- "^[[:alpha:]]+$"
+  sqlAssertPattern(x, pattern)
 }
 
 #' @rdname sqlAssertions
@@ -71,9 +70,8 @@ sqlAssertNum <- function(x) {
 #' @rdname sqlAssertions
 #' @export
 sqlAssertNums <- function(x) {
-  punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
-  pattern <- paste0("[ \n\t]|[a-z]|[A-Z]|", punct)
-  sqlAssertPattern(x, pattern, TRUE)
+  pattern <- "^[[:digit:].]+$"
+  sqlAssertPattern(x, pattern)
 }
 
 #' @rdname sqlAssertions
@@ -86,9 +84,22 @@ sqlAssertAlnum <- function(x) {
 #' @rdname sqlAssertions
 #' @export
 sqlAssertAlnums <- function(x) {
-  punct <- "[\\!\\`\\$\\*\\+\\?\\[\\^\\{\\|\\(\\\\]" # allows "."
-  pattern <- paste0("[ \n\t]|", punct)
-  sqlAssertPattern(x, pattern, TRUE)
+  pattern <- "^[[:alnum:]]+$"
+  sqlAssertPattern(x, pattern)
+}
+
+#' @rdname sqlAssertions
+#' @export
+sqlAssertWordChar <- function(x) {
+  stopifnot(length(x) == 1)
+  sqlAssertWordChars(x)
+}
+
+#' @rdname sqlAssertions
+#' @export
+sqlAssertWordChars <- function(x) {
+  pattern <- "^\\w+$"
+  sqlAssertPattern(x, pattern)
 }
 
 #' @rdname sqlAssertions
