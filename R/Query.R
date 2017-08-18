@@ -24,9 +24,9 @@
 #' @examples
 #' query1 <- "SELECT {{ varName }} FROM {{ tableName }} WHERE primaryKey = {{ id }};"
 #' query2 <- "SHOW TABLES;"
-#' 
+#'
 #' Query(query1, varName = "someVar", tableName = "someTable", .data = list(id = 1:2))
-#' 
+#'
 #' tmpFile <- tempfile()
 #' writeLines(c(query1, query2), tmpFile)
 #' Query(file(tmpFile))
@@ -35,7 +35,7 @@ Query <- function(.x, ..., .data = NULL, .envir = parent.frame()) {
 
   query <- queryRead(.x)
   query <- queryEvalTemplate(query, .data, .envir = .envir, ...)
-  
+
   queryConst(query)
 
 }
@@ -44,16 +44,15 @@ queryRead(x) %g% x
 
 queryRead(x ~ connection) %m% {
   on.exit(close(x))
-  
+
   query <- readLines(x)
-  query <- sub("^#", "", query)
-  query <- query[query != ""]               
+  query <- query[query != ""]
   query <- paste(query, collapse = "\n")
   query <- unlist(strsplit(query, ";"))
   query <- paste0(query, ";")
   query <- sub("^\\n+", "", query)
   query
-  
+
 }
 
 queryEvalTemplate(x, .data, ...) %g% x
@@ -85,13 +84,13 @@ queryEvalTemplate(x ~ list, .data ~ list, ...) %m% {
   fixedDots <- list(...)
 
   do.call(Map, c(list(f = localQueryEval), .data))
-  
+
 }
 
 queryConst <- function(x) {
   if (length(x) == 1) SingleQuery(x[[1]])
   else SingleQueryList(as.list(x))
-} 
+}
 
 #' @exportClass SingleQuery
 #' @rdname queries
@@ -99,7 +98,7 @@ character : SingleQuery() %type% {
   assert_that(
     is.scalar(.Object),
     length(unlist(strsplit(.Object, ";"))) == 1,
-    
+
     grepl(";$", .Object)
   )
   .Object
