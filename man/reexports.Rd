@@ -3,6 +3,8 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
+\alias{MariaDB}
+\alias{reexports}
 \alias{MySQL}
 \alias{reexports}
 \alias{SQLite}
@@ -13,6 +15,8 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
+  \item{RMariaDB}{\code{\link[RMariaDB]{MariaDB}}}
+
   \item{RMySQL}{\code{\link[RMySQL]{MySQL}}}
 
   \item{RSQLite}{\code{\link[RSQLite]{SQLite}}}

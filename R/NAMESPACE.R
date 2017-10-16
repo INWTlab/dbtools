@@ -14,6 +14,10 @@ NULL
 
 globalVariables(".")
 
+#' @importFrom RMariaDB MariaDB
+#' @export
+RMariaDB::MariaDB
+
 #' @importFrom RMySQL MySQL
 #' @export
 RMySQL::MySQL

@@ -79,7 +79,7 @@ sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
       do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
     } else {
       x
-    }    
+    }
   }
 
   isNestedList <- function(x) {
@@ -89,7 +89,7 @@ sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
   res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
   res <- insideOut(res)
   simplifyIfPossible(res, skipBindRows = !simplify)
-  
+
 }
 
 
@@ -115,7 +115,7 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
 
     con <- do.call(dbConnect, as.list(db))
     lapply(query, . %>% sendQuery(db = con, ...))
-    
+
   })
 
   simplifyIfPossible(downloadedData, skipBindRows = !simplify)
@@ -164,6 +164,34 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
   res <- dbSendQuery(db, query)
   dat <- fetchFirstResult(res)
   dumpRemainingResults(db)
+  checkForWarnings(db)
+  dat
+
+}
+
+#' @export
+#' @rdname sendQuery
+sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
+  # db: is a MariaDB connection
+  # query: is a character of length 1
+
+  dbSendQuery <- function(...) {
+    suppressWarnings(RMariaDB::dbSendQuery(...))
+  }
+
+  setNamesEncoding <- function(con, encoding) {
+    if (is.null(encoding)) return(NULL)
+    dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
+  }
+
+  checkForWarnings <- function(con) {
+    wrngs <- dbSendQuery(con, "SHOW WARNINGS;") %>% fetchFirstResult
+    if (nrow(wrngs) > 0) warning(wrngs)
+  }
+
+  setNamesEncoding(db, encoding)
+  res <- dbSendQuery(db, query)
+  dat <- fetchFirstResult(res)
   checkForWarnings(db)
   dat
 
