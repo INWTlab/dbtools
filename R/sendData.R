@@ -67,7 +67,28 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
   stopifnot(is.element(mode, c("insert", "replace", "truncate")))
 
   on.exit({
-    if (exists("path")) unlink(path)
+    if (file.exists(path)) unlink(path)
+  })
+
+  data <- convertToCharacter(data)
+  path <- normalizePath(tempfile("dbtools"), "/", FALSE)
+
+  cacheTable(data, path)
+  if (mode == "truncate")
+    truncateTable(db, table)
+  writeTable(db, path, table, names(data), mode)
+
+  TRUE
+}
+
+#' @rdname sendData
+#' @export
+sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
+
+  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
+
+  on.exit({
+    if (file.exists(path)) unlink(path)
   })
 
   data <- convertToCharacter(data)
@@ -100,8 +121,8 @@ writeTable <- function(db, path, table, names, mode) {
 }
 
 sqlLoadData <- function(path, table, names, mode) {
-  SingleQuery (
-    paste0 (
+  SingleQuery(
+    paste0(
       "LOAD DATA LOCAL INFILE '",
       path,
       "' ",

@@ -140,7 +140,7 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
   # query: is a character of length 1
 
   dbSendQuery <- function(...) {
-    suppressWarnings(RMySQL::dbSendQuery(...))
+    suppressWarnings(DBI::dbSendQuery(...))
   }
 
   setNamesEncoding <- function(con, encoding) {
@@ -176,7 +176,7 @@ sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %
   # query: is a character of length 1
 
   dbSendQuery <- function(...) {
-    suppressWarnings(RMariaDB::dbSendQuery(...))
+    suppressWarnings(DBI::dbSendQuery(...))
   }
 
   setNamesEncoding <- function(con, encoding) {
