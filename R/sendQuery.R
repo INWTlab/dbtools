@@ -135,8 +135,9 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
-  # db: is a MySQL connection
+sendQuery(db ~ MySQLConnection | MariaDBConnection, query ~ SingleQuery, ...,
+          encoding = "utf8") %m% {
+  # db: is a MySQL or a MariaDB connection
   # query: is a character of length 1
 
   dbSendQuery <- function(...) {
@@ -146,13 +147,6 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
   setNamesEncoding <- function(con, encoding) {
     if (is.null(encoding)) return(NULL)
     dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
-  }
-
-  dumpRemainingResults <- function(con) {
-    while (dbMoreResults(con)) {
-      dump <- dbNextResult(con)
-      dbClearResult(dump)
-    }
   }
 
   checkForWarnings <- function(con) {
@@ -164,34 +158,6 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
   res <- dbSendQuery(db, query)
   dat <- fetchFirstResult(res)
   dumpRemainingResults(db)
-  checkForWarnings(db)
-  dat
-
-}
-
-#' @export
-#' @rdname sendQuery
-sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
-  # db: is a MariaDB connection
-  # query: is a character of length 1
-
-  dbSendQuery <- function(...) {
-    suppressWarnings(DBI::dbSendQuery(...))
-  }
-
-  setNamesEncoding <- function(con, encoding) {
-    if (is.null(encoding)) return(NULL)
-    dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
-  }
-
-  checkForWarnings <- function(con) {
-    wrngs <- dbSendQuery(con, "SHOW WARNINGS;") %>% fetchFirstResult
-    if (nrow(wrngs) > 0) warning(wrngs)
-  }
-
-  setNamesEncoding(db, encoding)
-  res <- dbSendQuery(db, query)
-  dat <- fetchFirstResult(res)
   checkForWarnings(db)
   dat
 
@@ -248,3 +214,18 @@ fetchFirstResult <- function(res) {
   else NULL
 }
 
+dumpRemainingResults(con) %g% {
+  standardGeneric("dumpRemainingResults")
+}
+
+dumpRemainingResults(con ~ MySQLConnection) %m% {
+  while (dbMoreResults(con)) {
+    dump <- dbNextResult(con)
+    dbClearResult(dump)
+  }
+}
+
+dumpRemainingResults(con ~ MariaDBConnection) %m% {
+  # dbMoreResults and dbNextResult are not supported in RMariaDB
+  con
+}

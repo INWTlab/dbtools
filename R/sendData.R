@@ -40,13 +40,11 @@ sendData(db ~ CredentialsList, data ~ data.frame, table, ..., applyFun = lapply)
 #' @rdname sendData
 #' @export
 sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
-
   on.exit({
     if (exists("con")) dbDisconnect(con)
   })
 
   con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
-
   reTry(
     function(...) sendData(db = con, data = data, table = table, ...),
     ...
@@ -62,28 +60,8 @@ sendData(db ~ DBIConnection, data ~ data.frame, table, ...) %m% {
 
 #' @rdname sendData
 #' @export
-sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-
-  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
-
-  on.exit({
-    if (file.exists(path)) unlink(path)
-  })
-
-  data <- convertToCharacter(data)
-  path <- normalizePath(tempfile("dbtools"), "/", FALSE)
-
-  cacheTable(data, path)
-  if (mode == "truncate")
-    truncateTable(db, table)
-  writeTable(db, path, table, names(data), mode)
-
-  TRUE
-}
-
-#' @rdname sendData
-#' @export
-sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
+sendData(db ~ MySQLConnection | MariaDBConnection, data ~ data.frame, table,
+         ..., mode = "insert") %m% {
 
   stopifnot(is.element(mode, c("insert", "replace", "truncate")))
 

@@ -1,7 +1,7 @@
 Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
-Version: 0.2.12
+Version: 0.2.14
 Author: INWT-Statistics GmbH
 Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
 Description: Some tools to work with databases.
@@ -9,16 +9,16 @@ Depends:
     methods,
     aoos(>= 0.4.0)
 Imports:
-    assertthat,
-    dat,
-    data.table,
     DBI,
-    dplyr,
-    futile.logger,
-    magrittr,
     RMariaDB,
     RMySQL,
     RSQLite,
+    assertthat,
+    dat,
+    data.table,
+    dplyr,
+    futile.logger,
+    magrittr,
     templates
 License: MIT + file LICENSE
 LazyData: TRUE

@@ -12,7 +12,10 @@
 #' @importFrom templates tmpl
 NULL
 
-globalVariables(".")
+#' @importClassesFrom DBI DBIConnection
+#' @importClassesFrom RMariaDB MariaDBConnection
+#' @importClassesFrom RMySQL MySQLConnection
+NULL
 
 #' @importFrom RMariaDB MariaDB
 #' @export
@@ -25,6 +28,8 @@ RMySQL::MySQL
 #' @importFrom RSQLite SQLite
 #' @export
 RSQLite::SQLite
+
+globalVariables(".")
 
 local({
   # This sets all connection types for S4-dispatch

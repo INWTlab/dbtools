@@ -101,7 +101,7 @@ test_that("sendQuery can handle simplification", {
   dat <- sendQuery(cred, c("SELECT 1 AS x;"), simplify = FALSE)
   expect_is(dat, "list")
   lapply(dat, expect_is, "data.frame")
-  
+
   # expecting a list because of the different names
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = TRUE)
   expect_is(dat, "list")
@@ -121,18 +121,18 @@ test_that("sendQuery can handle simplification", {
 
 })
 
-context("sendQuery-RMySQL")
+testthat::context("sendQuery-RMySQL")
 
-test_that("sendQuery for failing RMySQL DB", {
+testthat::test_that("sendQuery for failing RMySQL DB", {
 
   cred <- Credentials(drv = MySQL, dbname = "Nirvana")
 
-  expect_error(
+  testthat::expect_error(
     sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging)
   )
-  
+
 })
-  
+
 test_that("sendQuery for RMySQL DB", {
   # Sometimes we get an error if docker has not been startet. Use:
   # sudo service docker.io start
@@ -158,33 +158,33 @@ test_that("sendQuery for RMySQL DB", {
 
   dat <- sendQuery(cred, "SELECT 1 AS x;")
 
-  expect_equal(nrow(dat), 1)
-  expect_equal(ncol(dat), 1)
-  expect_equal(names(dat), "x")
-  expect_true(all(dat$x == 1))
-  expect_is(dat, "data.frame")
+  testthat::expect_equal(nrow(dat), 1)
+  testthat::expect_equal(ncol(dat), 1)
+  testthat::expect_equal(names(dat), "x")
+  testthat::expect_true(all(dat$x == 1))
+  testthat::expect_is(dat, "data.frame")
 
   dat <- sendQuery(cred, rep("SELECT 1;", 2))
 
-  expect_equal(nrow(dat), 2)
-  expect_equal(ncol(dat), 1)
-  expect_true(all(dat$"1" == 1))
+  testthat::expect_equal(nrow(dat), 2)
+  testthat::expect_equal(ncol(dat), 1)
+  testthat::expect_true(all(dat$"1" == 1))
 
   dat <- sendQuery(cred, sapply(1:2, dummyQuery, const = 2))
 
-  expect_equal(nrow(dat), 2)
-  expect_equal(ncol(dat), 1)
-  expect_equal(names(dat), "x")
-  expect_true(all(dat$x == 3:4))
+  testthat::expect_equal(nrow(dat), 2)
+  testthat::expect_equal(ncol(dat), 1)
+  testthat::expect_equal(names(dat), "x")
+  testthat::expect_true(all(dat$x == 3:4))
 
-  expect_error(
+  testthat::expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
       errorLogging = noErrorLogging
     )
   )
-  expect_error(
+  testthat::expect_error(
     sendQuery(
       cred,
       "SELECT 1 FRM Tabelle;",
