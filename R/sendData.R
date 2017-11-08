@@ -60,7 +60,7 @@ sendData(db ~ DBIConnection, data ~ data.frame, table, ...) %m% {
 
 #' @rdname sendData
 #' @export
-sendData(db ~ MySQLConnection | MariaDBConnection, data ~ data.frame, table,
+sendData(db ~ MySQLConnection, data ~ data.frame, table,
          ..., mode = "insert") %m% {
 
   stopifnot(is.element(mode, c("insert", "replace", "truncate")))
@@ -78,6 +78,15 @@ sendData(db ~ MySQLConnection | MariaDBConnection, data ~ data.frame, table,
   writeTable(db, path, table, names(data), mode)
 
   TRUE
+}
+
+#' @rdname sendData
+#' @export
+sendData(db ~ MariaDBConnection, data ~ data.frame, table,
+         ..., mode = "insert") %m% {
+  getMethod("sendData", c(db = "MySQLConnection", data = "data.frame"))(
+    db = db, data = data, ..., mode = mode
+  )
 }
 
 convertToCharacter <- function(data) {

@@ -74,23 +74,23 @@ sendQuery(db, query, ...) %g% {
 sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
           applyFun = lapply, simplify = TRUE) %m% {
 
-  insideOut <- function(x) {
-    if (isNestedList(x)) {
-      do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
-    } else {
-      x
-    }
-  }
+            insideOut <- function(x) {
+              if (isNestedList(x)) {
+                do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
+              } else {
+                x
+              }
+            }
 
-  isNestedList <- function(x) {
-    is.list(x) && all(flatmap(x, is, class2 = "list"))
-  }
+            isNestedList <- function(x) {
+              is.list(x) && all(flatmap(x, is, class2 = "list"))
+            }
 
-  res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
-  res <- insideOut(res)
-  simplifyIfPossible(res, skipBindRows = !simplify)
+            res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
+            res <- insideOut(res)
+            simplifyIfPossible(res, skipBindRows = !simplify)
 
-}
+          }
 
 
 #' @rdname sendQuery
@@ -135,13 +135,12 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MySQLConnection | MariaDBConnection, query ~ SingleQuery, ...,
-          encoding = "utf8") %m% {
-  # db: is a MySQL or a MariaDB connection
+sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
+  # db: is a MySQL connection
   # query: is a character of length 1
 
   dbSendQuery <- function(...) {
-    suppressWarnings(DBI::dbSendQuery(...))
+    suppressWarnings(RMySQL::dbSendQuery(...))
   }
 
   setNamesEncoding <- function(con, encoding) {
@@ -161,6 +160,17 @@ sendQuery(db ~ MySQLConnection | MariaDBConnection, query ~ SingleQuery, ...,
   checkForWarnings(db)
   dat
 
+}
+
+#' @export
+#' @rdname sendQuery
+sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
+  # db: is a MySQL connection
+  # query: is a character of length 1
+
+  getMethod("sendQuery", c(db = "MySQLConnection", query = "SingleQuery"))(
+    db = db, query = query, ..., encoding = encoding
+  )
 }
 
 simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
@@ -214,18 +224,17 @@ fetchFirstResult <- function(res) {
   else NULL
 }
 
-dumpRemainingResults(con) %g% {
+dumpRemainingResults(db, ...) %g% {
   standardGeneric("dumpRemainingResults")
 }
 
-dumpRemainingResults(con ~ MySQLConnection) %m% {
-  while (dbMoreResults(con)) {
-    dump <- dbNextResult(con)
+dumpRemainingResults(db ~ MySQLConnection, ...) %m% {
+  while (dbMoreResults(db)) {
+    dump <- dbNextResult(db)
     dbClearResult(dump)
   }
 }
 
-dumpRemainingResults(con ~ MariaDBConnection) %m% {
-  # dbMoreResults and dbNextResult are not supported in RMariaDB
-  con
+dumpRemainingResults(db ~ MariaDBConnection, ...) %m% {
+  db
 }
