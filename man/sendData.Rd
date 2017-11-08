@@ -7,7 +7,7 @@
 \alias{sendData,Credentials,data.frame-method}
 \alias{sendData,DBIConnection,data.frame-method}
 \alias{sendData,MySQLConnection,data.frame-method}
-\alias{sendData,MySQLConnection,data.frame-method}
+\alias{sendData,MariaDBConnection,data.frame-method}
 \title{Copy data to database tables}
 \usage{
 sendData(db, data, table = deparse(substitute(data)), ...)
@@ -24,7 +24,7 @@ sendData(db, data, table = deparse(substitute(data)), ...)
 \S4method{sendData}{MySQLConnection,data.frame}(db, data, table, ...,
   mode = "insert")
 
-\S4method{sendData}{MySQLConnection,data.frame}(db, data, table, ...,
+\S4method{sendData}{MariaDBConnection,data.frame}(db, data, table, ...,
   mode = "insert")
 }
 \arguments{

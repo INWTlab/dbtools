@@ -12,11 +12,6 @@
 #' @importFrom templates tmpl
 NULL
 
-#' @importClassesFrom DBI DBIConnection
-#' @importClassesFrom RMariaDB MariaDBConnection
-#' @importClassesFrom RMySQL MySQLConnection
-NULL
-
 #' @importFrom RMariaDB MariaDB
 #' @export
 RMariaDB::MariaDB
