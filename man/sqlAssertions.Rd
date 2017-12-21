@@ -15,6 +15,7 @@
 \alias{sqlNames}
 \alias{sqlInNums}
 \alias{sqlInChars}
+\alias{sqlInAlnums}
 \title{SQL Assertions and Formats}
 \usage{
 sqlAssertPattern(x, pattern, negate = TRUE)
@@ -44,6 +45,8 @@ sqlNames(x)
 sqlInNums(x)
 
 sqlInChars(x)
+
+sqlInAlnums(x)
 }
 \arguments{
 \item{x}{(ANY) input}

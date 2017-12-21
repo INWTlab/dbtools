@@ -25,7 +25,7 @@ test_that("sqlPattern", {
   expectError(sqlAssertNum("a"))
   expectError(sqlAssertAlnum("a1!"))
   expectEqual(sqlAssertAlnum("a1"), "a1")
-  
+
 })
 
 test_that("Formats", {
@@ -45,6 +45,8 @@ test_that("Formats", {
   expectError(sqlName("DROP TABLE"))
   expectTrue(sqlNames(letters[1:2]) == "`a`, `b`")
   expectTrue(sqlInChars(letters[1:2]) == "(\"a\", \"b\")")
-  expectTrue(sqlInNums(1:2) == "(1, 2)")  
-    
+  expectTrue(sqlInNums(1:2) == "(1, 2)")
+  expectTrue(sqlInAlnums(c("1_A", "2_B")) == "(\"1_A\", \"2_B\")")
+
 })
+
