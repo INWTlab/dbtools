@@ -100,7 +100,7 @@ test_that("sendQuery can handle simplification", {
   # expecting a list with dfs
   dat <- sendQuery(cred, c("SELECT 1 AS x;"), simplify = FALSE)
   expect_is(dat, "list")
-  for (df in dat) expect_is(df,"data.frame")
+  for (df in dat) expect_is(df, "data.frame")
 
   # expecting a list because of the different names
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = TRUE)
