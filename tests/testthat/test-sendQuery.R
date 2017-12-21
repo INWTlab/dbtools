@@ -91,17 +91,17 @@ test_that("sendQuery can handle simplification", {
   # expecting a nested list:
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = FALSE)
   expect_is(dat, "list")
-  lapply(dat, expect_is, "list")
-  lapply(dat[[1]], expect_is, "data.frame")
-  lapply(dat[[2]], expect_is, "data.frame")
-  lapply(dat[[1]], function(df) expect_equal(names(df), "x"))
-  lapply(dat[[2]], function(df) expect_equal(names(df), "y"))
+  for (df in dat) expect_is(df, "list")
+  for (df in dat[[1]]) expect_is(df, "data.frame")
+  for (df in dat[[2]]) expect_is(df, "data.frame")
+  for (df in dat[[1]]) expect_equal(names(df), "x")
+  for (df in dat[[2]]) expect_equal(names(df), "y")
 
   # expecting a list with dfs
   dat <- sendQuery(cred, c("SELECT 1 AS x;"), simplify = FALSE)
   expect_is(dat, "list")
-  lapply(dat, expect_is, "data.frame")
-  
+  for (df in dat) expect_is(df,"data.frame")
+
   # expecting a list because of the different names
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = TRUE)
   expect_is(dat, "list")
@@ -130,9 +130,9 @@ test_that("sendQuery for failing RMySQL DB", {
   expect_error(
     sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging)
   )
-  
+
 })
-  
+
 test_that("sendQuery for RMySQL DB", {
   # Sometimes we get an error if docker has not been startet. Use:
   # sudo service docker.io start
