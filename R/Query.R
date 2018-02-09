@@ -10,6 +10,8 @@
 #' @param .data (list)
 #' @param .envir (environment) Should be left with the default. Sets the
 #'   environment in which to evaluate code chunks in queries.
+#' @param checkSemicolon (logical) Should be left with the default. Set to
+#'   false only in case you want to allow for semicolons within the query.
 #'
 #' @rdname queries
 #'
