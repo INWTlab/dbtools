@@ -31,12 +31,12 @@
 #' writeLines(c(query1, query2), tmpFile)
 #' Query(file(tmpFile))
 #' @export
-Query <- function(.x, ..., .data = NULL, .envir = parent.frame()) {
+Query <- function(.x, ..., .data = NULL, .envir = parent.frame(), checkSemicolon = TRUE) {
 
   query <- queryRead(.x)
   query <- queryEvalTemplate(query, .data, .envir = .envir, ...)
 
-  queryConst(query)
+  queryConst(query, checkSemicolon = checkSemicolon)
 
 }
 
@@ -87,29 +87,37 @@ queryEvalTemplate(x ~ list, .data ~ list, ...) %m% {
 
 }
 
-queryConst <- function(x) {
-  if (length(x) == 1) SingleQuery(x[[1]])
-  else SingleQueryList(as.list(x))
+queryConst <- function(x, checkSemicolon) {
+  if (length(x) == 1) SingleQuery(x[[1]], checkSemicolon = checkSemicolon)
+  else SingleQueryList(as.list(x), checkSemicolon = checkSemicolon)
 }
 
 #' @exportClass SingleQuery
 #' @rdname queries
-character : SingleQuery() %type% {
+character : SingleQuery(checkSemicolon = TRUE) %type% {
   assert_that(
     is.scalar(.Object),
-    length(unlist(strsplit(.Object, ";"))) == 1,
-
-    grepl(";$", .Object)
+    grepl(";$", .Object),
+    if (.Object@checkSemicolon)
+      length(unlist(strsplit(.Object, ";"))) == 1 else TRUE
   )
   .Object
 }
 
+SingleQuery <- function(..., checkSemicolon = TRUE) new(
+  'SingleQuery', checkSemicolon = checkSemicolon, ...
+)
+
 #' @exportClass SingleQueryList
 #' @rdname queries
-list : SingleQueryList() %type% {
-  S3Part(.Object) <- Map(SingleQuery, .Object)
+list : SingleQueryList(checkSemicolon = TRUE) %type% {
+  S3Part(.Object) <- lapply(.Object, SingleQuery, checkSemicolon = .Object@checkSemicolon)
   .Object
 }
+
+SingleQueryList <- function(..., checkSemicolon = TRUE) new(
+  'SingleQueryList', checkSemicolon = checkSemicolon, ...
+)
 
 show(object ~ SingleQuery) %m% {
   cat("Query:\n", S3Part(object, TRUE), "\n\n", sep = "")
