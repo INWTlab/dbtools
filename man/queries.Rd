@@ -20,6 +20,9 @@ query.}
 
 \item{.envir}{(environment) Should be left with the default. Sets the
 environment in which to evaluate code chunks in queries.}
+
+\item{checkSemicolon}{(logical) Should be left with the default. Set to
+false only in case you want to allow for semicolons within the query.}
 }
 \description{
 Data types to represent SQL queries. It should not be necessary to use
