@@ -1,12 +1,4 @@
 #' @import methods
-#' @importFrom aoos %g%
-#' @importFrom aoos %m%
-#' @importFrom aoos %type%
-#' @importFrom assertthat assert_that
-#' @importFrom assertthat %has_attr%
-#' @importFrom assertthat "on_failure<-"
-#' @importFrom assertthat is.scalar
-#' @importFrom dat flatmap
 #' @importFrom DBI dbClearResult
 #' @importFrom DBI dbConnect
 #' @importFrom DBI dbDisconnect
@@ -15,11 +7,20 @@
 #' @importFrom DBI dbListResults
 #' @importFrom DBI dbSendQuery
 #' @importFrom DBI dbWriteTable
+#' @importFrom aoos %g%
+#' @importFrom aoos %m%
+#' @importFrom aoos %type%
+#' @importFrom assertthat assert_that
+#' @importFrom assertthat %has_attr%
+#' @importFrom assertthat "on_failure<-"
+#' @importFrom assertthat is.scalar
+#' @importFrom dat flatmap
 #' @importFrom data.table fwrite
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom magrittr %>%
 #' @importFrom templates tmpl
+#' @importFrom utils capture.output
 NULL
 
 #' @importFrom RMariaDB MariaDB
