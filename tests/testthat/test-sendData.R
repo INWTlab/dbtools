@@ -232,3 +232,119 @@ testthat::test_that("sendData for RMySQL DB", {
   )
 
 })
+
+testthat::context("sendData-RMariaDB")
+testthat::test_that("sendData for MariaDB", {
+
+  tmp <- system(
+    paste('docker run --name mariadbtest -p 3306:3306',
+          '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test',
+          '-d mariadb:latest'),
+    intern = TRUE
+  )
+
+  Sys.sleep(15)
+
+  # prepare data
+  data(mtcars, envir = environment())
+  mtcars <- tibble::rownames_to_column(mtcars, "model")
+
+  cred <- dbtools::Credentials(
+    drv = MariaDB,
+    user = "root",
+    password = "root",
+    dbname = "test",
+    host = "127.0.0.1",
+    port = 3306
+  )
+
+  # create table
+  dbtools::sendQuery(cred, "CREATE TABLE `mtcars` (
+                     `model` VARCHAR(20) NOT NULL,
+                     `mpg` DOUBLE NOT NULL,
+                     `cyl` DOUBLE NOT NULL,
+                     `disp` DOUBLE NOT NULL,
+                     `hp` DOUBLE NOT NULL,
+                     `drat` DOUBLE NOT NULL,
+                     `wt` DOUBLE NOT NULL,
+                     `qsec` DOUBLE NOT NULL,
+                     `vs` DOUBLE NOT NULL,
+                     `am` DOUBLE NOT NULL,
+                     `gear` DOUBLE NOT NULL,
+                     `carb` DOUBLE NOT NULL,
+                     PRIMARY KEY (`model`));"
+)
+
+  # send data to database
+  testthat::expect_true(dbtools::sendData(cred, mtcars))
+
+  # retrieve data
+  res <- dbtools::sendQuery(cred, "SELECT * FROM `mtcars`;")
+
+  # objects should be equal
+  testthat::expect_identical(
+    res,
+    dplyr::arrange(tibble::as_data_frame(mtcars), model)
+  )
+
+  # duplicates in case of insert
+  testthat::expect_warning(
+    dbtools::sendData(cred, mtcars, mode = "insert"),
+    regexp = "Duplicate entry"
+  )
+
+  # duplicates in case of replace
+  testthat::expect_true(dbtools::sendData(cred, mtcars, mode = "replace"))
+
+  # truncate
+  dbtools::sendData(cred, dplyr::slice(mtcars, 1:5), table = "mtcars", mode = "truncate")
+
+  # retrieve data
+  res <- dbtools::sendQuery(cred, "SELECT * FROM `mtcars`;")
+  testthat::expect_identical(nrow(res), 5L)
+
+  # field order
+  testthat::expect_true(
+    dbtools::sendData(
+      cred,
+      dplyr::select(mtcars, dplyr::one_of(rev(names(mtcars)))),
+      table = "mtcars",
+      mode = "truncate"
+    )
+  )
+
+  # datetime fields
+  dbtools::sendQuery(cred, "CREATE TABLE `dtm` (
+    `dtm` DATETIME NOT NULL);"
+  )
+
+  testthat::expect_silent(
+    dbtools::sendData(cred, data.frame(dtm = Sys.time()), table = "dtm")
+  )
+
+  # NaN
+  dbtools::sendQuery(cred, "CREATE TABLE `nan` (
+    `nan` INT NULL);"
+  )
+
+  testthat::expect_silent(
+    dbtools::sendData(cred, data.frame(nan = NaN), table = "nan")
+  )
+
+  # errors
+  expect_error(
+    sendData(
+      cred,
+      mtcars,
+      mode = "wrong spelling",
+      errorLogging = noErrorLogging
+    )
+  )
+
+  # End the temp db:
+  tmp <- system(
+    'docker kill mariadbtest; docker rm -v mariadbtest',
+    intern = TRUE
+  )
+
+})

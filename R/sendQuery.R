@@ -74,23 +74,23 @@ sendQuery(db, query, ...) %g% {
 sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
           applyFun = lapply, simplify = TRUE) %m% {
 
-            insideOut <- function(x) {
-              if (isNestedList(x)) {
-                do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
-              } else {
-                x
-              }
-            }
+  insideOut <- function(x) {
+    if (isNestedList(x)) {
+      do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
+    } else {
+      x
+    }
+  }
 
-            isNestedList <- function(x) {
-              is.list(x) && all(flatmap(x, is, class2 = "list"))
-            }
+  isNestedList <- function(x) {
+    is.list(x) && all(flatmap(x, is, class2 = "list"))
+  }
 
-            res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
-            res <- insideOut(res)
-            simplifyIfPossible(res, skipBindRows = !simplify)
+  res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
+  res <- insideOut(res)
+  simplifyIfPossible(res, skipBindRows = !simplify)
 
-          }
+}
 
 
 #' @rdname sendQuery
@@ -129,7 +129,7 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
   # query: is a character of length 1
 
   res <- dbSendQuery(db, query)
-  fetchFirstResult(res)
+  fetchResult(res)
 
 }
 
@@ -139,24 +139,9 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
   # db: is a MySQL connection
   # query: is a character of length 1
 
-  dbSendQuery <- function(...) {
-    suppressWarnings(RMySQL::dbSendQuery(...))
-  }
-
-  setNamesEncoding <- function(con, encoding) {
-    if (is.null(encoding)) return(NULL)
-    dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
-  }
-
-  checkForWarnings <- function(con) {
-    wrngs <- dbSendQuery(con, "SHOW WARNINGS;") %>% fetchFirstResult
-    if (nrow(wrngs) > 0) warning(wrngs)
-  }
-
   setNamesEncoding(db, encoding)
   res <- dbSendQuery(db, query)
-  dat <- fetchFirstResult(res)
-  dumpRemainingResults(db)
+  dat <- fetchResult(res)
   checkForWarnings(db)
   dat
 
@@ -168,9 +153,12 @@ sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %
   # db: is a MySQL connection
   # query: is a character of length 1
 
-  getMethod("sendQuery", c(db = "MySQLConnection", query = "SingleQuery"))(
-    db = db, query = query, ..., encoding = encoding
-  )
+  setNamesEncoding(db, encoding)
+  res <- dbSendQuery(db, query)
+  dat <- fetchResult(res)
+  checkForWarnings(db)
+  dat
+
 }
 
 simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
@@ -217,24 +205,34 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
 
 }
 
-fetchFirstResult <- function(res) {
+sendQueryDb <- function(...) {
+  res <- suppressWarnings(dbSendQuery(...))
+  fetchResult(res)
+}
+
+fetchResult <- function(res) {
   # Helper used in sendQuery methods.
   on.exit(dbClearResult(res))
-  if (!dbHasCompleted(res)) dplyr::as.tbl(dbFetch(res, n = -1))
+  if (!dbHasCompleted(res))
+    dplyr::as.tbl(dbFetch(res, n = -1))
   else NULL
 }
 
-dumpRemainingResults(db, ...) %g% {
-  standardGeneric("dumpRemainingResults")
+setNamesEncoding <- function(con, encoding) {
+  if (is.null(encoding)) return(NULL)
+  sendQueryDb(con, paste0("SET NAMES '", encoding, "';"))
 }
 
-dumpRemainingResults(db ~ MySQLConnection, ...) %m% {
-  while (dbMoreResults(db)) {
-    dump <- dbNextResult(db)
-    dbClearResult(dump)
+checkForWarnings <- function(con) {
+  res <- sendQueryDb(con, "SHOW WARNINGS;")
+  if (nrow(res) > 0) {
+    warn <- formatWarnings(res)
+    warning(warn)
   }
 }
 
-dumpRemainingResults(db ~ MariaDBConnection, ...) %m% {
-  db
+formatWarnings <- function(dat) {
+  dat <- capture.output(print(dat))
+  dat <- paste(dat, collapse = "\n")
+  dat
 }

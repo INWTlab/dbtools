@@ -47,7 +47,7 @@ connection to a database.  \cr (DBIConnection)
 These functions copy data frames to database tables
 }
 \details{
-Basically, these functions are intended to behave like dbSendQuery.
+Basically, these functions are intended to behave like dbWriteTable.
 However, there are two notebale exceptions:
 \enumerate{
   \item append is always set to TRUE, i.e. the target database table must

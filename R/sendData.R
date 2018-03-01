@@ -2,7 +2,7 @@
 #'
 #' These functions copy data frames to database tables
 #'
-#' @details Basically, these functions are intended to behave like dbSendQuery.
+#' @details Basically, these functions are intended to behave like dbWriteTable.
 #' However, there are two notebale exceptions:
 #' \enumerate{
 #'   \item append is always set to TRUE, i.e. the target database table must
@@ -40,11 +40,13 @@ sendData(db ~ CredentialsList, data ~ data.frame, table, ..., applyFun = lapply)
 #' @rdname sendData
 #' @export
 sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
+
   on.exit({
     if (exists("con")) dbDisconnect(con)
   })
 
   con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
+
   reTry(
     function(...) sendData(db = con, data = data, table = table, ...),
     ...
@@ -60,15 +62,11 @@ sendData(db ~ DBIConnection, data ~ data.frame, table, ...) %m% {
 
 #' @rdname sendData
 #' @export
-sendData(db ~ MySQLConnection, data ~ data.frame, table,
-         ..., mode = "insert") %m% {
+sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
 
   stopifnot(is.element(mode, c("insert", "replace", "truncate")))
 
-  on.exit({
-    if (file.exists(path)) unlink(path)
-  })
-
+  on.exit(unlink(path))
   data <- convertToCharacter(data)
   path <- normalizePath(tempfile("dbtools"), "/", FALSE)
 
@@ -82,11 +80,20 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table,
 
 #' @rdname sendData
 #' @export
-sendData(db ~ MariaDBConnection, data ~ data.frame, table,
-         ..., mode = "insert") %m% {
-  getMethod("sendData", c(db = "MySQLConnection", data = "data.frame"))(
-    db = db, data = data, ..., mode = mode
-  )
+sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
+
+  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
+
+  on.exit(unlink(path))
+  data <- convertToCharacter(data)
+  path <- normalizePath(tempfile("dbtools"), "/", FALSE)
+
+  cacheTable(data, path)
+  if (mode == "truncate")
+    truncateTable(db, table)
+  writeTable(db, path, table, names(data), mode)
+
+  TRUE
 }
 
 convertToCharacter <- function(data) {
@@ -108,8 +115,8 @@ writeTable <- function(db, path, table, names, mode) {
 }
 
 sqlLoadData <- function(path, table, names, mode) {
-  SingleQuery(
-    paste0(
+  SingleQuery (
+    paste0 (
       "LOAD DATA LOCAL INFILE '",
       path,
       "' ",

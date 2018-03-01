@@ -91,16 +91,16 @@ test_that("sendQuery can handle simplification", {
   # expecting a nested list:
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = FALSE)
   expect_is(dat, "list")
-  lapply(dat, expect_is, "list")
-  lapply(dat[[1]], expect_is, "data.frame")
-  lapply(dat[[2]], expect_is, "data.frame")
-  lapply(dat[[1]], function(df) expect_equal(names(df), "x"))
-  lapply(dat[[2]], function(df) expect_equal(names(df), "y"))
+  for (df in dat) expect_is(df, "list")
+  for (df in dat[[1]]) expect_is(df, "data.frame")
+  for (df in dat[[2]]) expect_is(df, "data.frame")
+  for (df in dat[[1]]) expect_equal(names(df), "x")
+  for (df in dat[[2]]) expect_equal(names(df), "y")
 
   # expecting a list with dfs
   dat <- sendQuery(cred, c("SELECT 1 AS x;"), simplify = FALSE)
   expect_is(dat, "list")
-  lapply(dat, expect_is, "data.frame")
+  for (df in dat) expect_is(df, "data.frame")
 
   # expecting a list because of the different names
   dat <- sendQuery(cred, c("SELECT 1 AS x;", "SELECT 1 AS y;"), simplify = TRUE)
@@ -121,13 +121,13 @@ test_that("sendQuery can handle simplification", {
 
 })
 
-testthat::context("sendQuery-RMySQL")
+context("sendQuery-RMySQL")
 
-testthat::test_that("sendQuery for failing RMySQL DB", {
+test_that("sendQuery for failing RMySQL DB", {
 
   cred <- Credentials(drv = MySQL, dbname = "Nirvana")
 
-  testthat::expect_error(
+  expect_error(
     sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging)
   )
 
@@ -158,33 +158,33 @@ test_that("sendQuery for RMySQL DB", {
 
   dat <- sendQuery(cred, "SELECT 1 AS x;")
 
-  testthat::expect_equal(nrow(dat), 1)
-  testthat::expect_equal(ncol(dat), 1)
-  testthat::expect_equal(names(dat), "x")
-  testthat::expect_true(all(dat$x == 1))
-  testthat::expect_is(dat, "data.frame")
+  expect_equal(nrow(dat), 1)
+  expect_equal(ncol(dat), 1)
+  expect_equal(names(dat), "x")
+  expect_true(all(dat$x == 1))
+  expect_is(dat, "data.frame")
 
   dat <- sendQuery(cred, rep("SELECT 1;", 2))
 
-  testthat::expect_equal(nrow(dat), 2)
-  testthat::expect_equal(ncol(dat), 1)
-  testthat::expect_true(all(dat$"1" == 1))
+  expect_equal(nrow(dat), 2)
+  expect_equal(ncol(dat), 1)
+  expect_true(all(dat$"1" == 1))
 
   dat <- sendQuery(cred, sapply(1:2, dummyQuery, const = 2))
 
-  testthat::expect_equal(nrow(dat), 2)
-  testthat::expect_equal(ncol(dat), 1)
-  testthat::expect_equal(names(dat), "x")
-  testthat::expect_true(all(dat$x == 3:4))
+  expect_equal(nrow(dat), 2)
+  expect_equal(ncol(dat), 1)
+  expect_equal(names(dat), "x")
+  expect_true(all(dat$x == 3:4))
 
-  testthat::expect_error(
+  expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
       errorLogging = noErrorLogging
     )
   )
-  testthat::expect_error(
+  expect_error(
     sendQuery(
       cred,
       "SELECT 1 FRM Tabelle;",
@@ -197,6 +197,73 @@ test_that("sendQuery for RMySQL DB", {
   # End the temp db:
   tmp <- system(
     'docker kill test-mysql-db; docker rm -v test-mysql-db',
+    intern = TRUE
+  )
+
+})
+
+context("sendQuery-RMariaDB")
+test_that("sendQuery for MariaDB", {
+
+  tmp <- system(
+    paste('docker run --name mariadbtest -p 3306:3306',
+          '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test',
+          '-d mariadb:latest'),
+    intern = TRUE
+  )
+
+  Sys.sleep(15)
+
+  cred <- Credentials(
+    drv = MariaDB,
+    user = "root",
+    password = "root",
+    dbname = "test",
+    host = "127.0.0.1",
+    port = 3306
+  )
+
+  dat <- sendQuery(cred, "SELECT 1 AS x;")
+
+  expect_equal(nrow(dat), 1)
+  expect_equal(ncol(dat), 1)
+  expect_equal(names(dat), "x")
+  expect_true(all(dat$x == 1))
+  expect_is(dat, "data.frame")
+
+  dat <- sendQuery(cred, rep("SELECT 1;", 2))
+
+  expect_equal(nrow(dat), 2)
+  expect_equal(ncol(dat), 1)
+  expect_true(all(dat$"1" == 1))
+
+  dat <- sendQuery(cred, sapply(1:2, dummyQuery, const = 2))
+
+  expect_equal(nrow(dat), 2)
+  expect_equal(ncol(dat), 1)
+  expect_equal(names(dat), "x")
+  expect_true(all(dat$x == 3:4))
+
+  expect_error(
+    sendQuery(
+      cred,
+      "SELECT * FRM Tabelle;",
+      errorLogging = noErrorLogging
+    )
+  )
+  expect_error(
+    sendQuery(
+      cred,
+      "SELECT 1 FRM Tabelle;",
+      tries = 2,
+      intSleep = 1,
+      errorLogging = noErrorLogging
+    )
+  )
+
+  # End the temp db:
+  tmp <- system(
+    'docker kill mariadbtest; docker rm -v mariadbtest',
     intern = TRUE
   )
 

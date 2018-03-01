@@ -1,10 +1,20 @@
 #' @import methods
-#' @importFrom aoos %g% %m% %type%
-#' @importFrom assertthat assert_that %has_attr% "on_failure<-" is.scalar
+#' @importFrom aoos %g%
+#' @importFrom aoos %m%
+#' @importFrom aoos %type%
+#' @importFrom assertthat assert_that
+#' @importFrom assertthat %has_attr%
+#' @importFrom assertthat "on_failure<-"
+#' @importFrom assertthat is.scalar
 #' @importFrom dat flatmap
-#' @importFrom DBI dbClearResult dbConnect dbDisconnect dbFetch dbHasCompleted
-#' dbListResults dbSendQuery dbWriteTable
-#' @importFrom RMySQL dbMoreResults dbNextResult
+#' @importFrom DBI dbClearResult
+#' @importFrom DBI dbConnect
+#' @importFrom DBI dbDisconnect
+#' @importFrom DBI dbFetch
+#' @importFrom DBI dbHasCompleted
+#' @importFrom DBI dbListResults
+#' @importFrom DBI dbSendQuery
+#' @importFrom DBI dbWriteTable
 #' @importFrom data.table fwrite
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
