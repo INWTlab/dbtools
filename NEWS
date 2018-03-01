@@ -1,4 +1,7 @@
 Version 0.2.14
+- addtional sendQuery and sendData methods for MariaDB-Connection
+
+Version 0.2.14
 - support MariaDB connections
 
 Version 0.2.13
