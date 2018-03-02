@@ -237,7 +237,7 @@ testthat::context("sendData-RMariaDB")
 testthat::test_that("sendData for MariaDB", {
 
   tmp <- system(
-    paste('docker run --name mariadbtest -p 3306:3306',
+    paste('docker run --name mariadbtest -p 127.0.0.1:3307:3306',
           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test',
           '-d mariadb:latest'),
     intern = TRUE
@@ -255,7 +255,7 @@ testthat::test_that("sendData for MariaDB", {
     password = "root",
     dbname = "test",
     host = "127.0.0.1",
-    port = 3306
+    port = 3307
   )
 
   # create table
