@@ -132,3 +132,9 @@ sqlInNums <- function(x) {
 sqlInChars <- function(x) {
   sqlParan(x, function(x) sqlEsc(x, sqlAssertChars, "\""))
 }
+
+#' @rdname sqlAssertions
+#' @export
+sqlInAlnums <- function(x) {
+  sqlParan(x, function(x) sqlEsc(x, sqlAssertAlnums, "\""))
+}
