@@ -232,7 +232,7 @@ checkForWarnings <- function(con) {
 }
 
 formatWarnings <- function(dat) {
-  dat <- capture.output(print(dat))
+  dat <- capture.output(dat)
   dat <- paste(dat, collapse = "\n")
   dat
 }
