@@ -138,13 +138,7 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
-
-  setNamesEncoding(db, encoding)
-  res <- dbSendQuery(db, query)
-  dat <- fetchResult(res)
-  checkForWarnings(db)
-  dat
-
+  .sendQuery(db, query, ..., encoding = encoding)
 }
 
 #' @export
@@ -152,13 +146,15 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
 sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
+  .sendQuery(db, query, ..., encoding = encoding)
+}
 
+.sendQuery <- function(db, query, ..., encoding) {
   setNamesEncoding(db, encoding)
   res <- dbSendQuery(db, query)
   dat <- fetchResult(res)
   checkForWarnings(db)
   dat
-
 }
 
 simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {

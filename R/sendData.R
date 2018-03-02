@@ -63,25 +63,16 @@ sendData(db ~ DBIConnection, data ~ data.frame, table, ...) %m% {
 #' @rdname sendData
 #' @export
 sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-
-  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
-
-  on.exit(unlink(path))
-  data <- convertToCharacter(data)
-  path <- normalizePath(tempfile("dbtools"), "/", FALSE)
-
-  cacheTable(data, path)
-  if (mode == "truncate")
-    truncateTable(db, table)
-  writeTable(db, path, table, names(data), mode)
-
-  TRUE
+  .sendData(db, data, table, ..., mode = mode)
 }
 
 #' @rdname sendData
 #' @export
 sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
+  .sendData(db, data, table, ..., mode = mode)
+}
 
+.sendData <- function(db, data, table, ..., mode) {
   stopifnot(is.element(mode, c("insert", "replace", "truncate")))
 
   on.exit(unlink(path))
