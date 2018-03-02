@@ -7,6 +7,7 @@ test_that("Single Query is good", {
 
   expect_error(SingleQuery("SELECT 2"))
   expect_error(SingleQuery("SELECT 2; SELECT 1;"))
+  expect_length(dbtools:::SingleQuery("SELECT 2; SELECT 1;", checkSemicolon = FALSE), 1)
 
 })
 
@@ -14,7 +15,9 @@ test_that("Single Query is good", {
 test_that("Query Interface", {
 
   expectTrue <- function(a) testthat::expect_true(a)
-    
+
+  testthat::expect_length(Query("SELECT 2; SELECT 1;", checkSemicolon = FALSE), 1)
+
   ## From file
   fileName <- tempfile()
 
@@ -23,7 +26,7 @@ test_that("Query Interface", {
       "FROM {{ table }};",
       "",
       "SELECT * ",
-      "FROM {{ toupper(table) }};"    
+      "FROM {{ toupper(table) }};"
       ),
     fileName
   )
@@ -49,14 +52,14 @@ test_that("Query Interface", {
 
   expectTrue(dat$X == 1)
   expectTrue(query == dbtools:::SingleQuery("SELECT\n1 AS X;"))
-  
+
   ## From character
   someQuery <- "SELECT {{ someField }} FROM {{ someTable }};"
   expectTrue(
     Query(someQuery, someField ~ fieldName, someTable ~ tableName) ==
     dbtools:::SingleQuery("SELECT fieldName FROM tableName;")
   )
-  
+
   someQuery <- "SELECT {{ someField }} FROM {{ someTable }} WHERE id = {{ id }};"
   df <- data.frame(id = 1:2)
 
@@ -73,5 +76,5 @@ test_that("Query Interface", {
     ))
 
   for (i in 1:nrow(df)) expectTrue(query[[i]] == queryResult[[i]])
-  
+
 })

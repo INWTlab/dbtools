@@ -7,7 +7,8 @@
 \alias{SingleQueryList-class}
 \title{SQL Query Objects}
 \usage{
-Query(.x, ..., .data = NULL, .envir = parent.frame())
+Query(.x, ..., .data = NULL, .envir = parent.frame(),
+  checkSemicolon = TRUE)
 }
 \arguments{
 \item{.x}{(character | connection) A character or connection containing a
@@ -19,6 +20,9 @@ query.}
 
 \item{.envir}{(environment) Should be left with the default. Sets the
 environment in which to evaluate code chunks in queries.}
+
+\item{checkSemicolon}{(logical) Should be left with the default. Set to
+false only in case you want to allow for semicolons within the query.}
 }
 \description{
 Data types to represent SQL queries. It should not be necessary to use
