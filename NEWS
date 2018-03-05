@@ -1,8 +1,5 @@
-Version 0.2.15
+Version 0.2.16
 - addtional sendQuery and sendData methods for MariaDB-Connection
-
-Version 0.2.14
-- support MariaDB connections
 
 Version 0.2.13
 - re-export MariaDB driver
