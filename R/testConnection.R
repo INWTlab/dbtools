@@ -39,7 +39,7 @@ testConnection(x ~ Credentials, logger, ...) %m% {
 #' @export
 #' @rdname testConnection
 testConnection(x ~ CredentialsList, logger, ...) %m% {
-  invisible(vapply(x, testConnection, logical(1), logger = logger, ...) %>% all)
+  invisible(all(vapply(x, testConnection, logical(1), logger = logger, ...)))
 }
 
 #' @export

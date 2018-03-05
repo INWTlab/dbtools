@@ -4,7 +4,6 @@
 #' @importFrom DBI dbDisconnect
 #' @importFrom DBI dbFetch
 #' @importFrom DBI dbHasCompleted
-#' @importFrom DBI dbListResults
 #' @importFrom DBI dbSendQuery
 #' @importFrom DBI dbWriteTable
 #' @importFrom aoos %g%
@@ -18,7 +17,6 @@
 #' @importFrom data.table fwrite
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
-#' @importFrom magrittr %>%
 #' @importFrom templates tmpl
 #' @importFrom utils capture.output
 NULL
@@ -34,8 +32,6 @@ RMySQL::MySQL
 #' @importFrom RSQLite SQLite
 #' @export
 RSQLite::SQLite
-
-globalVariables(".")
 
 local({
   # This sets all connection types for S4-dispatch

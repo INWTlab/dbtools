@@ -114,7 +114,7 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
     })
 
     con <- do.call(dbConnect, as.list(db))
-    lapply(query, . %>% sendQuery(db = con, ...))
+    lapply(query, sendQuery, db = con, ...)
 
   })
 
@@ -151,8 +151,7 @@ sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %
 
 .sendQuery <- function(db, query, ..., encoding) {
   setNamesEncoding(db, encoding)
-  res <- dbSendQuery(db, query)
-  dat <- fetchResult(res)
+  dat <- sendQueryDb(db, query)
   checkForWarnings(db)
   dat
 }
