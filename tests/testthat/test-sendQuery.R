@@ -133,19 +133,14 @@ test_that("sendQuery for failing RMySQL DB", {
 
 })
 
-test_that("sendQuery for RMySQL DB", {
-  # Sometimes we get an error if docker has not been startet. Use:
-  # sudo service docker.io start
-  # check with:
-  # sudo service docker.io status
-
+testSendQueryDocker <- function(db = "mysql") {
   tmp <- system(
-    paste0('docker run --name test-mysql-db -p 127.0.0.1:3307:3306 ',
-           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
+    paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':latest'),
     intern = TRUE
   )
 
-  Sys.sleep(15) # Takes some time to fire up db:
+  Sys.sleep(15)
 
   cred <- Credentials(
     drv = MySQL,
@@ -194,77 +189,17 @@ test_that("sendQuery for RMySQL DB", {
     )
   )
 
-  # End the temp db:
   tmp <- system(
-    'docker kill test-mysql-db; docker rm -v test-mysql-db',
+    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
     intern = TRUE
   )
+}
 
+test_that("sendQuery for RMySQL DB", {
+  testSendQueryDocker()
 })
 
 context("sendQuery-RMariaDB")
 test_that("sendQuery for MariaDB", {
-
-  tmp <- system(
-    paste('docker run --name mariadbtest -p 127.0.0.1:3307:3306',
-          '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test',
-          '-d mariadb:latest'),
-    intern = TRUE
-  )
-
-  Sys.sleep(15)
-
-  cred <- Credentials(
-    drv = MariaDB,
-    user = "root",
-    password = "root",
-    dbname = "test",
-    host = "127.0.0.1",
-    port = 3307
-  )
-
-  dat <- sendQuery(cred, "SELECT 1 AS x;")
-
-  expect_equal(nrow(dat), 1)
-  expect_equal(ncol(dat), 1)
-  expect_equal(names(dat), "x")
-  expect_true(all(dat$x == 1))
-  expect_is(dat, "data.frame")
-
-  dat <- sendQuery(cred, rep("SELECT 1;", 2))
-
-  expect_equal(nrow(dat), 2)
-  expect_equal(ncol(dat), 1)
-  expect_true(all(dat$"1" == 1))
-
-  dat <- sendQuery(cred, sapply(1:2, dummyQuery, const = 2))
-
-  expect_equal(nrow(dat), 2)
-  expect_equal(ncol(dat), 1)
-  expect_equal(names(dat), "x")
-  expect_true(all(dat$x == 3:4))
-
-  expect_error(
-    sendQuery(
-      cred,
-      "SELECT * FRM Tabelle;",
-      errorLogging = noErrorLogging
-    )
-  )
-  expect_error(
-    sendQuery(
-      cred,
-      "SELECT 1 FRM Tabelle;",
-      tries = 2,
-      intSleep = 1,
-      errorLogging = noErrorLogging
-    )
-  )
-
-  # End the temp db:
-  tmp <- system(
-    'docker kill mariadbtest; docker rm -v mariadbtest',
-    intern = TRUE
-  )
-
+  testSendQueryDocker(db = "mariadb")
 })
