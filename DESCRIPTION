@@ -18,7 +18,6 @@ Imports:
     data.table,
     dplyr,
     futile.logger,
-    magrittr,
     templates
 License: MIT + file LICENSE
 LazyData: TRUE
