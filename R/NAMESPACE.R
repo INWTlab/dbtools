@@ -17,6 +17,7 @@
 #' @importFrom data.table fwrite
 #' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
+#' @importFrom futile.logger flog.info
 #' @importFrom templates tmpl
 #' @importFrom utils capture.output
 NULL

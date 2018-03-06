@@ -47,7 +47,7 @@ testConnection(x ~ CredentialsList, logger, ...) %m% {
 loggerConnection <- function(x, status) {
   statusString <- if (status) "OK" else "FAILED"
   msgString <- paste(as.character(x), collapse = "--")
-  futile.logger::flog.info(paste(msgString, statusString, collapse = " -> "))
+  flog.info(paste(msgString, statusString, collapse = " -> "))
 }
 
 #' @export
