@@ -53,7 +53,9 @@ them to a variable.
 
 ```{r results = 'hide'}
 data(USArrests, envir = environment())
-USArrests <- tibble::rownames_to_column(USArrests, "State")
+USArrests$State <- row.names(USArrests)
+USArrests <- USArrests[c(length(USArrests), 1:(length(USArrests) - 1))]
+row.names(USArrests) <- NULL
 USArrests
 ```
 

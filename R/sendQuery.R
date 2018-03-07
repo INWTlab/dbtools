@@ -209,7 +209,7 @@ fetchResult <- function(res) {
   # Helper used in sendQuery methods.
   on.exit(dbClearResult(res))
   if (!dbHasCompleted(res))
-    as_data_frame(dbFetch(res, n = -1))
+    as.data.table(dbFetch(res, n = -1))
   else NULL
 }
 
