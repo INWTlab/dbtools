@@ -2,9 +2,10 @@ Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
 Version: 0.3.0
-Author: INWT-Statistics GmbH
-Maintainer: INWT-Statistics GmbH <sebastian.warnholz@inwt-statistics.de>
-Description: Some tools to work with databases.
+Authors@R: c(
+    person("Jonathan", "Bob", , "jonathan.bob@inwt-statistics.de", c("aut")),
+    person("Sebastian", "Warnholz", , "sebastian.warnholz@inwt-statistics.de", role = c("aut", "cre")))
+Description: Tools to work with databases.
 Depends:
     methods,
     aoos(>= 0.4.0)
@@ -14,7 +15,6 @@ Imports:
     RMySQL,
     RSQLite,
     assertthat,
-    dat,
     data.table,
     futile.logger,
     templates,
@@ -23,8 +23,7 @@ License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
     lintr,
-    testthat,
-    tibble
+    testthat
 Collate:
     'Credentials.R'
     'NAMESPACE.R'

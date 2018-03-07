@@ -13,7 +13,6 @@
 #' @importFrom assertthat %has_attr%
 #' @importFrom assertthat "on_failure<-"
 #' @importFrom assertthat is.scalar
-#' @importFrom dat flatmap
 #' @importFrom data.table fwrite
 #' @importFrom futile.logger flog.error
 #' @importFrom futile.logger flog.info
@@ -37,9 +36,9 @@ RSQLite::SQLite
 local({
   # This sets all connection types for S4-dispatch
   types <- c(
-  "file", "url", "gzfile", "bzfile", "unz", "pipe",
-  "fifo", "sockconn", "terminal", "textConnection",
-  "gzcon"
+    "file", "url", "gzfile", "bzfile", "unz", "pipe",
+    "fifo", "sockconn", "terminal", "textConnection",
+    "gzcon"
   )
 
   Map(function(a, b) setOldClass(c(a, b)), types, "connection")

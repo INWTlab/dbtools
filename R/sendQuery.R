@@ -83,7 +83,7 @@ sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
   }
 
   isNestedList <- function(x) {
-    is.list(x) && all(flatmap(x, is, class2 = "list"))
+    is.list(x) && all(unlist(lapply(x, is, class2 = "list")))
   }
 
   res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
@@ -168,7 +168,7 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
   # 4. Multiple Credentials + Multiple Queries: list[lists[dfs]] -> df | list[dfs]
 
   allEqual <- function(x) {
-    all(flatmap(x, y ~ all(y == x[[1]])))
+    all(unlist(lapply(x, function(y) all(y == x[[1]]))))
   }
 
   haveEqualNames <- function(x) {
@@ -176,11 +176,11 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
   }
 
   allDataFrames <- function(x) {
-    all(flatmap(x, is, class2 = "data.frame"))
+    all(unlist(lapply(x, is, class2 = "data.frame")))
   }
 
   allLists <- function(x) {
-    all(flatmap(x, is, class2 = "list"))
+    all(unlist(lapply(x, is, class2 = "list")))
   }
 
   isCase1 <- function(x) isCase2(x) && (length(x) == 1)
