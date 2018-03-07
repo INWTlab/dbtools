@@ -15,11 +15,10 @@
 #' @importFrom assertthat is.scalar
 #' @importFrom dat flatmap
 #' @importFrom data.table fwrite
-#' @importFrom dplyr as.tbl
-#' @importFrom dplyr bind_rows
 #' @importFrom futile.logger flog.error
 #' @importFrom futile.logger flog.info
 #' @importFrom templates tmpl
+#' @importFrom tibble as_data_frame
 #' @importFrom utils capture.output
 NULL
 

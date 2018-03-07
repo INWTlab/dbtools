@@ -162,11 +162,13 @@ testSendDataDocker <- function(db = "mysql") {
   # retrieve data
   res <- dbtools::sendQuery(cred, "SELECT * FROM `mtcars`;")
 
+  # prepare mtcars for test
+  dat <- mtcars[order(mtcars$model), ]
+  row.names(dat) <- NULL
+  dat <- tibble::as_data_frame(dat)
+
   # objects should be equal
-  testthat::expect_identical(
-    res,
-    dplyr::arrange(tibble::as_data_frame(mtcars), model)
-  )
+  testthat::expect_identical(res, dat)
 
   # duplicates in case of insert
   testthat::expect_warning(
@@ -178,7 +180,7 @@ testSendDataDocker <- function(db = "mysql") {
   testthat::expect_true(dbtools::sendData(cred, mtcars, mode = "replace"))
 
   # truncate
-  dbtools::sendData(cred, dplyr::slice(mtcars, 1:5), table = "mtcars", mode = "truncate")
+  dbtools::sendData(cred, mtcars[1:5, ], table = "mtcars", mode = "truncate")
 
   # retrieve data
   res <- dbtools::sendQuery(cred, "SELECT * FROM `mtcars`;")
@@ -188,7 +190,7 @@ testSendDataDocker <- function(db = "mysql") {
   testthat::expect_true(
     dbtools::sendData(
       cred,
-      dplyr::select(mtcars, dplyr::one_of(rev(names(mtcars)))),
+      mtcars[rev(names(mtcars))],
       table = "mtcars",
       mode = "truncate"
     )

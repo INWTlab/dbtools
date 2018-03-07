@@ -16,9 +16,9 @@ Imports:
     assertthat,
     dat,
     data.table,
-    dplyr,
     futile.logger,
-    templates
+    templates,
+    tibble
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:

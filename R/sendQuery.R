@@ -193,7 +193,7 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
   } else if (isCase1(x)) {
     x[[1]]
   } else if (isCase3(x)) {
-    bind_rows(x)
+    do.call("rbind", x)
   } else {
     x
   }
@@ -209,7 +209,7 @@ fetchResult <- function(res) {
   # Helper used in sendQuery methods.
   on.exit(dbClearResult(res))
   if (!dbHasCompleted(res))
-    as.tbl(dbFetch(res, n = -1))
+    as_data_frame(dbFetch(res, n = -1))
   else NULL
 }
 
