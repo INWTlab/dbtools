@@ -8,6 +8,7 @@
 \alias{sendQuery,Credentials,SingleQueryList-method}
 \alias{sendQuery,DBIConnection,SingleQuery-method}
 \alias{sendQuery,MySQLConnection,SingleQuery-method}
+\alias{sendQuery,MariaDBConnection,SingleQuery-method}
 \title{Send query to database and fetch result}
 \usage{
 sendQuery(db, query, ...)
@@ -23,6 +24,9 @@ sendQuery(db, query, ...)
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
 
 \S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...,
+  encoding = "utf8")
+
+\S4method{sendQuery}{MariaDBConnection,SingleQuery}(db, query, ...,
   encoding = "utf8")
 }
 \arguments{

@@ -6,6 +6,10 @@ output:
 
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
+```{r echo=FALSE}
+options(datatable.print.nrows = 10)
+```
+
 This package abstracts typical patterns used when connecting to and 
 communicating with databases in R. It aims to provide very few, simple and 
 reliable functions for sending queries and data to databases.
@@ -53,7 +57,9 @@ them to a variable.
 
 ```{r results = 'hide'}
 data(USArrests, envir = environment())
-USArrests <- tibble::rownames_to_column(USArrests, "State")
+USArrests$State <- row.names(USArrests)
+USArrests <- USArrests[c(length(USArrests), 1:(length(USArrests) - 1))]
+row.names(USArrests) <- NULL
 USArrests
 ```
 

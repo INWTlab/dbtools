@@ -133,19 +133,14 @@ test_that("sendQuery for failing RMySQL DB", {
 
 })
 
-test_that("sendQuery for RMySQL DB", {
-  # Sometimes we get an error if docker has not been startet. Use:
-  # sudo service docker.io start
-  # check with:
-  # sudo service docker.io status
-
+testSendQueryDocker <- function(db = "mysql") {
   tmp <- system(
-    paste0('docker run --name test-mysql-db -p 127.0.0.1:3307:3306 ',
-           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d mysql'),
+    paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':latest'),
     intern = TRUE
   )
 
-  Sys.sleep(15) # Takes some time to fire up db:
+  Sys.sleep(15)
 
   cred <- Credentials(
     drv = MySQL,
@@ -194,10 +189,17 @@ test_that("sendQuery for RMySQL DB", {
     )
   )
 
-  # End the temp db:
   tmp <- system(
-    'docker kill test-mysql-db; docker rm -v test-mysql-db',
+    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
     intern = TRUE
   )
+}
 
+test_that("sendQuery for RMySQL DB", {
+  testSendQueryDocker()
+})
+
+context("sendQuery-RMariaDB")
+test_that("sendQuery for MariaDB", {
+  testSendQueryDocker(db = "mariadb")
 })

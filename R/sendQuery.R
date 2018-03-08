@@ -79,17 +79,17 @@ sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
       do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
     } else {
       x
-    }    
+    }
   }
 
   isNestedList <- function(x) {
-    is.list(x) && all(flatmap(x, is, class2 = "list"))
+    is.list(x) && all(unlist(lapply(x, is, class2 = "list")))
   }
 
   res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
   res <- insideOut(res)
   simplifyIfPossible(res, skipBindRows = !simplify)
-  
+
 }
 
 
@@ -114,8 +114,8 @@ sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
     })
 
     con <- do.call(dbConnect, as.list(db))
-    lapply(query, . %>% sendQuery(db = con, ...))
-    
+    lapply(query, sendQuery, db = con, ...)
+
   })
 
   simplifyIfPossible(downloadedData, skipBindRows = !simplify)
@@ -129,7 +129,7 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
   # query: is a character of length 1
 
   res <- dbSendQuery(db, query)
-  fetchFirstResult(res)
+  fetchResult(res)
 
 }
 
@@ -138,35 +138,22 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
+  .sendQuery(db, query, ..., encoding = encoding)
+}
 
-  dbSendQuery <- function(...) {
-    suppressWarnings(RMySQL::dbSendQuery(...))
-  }
+#' @export
+#' @rdname sendQuery
+sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
+  # db: is a MySQL connection
+  # query: is a character of length 1
+  .sendQuery(db, query, ..., encoding = encoding)
+}
 
-  setNamesEncoding <- function(con, encoding) {
-    if (is.null(encoding)) return(NULL)
-    dbSendQuery(con, paste0("SET NAMES '", encoding, "';"))
-  }
-
-  dumpRemainingResults <- function(con) {
-    while (dbMoreResults(con)) {
-      dump <- dbNextResult(con)
-      dbClearResult(dump)
-    }
-  }
-
-  checkForWarnings <- function(con) {
-    wrngs <- dbSendQuery(con, "SHOW WARNINGS;") %>% fetchFirstResult
-    if (nrow(wrngs) > 0) warning(wrngs)
-  }
-
+.sendQuery <- function(db, query, ..., encoding) {
   setNamesEncoding(db, encoding)
-  res <- dbSendQuery(db, query)
-  dat <- fetchFirstResult(res)
-  dumpRemainingResults(db)
+  dat <- sendQueryDb(db, query)
   checkForWarnings(db)
   dat
-
 }
 
 simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
@@ -181,7 +168,7 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
   # 4. Multiple Credentials + Multiple Queries: list[lists[dfs]] -> df | list[dfs]
 
   allEqual <- function(x) {
-    all(flatmap(x, y ~ all(y == x[[1]])))
+    all(unlist(lapply(x, function(y) all(y == x[[1]]))))
   }
 
   haveEqualNames <- function(x) {
@@ -189,11 +176,11 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
   }
 
   allDataFrames <- function(x) {
-    all(flatmap(x, is, class2 = "data.frame"))
+    all(unlist(lapply(x, is, class2 = "data.frame")))
   }
 
   allLists <- function(x) {
-    all(flatmap(x, is, class2 = "list"))
+    all(unlist(lapply(x, is, class2 = "list")))
   }
 
   isCase1 <- function(x) isCase2(x) && (length(x) == 1)
@@ -206,17 +193,41 @@ simplifyIfPossible <- function(x, skipCase4 = FALSE, skipBindRows = FALSE) {
   } else if (isCase1(x)) {
     x[[1]]
   } else if (isCase3(x)) {
-    bind_rows(x)
+    do.call("rbind", x)
   } else {
     x
   }
 
 }
 
-fetchFirstResult <- function(res) {
+sendQueryDb <- function(...) {
+  res <- suppressWarnings(dbSendQuery(...))
+  fetchResult(res)
+}
+
+fetchResult <- function(res) {
   # Helper used in sendQuery methods.
   on.exit(dbClearResult(res))
-  if (!dbHasCompleted(res)) dplyr::as.tbl(dbFetch(res, n = -1))
+  if (!dbHasCompleted(res))
+    as.data.table(dbFetch(res, n = -1))
   else NULL
 }
 
+setNamesEncoding <- function(con, encoding) {
+  if (is.null(encoding)) return(NULL)
+  sendQueryDb(con, paste0("SET NAMES '", encoding, "';"))
+}
+
+checkForWarnings <- function(con) {
+  res <- sendQueryDb(con, "SHOW WARNINGS;")
+  if (nrow(res) > 0) {
+    warn <- formatWarnings(res)
+    warning(warn)
+  }
+}
+
+formatWarnings <- function(dat) {
+  dat <- capture.output(dat)
+  dat <- paste(dat, collapse = "\n")
+  dat
+}

@@ -7,6 +7,7 @@
 \alias{sendData,Credentials,data.frame-method}
 \alias{sendData,DBIConnection,data.frame-method}
 \alias{sendData,MySQLConnection,data.frame-method}
+\alias{sendData,MariaDBConnection,data.frame-method}
 \title{Copy data to database tables}
 \usage{
 sendData(db, data, table = deparse(substitute(data)), ...)
@@ -21,6 +22,9 @@ sendData(db, data, table = deparse(substitute(data)), ...)
   table = deparse(substitute(data)), ...)
 
 \S4method{sendData}{MySQLConnection,data.frame}(db, data, table, ...,
+  mode = "insert")
+
+\S4method{sendData}{MariaDBConnection,data.frame}(db, data, table, ...,
   mode = "insert")
 }
 \arguments{
@@ -43,7 +47,7 @@ connection to a database.  \cr (DBIConnection)
 These functions copy data frames to database tables
 }
 \details{
-Basically, these functions are intended to behave like dbSendQuery.
+Basically, these functions are intended to behave like dbWriteTable.
 However, there are two notebale exceptions:
 \enumerate{
   \item append is always set to TRUE, i.e. the target database table must

@@ -75,9 +75,9 @@ list : CredentialsList() %type% {
   makeCredList <- function(.Object) {
     if (is.function(.Object$drv)) .Object$drv <- list(.Object$drv)
     maxLength <- max(unlist(lapply(.Object, length)))
-    wideList <- lapply(.Object, . %>% rep(length.out = maxLength))
-    spreadOutList <- lapply(1:maxLength, . %>% lapply(X = wideList, `[[`, i = .))
-    lapply(spreadOutList, . %>% do.call(what = Credentials, args = .))
+    wideList <- lapply(.Object, rep, length.out = maxLength)
+    spreadOutList <- lapply(1:maxLength, function(i) lapply(X = wideList, `[[`, i = i))
+    lapply(spreadOutList, do.call, what = Credentials)
   }
 
   # Init:
