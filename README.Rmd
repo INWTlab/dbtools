@@ -6,6 +6,10 @@ output:
 
 [![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
 
+```{r echo=FALSE}
+options(datatable.print.nrows = 10)
+```
+
 This package abstracts typical patterns used when connecting to and 
 communicating with databases in R. It aims to provide very few, simple and 
 reliable functions for sending queries and data to databases.
