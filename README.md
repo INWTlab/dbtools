@@ -36,7 +36,7 @@ Now, let's check whether we can actually access the database example.db.
 testConnection(cred)
 ```
 
-    ## INFO [2018-03-08 11:23:02] example.db OK
+    ## INFO [2018-03-08 11:33:12] example.db OK
 
 ``` r
 cred
@@ -51,7 +51,7 @@ For the remainder of this example, we make use of the USArrests dataset. Unfortu
 ``` r
 data(USArrests, envir = environment())
 USArrests$State <- row.names(USArrests)
-USArrests <- USArrests[c(length(USArrests), 1:(length(USArrests) - 1))]
+USArrests <- USArrests[c("State", "Murder", "Assault", "UrbanPop", "Rape")]
 row.names(USArrests) <- NULL
 USArrests
 ```
@@ -136,10 +136,10 @@ dat <- sendQuery(
 )
 ```
 
-    ## ERROR [2018-03-08 11:23:02] Error in rsqlite_send_query(conn@ptr, statement) : 
+    ## ERROR [2018-03-08 11:33:12] Error in rsqlite_send_query(conn@ptr, statement) : 
     ##   no such table: USArrest
     ## 
-    ## ERROR [2018-03-08 11:23:03] Error in rsqlite_send_query(conn@ptr, statement) : 
+    ## ERROR [2018-03-08 11:33:13] Error in rsqlite_send_query(conn@ptr, statement) : 
     ##   no such table: USArrest
 
     ## Error in reTry(..., fun = function(...) {: Error in rsqlite_send_query(conn@ptr, statement) : 

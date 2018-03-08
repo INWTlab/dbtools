@@ -58,7 +58,7 @@ them to a variable.
 ```{r results = 'hide'}
 data(USArrests, envir = environment())
 USArrests$State <- row.names(USArrests)
-USArrests <- USArrests[c(length(USArrests), 1:(length(USArrests) - 1))]
+USArrests <- USArrests[c("State", "Murder", "Assault", "UrbanPop", "Rape")]
 row.names(USArrests) <- NULL
 USArrests
 ```
