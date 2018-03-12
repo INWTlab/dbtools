@@ -41,16 +41,18 @@ sendData(db ~ CredentialsList, data ~ data.frame, table, ..., applyFun = lapply)
 #' @export
 sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
 
-  on.exit({
-    if (exists("con")) dbDisconnect(con)
+  reTry(..., fun = function(...) {
+
+    on.exit({
+      if (exists("con")) {
+        dbDisconnect(con)
+      }
+    })
+
+    con <- do.call(dbConnect, as.list(db))
+    sendData(db = con, data = data, table = table, ...)
+
   })
-
-  con <- reTry(function(...) do.call(dbConnect, as.list(db)), ...)
-
-  reTry(
-    function(...) sendData(db = con, data = data, table = table, ...),
-    ...
-  )
 
 }
 
