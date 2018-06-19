@@ -75,7 +75,8 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
 }
 
 .sendData <- function(db, data, table, ..., mode) {
-  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
+  stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
+  if (mode == "update") return(.sendDataUpdate(db, data, table, ...))
 
   on.exit(unlink(path))
   data <- convertToCharacter(data)
@@ -85,6 +86,43 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   if (mode == "truncate")
     truncateTable(db, table)
   writeTable(db, path, table, names(data), mode)
+
+  TRUE
+}
+
+## .onLoad <- function(libname, pkgname) {
+##   library.dynam("RMySQL",package=c("RMySQL")) 
+## }
+
+
+# @useDynLib RMySQL RS_MySQL_exec
+.sendDataUpdate <- function(db, data, table, ...) {
+  ## con (connection) an open connection!
+  if (nrow(data) == 0) return(TRUE)
+
+  # library.dynam("RMySQL", "RMySQL", lib.loc=.libPaths()[1])
+  # It ain't pretty but fast(er)...
+  table <- sqlEsc(table)
+  data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
+  data[] <- lapply(data, function(col) paste0("'", col, "'"))
+  cols <- names(data)
+  colsInParan <- sqlParan(sqlEsc(cols))
+  colsInUpdate <- sqlComma(paste(cols, cols, sep = " = "))
+  data <- as.matrix(data)
+
+  for (i in 1:nrow(data))
+    ## the following line may run millions of times:
+    ## (1) we don't want to do too many S4 inits
+    ## (2) we don't want to do S4 dispatch
+    ## sacrifice safety for performance...
+    .Call(
+      "RS_MySQL_exec",
+      db@Id,
+      sqlUpdateData(table, colsInParan, data[i, ], colsInUpdate),
+      PACKAGE = "RMySQL"
+    )
+
+  checkForWarnings(db)
 
   TRUE
 }
@@ -126,5 +164,17 @@ sqlLoadData <- function(path, table, names, mode) {
       sqlParan(sqlEsc(names)),
       ";"
     )
+  )
+}
+
+sqlUpdateData <- function(table, cols, values, colsUpdate) {
+  paste(
+    sep = " ",
+    "INSERT INTO", table,
+    cols,
+    "VALUES", sqlParan(values),
+    "ON DUPLICATE KEY UPDATE",
+    colsUpdate,
+    ";"
   )
 }

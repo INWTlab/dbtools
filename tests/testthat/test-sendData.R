@@ -127,6 +127,10 @@ testSendDataDocker <- function(db = "mysql") {
            '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':latest'),
     intern = TRUE
   )
+  on.exit(tmp <- system(
+    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
+    intern = TRUE
+  ))
 
   Sys.sleep(15) # Takes some time to fire up db:
 
@@ -185,6 +189,9 @@ testSendDataDocker <- function(db = "mysql") {
   # duplicates in case of replace
   expect_true(sendData(cred, mtcars, mode = "replace"))
 
+  # update -- should be redundant for following tests
+  expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
+
   # truncate
   sendData(cred, mtcars[1:5, ], table = "mtcars", mode = "truncate")
 
@@ -230,11 +237,7 @@ testSendDataDocker <- function(db = "mysql") {
     )
   )
 
-  tmp <- system(
-    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
-    intern = TRUE
-  )
-}
+  }
 
 context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
@@ -245,3 +248,4 @@ context("sendData-RMariaDB")
 test_that("sendData for MariaDB", {
   testSendDataDocker(db = "mariadb")
 })
+
