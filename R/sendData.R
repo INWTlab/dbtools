@@ -105,8 +105,8 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   table <- sqlEsc(table)
   data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
   data[] <- lapply(data, function(col) paste0("'", col, "'"))
-  cols <- names(data)
-  colsInParan <- sqlParan(sqlEsc(cols))
+  cols <- sapply(names(data), sqlEsc)
+  colsInParan <- sqlParan(cols)
   colsInUpdate <- sqlComma(paste(cols, cols, sep = " = "))
   data <- as.matrix(data)
 
