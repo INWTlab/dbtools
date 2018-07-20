@@ -71,7 +71,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 #' @rdname sendData
 #' @export
 sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-  if (mode == "update") stop("Update mode is currently only supported for MySQL")
+  if (mode == "update") stop("Update mode is only supported for MySQL driver")
   .sendData(db, data, table, ..., mode = mode)
 }
 
@@ -99,7 +99,7 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   table <- sqlEsc(table)
   data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
   data[] <- lapply(data, function(col) paste0("'", col, "'"))
-  cols <- sapply(names(data), sqlEsc)
+  cols <- unlist(lapply(names(data), sqlEsc))
   colsInParan <- sqlParan(cols)
   colsInUpdate <- sqlComma(paste(cols, cols, sep = " = "))
   data <- as.matrix(data)

@@ -193,10 +193,13 @@ testSendDataDocker <- function(db = "mysql") {
   expect_identical(nrow(res), 32L)
 
   # mode: update
-  sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
-  expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
-  res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
-  expect_identical(nrow(res), 32L)
+  if (db == "mysql") { # not implemented for mariadb yet
+    sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
+    expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
+    expect_true(sendData(cred, mtcars[1, ], table = "mtcars", mode = "update"))
+    res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
+    expect_identical(nrow(res), 32L)
+  }
 
   # mode: truncate
   sendData(cred, mtcars[1:5, ], table = "mtcars", mode = "truncate")
