@@ -71,11 +71,13 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 #' @rdname sendData
 #' @export
 sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
+  if (mode == "update") stop("Update mode is only supported for MySQL driver")
   .sendData(db, data, table, ..., mode = mode)
 }
 
 .sendData <- function(db, data, table, ..., mode) {
-  stopifnot(is.element(mode, c("insert", "replace", "truncate")))
+  stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
+  if (mode == "update") return(.sendDataUpdate(db, data, table, ...))
 
   on.exit(unlink(path))
   data <- convertToCharacter(data)
@@ -85,6 +87,31 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   if (mode == "truncate")
     truncateTable(db, table)
   writeTable(db, path, table, names(data), mode)
+
+  TRUE
+}
+
+.sendDataUpdate <- function(db, data, table, ...) {
+  ## con (connection) an open connection!
+  if (nrow(data) == 0) return(TRUE)
+
+  # It ain't pretty but fast(er)...
+  table <- sqlEsc(table)
+  data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
+  data[] <- lapply(data, function(col) paste0("'", col, "'"))
+  cols <- unlist(lapply(names(data), sqlEsc))
+  colsInParan <- sqlParan(cols)
+  colsInUpdate <- sqlComma(paste(cols, cols, sep = " = "))
+  data <- as.matrix(data)
+
+  for (i in 1:nrow(data))
+    .Call(
+      RMySQLExec(),
+      db@Id,
+      sqlUpdateData(table, colsInParan, data[i, ], colsInUpdate)
+    )
+
+  checkForWarnings(db)
 
   TRUE
 }
@@ -126,5 +153,17 @@ sqlLoadData <- function(path, table, names, mode) {
       sqlParan(sqlEsc(names)),
       ";"
     )
+  )
+}
+
+sqlUpdateData <- function(table, cols, values, colsUpdate) {
+  paste(
+    sep = " ",
+    "INSERT INTO", table,
+    cols,
+    "VALUES", sqlParan(values),
+    "ON DUPLICATE KEY UPDATE",
+    colsUpdate,
+    ";"
   )
 }

@@ -29,6 +29,12 @@ RMariaDB::MariaDB
 #' @export
 RMySQL::MySQL
 
+# We import the link to the C interface for executing queries from RMySQL
+# We need this to avoid S4 dispatch and S4 inits which cause performance
+# problems. This is dangerous because we rely on implementation detail from
+# RMySQL, but currently the best I can think of...
+RMySQLExec <- function() eval(parse(text = "RMySQL:::RS_MySQL_exec"))
+
 #' @importFrom RSQLite SQLite
 #' @export
 RSQLite::SQLite

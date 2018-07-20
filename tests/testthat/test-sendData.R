@@ -127,6 +127,10 @@ testSendDataDocker <- function(db = "mysql") {
            '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':latest'),
     intern = TRUE
   )
+  on.exit(tmp <- system(
+    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
+    intern = TRUE
+  ))
 
   Sys.sleep(15) # Takes some time to fire up db:
 
@@ -176,19 +180,29 @@ testSendDataDocker <- function(db = "mysql") {
   # objects should be equal
   expect_identical(res, dat)
 
-  # duplicates in case of insert
+  # mode: insert
   expect_warning(
     sendData(cred, mtcars, mode = "insert"),
     regexp = "Duplicate entry"
   )
 
-  # duplicates in case of replace
+  # mode: replace
+  sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
   expect_true(sendData(cred, mtcars, mode = "replace"))
+  res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
+  expect_identical(nrow(res), 32L)
 
-  # truncate
+  # mode: update
+  if (db == "mysql") { # not implemented for mariadb yet
+    sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
+    expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
+    expect_true(sendData(cred, mtcars[1, ], table = "mtcars", mode = "update"))
+    res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
+    expect_identical(nrow(res), 32L)
+  }
+
+  # mode: truncate
   sendData(cred, mtcars[1:5, ], table = "mtcars", mode = "truncate")
-
-  # retrieve data
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 5L)
 
@@ -230,11 +244,7 @@ testSendDataDocker <- function(db = "mysql") {
     )
   )
 
-  tmp <- system(
-    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
-    intern = TRUE
-  )
-}
+  }
 
 context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
@@ -245,3 +255,4 @@ context("sendData-RMariaDB")
 test_that("sendData for MariaDB", {
   testSendDataDocker(db = "mariadb")
 })
+
