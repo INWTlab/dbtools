@@ -71,6 +71,7 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 #' @rdname sendData
 #' @export
 sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
+  if (mode == "update") stop("Update mode is currently only supported for MySQL")
   .sendData(db, data, table, ..., mode = mode)
 }
 
@@ -90,17 +91,10 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   TRUE
 }
 
-## .onLoad <- function(libname, pkgname) {
-##   library.dynam("RMySQL",package=c("RMySQL")) 
-## }
-
-
-# @useDynLib RMySQL RS_MySQL_exec
 .sendDataUpdate <- function(db, data, table, ...) {
   ## con (connection) an open connection!
   if (nrow(data) == 0) return(TRUE)
 
-  # library.dynam("RMySQL", "RMySQL", lib.loc=.libPaths()[1])
   # It ain't pretty but fast(er)...
   table <- sqlEsc(table)
   data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
@@ -111,15 +105,10 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   data <- as.matrix(data)
 
   for (i in 1:nrow(data))
-    ## the following line may run millions of times:
-    ## (1) we don't want to do too many S4 inits
-    ## (2) we don't want to do S4 dispatch
-    ## sacrifice safety for performance...
     .Call(
-      "RS_MySQL_exec",
+      RMySQLExec(),
       db@Id,
-      sqlUpdateData(table, colsInParan, data[i, ], colsInUpdate),
-      PACKAGE = "RMySQL"
+      sqlUpdateData(table, colsInParan, data[i, ], colsInUpdate)
     )
 
   checkForWarnings(db)
