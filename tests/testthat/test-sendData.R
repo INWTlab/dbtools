@@ -180,22 +180,26 @@ testSendDataDocker <- function(db = "mysql") {
   # objects should be equal
   expect_identical(res, dat)
 
-  # duplicates in case of insert
+  # mode: insert
   expect_warning(
     sendData(cred, mtcars, mode = "insert"),
     regexp = "Duplicate entry"
   )
 
-  # duplicates in case of replace
+  # mode: replace
+  sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
   expect_true(sendData(cred, mtcars, mode = "replace"))
+  res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
+  expect_identical(nrow(res), 32L)
 
-  # update -- should be redundant for following tests
+  # mode: update
+  sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
   expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
+  res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
+  expect_identical(nrow(res), 32L)
 
-  # truncate
+  # mode: truncate
   sendData(cred, mtcars[1:5, ], table = "mtcars", mode = "truncate")
-
-  # retrieve data
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 5L)
 
