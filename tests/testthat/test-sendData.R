@@ -121,10 +121,10 @@ test_that("Error handling and retry in sendData", {
 
 })
 
-testSendDataDocker <- function(db = "mysql") {
+testSendDataDocker <- function(db = "mysql", version = "latest") {
   tmp <- system(
     paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
-           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':latest'),
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':', version),
     intern = TRUE
   )
   on.exit(tmp <- system(
@@ -248,11 +248,11 @@ testSendDataDocker <- function(db = "mysql") {
 
 context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
-  testSendDataDocker()
+  testSendDataDocker("mysql", "5.7")
 })
 
 context("sendData-RMariaDB")
 test_that("sendData for MariaDB", {
-  testSendDataDocker(db = "mariadb")
+  testSendDataDocker("mariadb", "latest")
 })
 
