@@ -101,7 +101,7 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   data[] <- lapply(data, function(col) paste0("'", col, "'"))
   cols <- unlist(lapply(names(data), sqlEsc))
   colsInParan <- sqlParan(cols)
-  colsInUpdate <- sqlComma(paste(cols, cols, sep = " = "))
+  colsInUpdate <- sqlComma(sprintf("%s=VALUES(%s)", cols, cols))
   data <- as.matrix(data)
 
   for (i in 1:nrow(data))
