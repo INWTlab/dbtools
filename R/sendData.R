@@ -135,8 +135,8 @@ writeTable <- function(db, path, table, names, mode) {
 }
 
 sqlLoadData <- function(path, table, names, mode) {
-  SingleQuery (
-    paste0 (
+  SingleQuery(
+    paste0(
       "LOAD DATA LOCAL INFILE '",
       path,
       "' ",
@@ -145,7 +145,7 @@ sqlLoadData <- function(path, table, names, mode) {
       "INTO TABLE `",
       table,
       "` ",
-      "CHARACTER SET UTF8 ",
+      "CHARACTER SET UTF8MB4 ",
       "FIELDS TERMINATED BY ',' ",
       "OPTIONALLY ENCLOSED BY '\"' ",
       "LINES TERMINATED BY '\n' ",

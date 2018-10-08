@@ -122,15 +122,8 @@ test_that("Error handling and retry in sendData", {
 })
 
 testSendDataDocker <- function(db = "mysql") {
-  tmp <- system(
-    paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
-           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':latest'),
-    intern = TRUE
-  )
-  on.exit(tmp <- system(
-    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
-    intern = TRUE
-  ))
+  tmp <- startContainer(db = db)
+  on.exit(tmp <- stopContainer(db = db))
 
   Sys.sleep(15) # Takes some time to fire up db:
 
@@ -244,7 +237,7 @@ testSendDataDocker <- function(db = "mysql") {
     )
   )
 
-  }
+}
 
 context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
