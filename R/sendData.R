@@ -93,12 +93,19 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
 
 .sendDataUpdate <- function(db, data, table, ...) {
   ## con (connection) an open connection!
+
+  quoteValues <- function(x) {
+    ind <- which(is.na(x))
+    x <- paste0("'", x, "'")
+    x[ind] <- "NULL"
+    x
+  }
+
   if (nrow(data) == 0) return(TRUE)
 
   # It ain't pretty but fast(er)...
   table <- sqlEsc(table)
-  data[is.na(data)] <- NA # Expression is.na(as.character(NaN)) is false
-  data[] <- lapply(data, function(col) paste0("'", col, "'"))
+  data[] <- lapply(data, quoteValues)
   cols <- unlist(lapply(names(data), sqlEsc))
   colsInParan <- sqlParan(cols)
   colsInUpdate <- sqlComma(sprintf("%s=VALUES(%s)", cols, cols))

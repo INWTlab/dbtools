@@ -16,7 +16,8 @@ sendQuery(db, query, ...)
 \S4method{sendQuery}{CredentialsList,SingleQueryList}(db, query, ...,
   applyFun = lapply, simplify = TRUE)
 
-\S4method{sendQuery}{CredentialsORCredentialsList,character}(db, query, ...)
+\S4method{sendQuery}{CredentialsORCredentialsList,character}(db, query,
+  ...)
 
 \S4method{sendQuery}{Credentials,SingleQueryList}(db, query, ...,
   simplify = TRUE)

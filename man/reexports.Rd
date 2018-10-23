@@ -4,9 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{MariaDB}
-\alias{reexports}
 \alias{MySQL}
-\alias{reexports}
 \alias{SQLite}
 \title{Objects exported from other packages}
 \keyword{internal}

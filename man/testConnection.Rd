@@ -13,7 +13,8 @@ testConnection(x, logger = loggerConnection, ...)
 
 \S4method{testConnection}{Credentials}(x, logger = loggerConnection, ...)
 
-\S4method{testConnection}{CredentialsList}(x, logger = loggerConnection, ...)
+\S4method{testConnection}{CredentialsList}(x, logger = loggerConnection,
+  ...)
 
 loggerConnection(x, status)
 
