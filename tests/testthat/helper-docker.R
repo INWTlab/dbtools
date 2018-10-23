@@ -8,6 +8,7 @@ startContainer <- function(db = "mysql", version = "latest") {
   )
 
   system(cmd, intern = TRUE)
+  Sys.sleep(15) # Takes some time to fire up db:
 }
 
 stopContainer <- function(db = "mysql") {

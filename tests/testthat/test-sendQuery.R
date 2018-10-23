@@ -137,8 +137,6 @@ testSendQueryDocker <- function(db = "mysql", version = "latest") {
   tmp <- startContainer(db = db, version = version)
   on.exit(tmp <- stopContainer(db = db))
 
-  Sys.sleep(15) # Takes some time to fire up db:
-
   cred <- Credentials(
     drv = MySQL,
     user = "root",

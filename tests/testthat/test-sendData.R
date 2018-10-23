@@ -125,8 +125,6 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   tmp <- startContainer(db = db, version = version)
   on.exit(tmp <- stopContainer(db = db))
 
-  Sys.sleep(15) # Takes some time to fire up db:
-
   # prepare data
   data(mtcars, envir = environment())
   mtcars$model <- row.names(mtcars)
