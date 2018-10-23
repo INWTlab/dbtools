@@ -133,9 +133,16 @@ test_that("sendQuery for failing RMySQL DB", {
 
 })
 
-testSendQueryDocker <- function(db = "mysql") {
-  tmp <- startContainer(db = db)
-  on.exit(tmp <- stopContainer(db = db))
+testSendQueryDocker <- function(db = "mysql", version = "latest") {
+  tmp <- system(
+    paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':', version),
+    intern = TRUE
+  )
+  on.exit(tmp <- system(
+    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
+    intern = TRUE
+  ))
 
   Sys.sleep(15) # Takes some time to fire up db:
 
@@ -188,10 +195,10 @@ testSendQueryDocker <- function(db = "mysql") {
 }
 
 test_that("sendQuery for RMySQL DB", {
-  testSendQueryDocker()
+  testSendQueryDocker("mysql", "5.7")
 })
 
 context("sendQuery-RMariaDB")
 test_that("sendQuery for MariaDB", {
-  testSendQueryDocker(db = "mariadb")
+  testSendQueryDocker("mariadb", "latest")
 })
