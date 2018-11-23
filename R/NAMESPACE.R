@@ -29,6 +29,10 @@ RMariaDB::MariaDB
 #' @export
 RMySQL::MySQL
 
+#' @importFrom RMySQL CLIENT_SSL
+#' @export
+RMySQL::CLIENT_SSL
+
 # We import the link to the C interface for executing queries from RMySQL
 # We need this to avoid S4 dispatch and S4 inits which cause performance
 # problems. This is dangerous because we rely on implementation detail from
