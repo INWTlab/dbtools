@@ -5,6 +5,7 @@
 \alias{reexports}
 \alias{MariaDB}
 \alias{MySQL}
+\alias{CLIENT_SSL}
 \alias{SQLite}
 \title{Objects exported from other packages}
 \keyword{internal}
@@ -15,7 +16,7 @@ below to see their documentation.
 \describe{
   \item{RMariaDB}{\code{\link[RMariaDB]{MariaDB}}}
 
-  \item{RMySQL}{\code{\link[RMySQL]{MySQL}}}
+  \item{RMySQL}{\code{\link[RMySQL]{MySQL}}, \code{\link[RMySQL]{CLIENT_SSL}}}
 
   \item{RSQLite}{\code{\link[RSQLite]{SQLite}}}
 }}
