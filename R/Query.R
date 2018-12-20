@@ -48,8 +48,10 @@ queryRead(x ~ connection) %m% {
   on.exit(close(x))
 
   query <- readLines(x)
+  query <- sub("(-- .*)|(#.*)", "", query)
   query <- query[query != ""]
   query <- paste(query, collapse = "\n")
+  query <- gsub("(\\\n)?/\\*.*?\\*/", "", query)
   query <- unlist(strsplit(query, ";"))
   query <- paste0(query, ";")
   query <- sub("^\\n+", "", query)
