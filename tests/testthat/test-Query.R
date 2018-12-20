@@ -11,6 +11,11 @@ test_that("Single Query is good", {
 
 })
 
+test_that("remove comments from queries", {
+  query <- Query(file("sql/comments.sql"))
+  testthat::expect_identical(length(query), 4L)
+  testthat::expect_true(all(query == "select 1 as x;"))
+})
 
 test_that("Query Interface", {
 
