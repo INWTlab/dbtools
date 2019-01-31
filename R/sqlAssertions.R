@@ -106,7 +106,8 @@ sqlComma <- function(x, assert = identity) {
 #' @rdname sqlAssertions
 #' @export
 sqlEsc <- function(x, assert = identity, with = "`") {
-  sqlComma(paste0(with, assert(x), with))
+  if (length(x) == 0) x
+  else sqlComma(paste0(with, assert(x), with))
 }
 
 #' @rdname sqlAssertions

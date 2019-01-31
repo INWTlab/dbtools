@@ -48,5 +48,10 @@ test_that("Formats", {
   expectTrue(sqlInNums(1:2) == "(1, 2)")
   expectTrue(sqlInAlnums(c("1_A", "2_B")) == "(\"1_A\", \"2_B\")")
 
+  # Tests after #52
+  expectTrue(sqlInChars(character()) == "()")
+  expectTrue(sqlInNums(numeric()) == "()")
+  expectTrue(sqlInAlnums(character()) == "()")
+
 })
 
