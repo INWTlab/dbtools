@@ -10,7 +10,7 @@
 #'   \item row.names is always set to FALSE, i.e., row.names must be converted
 #'   to a variable if you want to keep them
 #' }
-#' There are three different modes for sending data to the database:
+#' There are four different modes for sending data to the database:
 #' \describe{
 #'   \item{insert}{INSERT INTO TABLE, i.e. in case of duplicates only the first
 #'   entry will be kept}
@@ -18,6 +18,7 @@
 #'   entry will be kept}
 #'   \item{truncate}{like dbWriteTable with argument overwrite = TRUE, i.e., the
 #'   table is truncated before sending the data}
+#'   \item{update}{like insert but falls back to update on duplicate key}
 #' }
 #'
 #' @inheritParams sendQuery
@@ -71,13 +72,11 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 #' @rdname sendData
 #' @export
 sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-  if (mode == "update") stop("Update mode is only supported for MySQL driver")
   .sendData(db, data, table, ..., mode = mode)
 }
 
 .sendData <- function(db, data, table, ..., mode) {
   stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
-  if (mode == "update") return(.sendDataUpdate(db, data, table, ...))
 
   on.exit(unlink(path))
   data <- convertToCharacter(data)
@@ -86,39 +85,11 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   cacheTable(data, path)
   if (mode == "truncate")
     truncateTable(db, table)
-  writeTable(db, path, table, names(data), mode)
-
-  TRUE
-}
-
-.sendDataUpdate <- function(db, data, table, ...) {
-  ## con (connection) an open connection!
-
-  quoteValues <- function(x) {
-    ind <- which(is.na(x))
-    x <- paste0("'", x, "'")
-    x[ind] <- "NULL"
-    x
+  if (mode == "update") {
+    updateTable(db, path, table, names(data))
+    return(TRUE)
   }
-
-  if (nrow(data) == 0) return(TRUE)
-
-  # It ain't pretty but fast(er)...
-  table <- sqlEsc(table)
-  data[] <- lapply(data, quoteValues)
-  cols <- unlist(lapply(names(data), sqlEsc))
-  colsInParan <- sqlParan(cols)
-  colsInUpdate <- sqlComma(sprintf("%s=VALUES(%s)", cols, cols))
-  data <- as.matrix(data)
-
-  for (i in 1:nrow(data))
-    .Call(
-      RMySQLExec(),
-      db@Id,
-      sqlUpdateData(table, colsInParan, data[i, ], colsInUpdate)
-    )
-
-  checkForWarnings(db)
+  writeTable(db, path, table, names(data), mode)
 
   TRUE
 }
@@ -142,8 +113,8 @@ writeTable <- function(db, path, table, names, mode) {
 }
 
 sqlLoadData <- function(path, table, names, mode) {
-  SingleQuery (
-    paste0 (
+  SingleQuery(
+    paste0(
       "LOAD DATA LOCAL INFILE '",
       path,
       "' ",
@@ -163,14 +134,44 @@ sqlLoadData <- function(path, table, names, mode) {
   )
 }
 
-sqlUpdateData <- function(table, cols, values, colsUpdate) {
-  paste(
-    sep = " ",
-    "INSERT INTO", table,
-    cols,
-    "VALUES", sqlParan(values),
-    "ON DUPLICATE KEY UPDATE",
-    colsUpdate,
-    ";"
+updateTable <- function(db, path, table, names) {
+
+  # 1. create temporary table like target table
+  temporaryTable <- paste0("tmp_", table)
+  createTemporaryTable(db, table, temporaryTable)
+
+  # 2. insert into temporary table
+  writeTable(db, path, temporaryTable, names, mode = "insert")
+
+  # 3. actual update via insert into statement
+  updateTargetTable(db, table, temporaryTable, names)
+
+}
+
+createTemporaryTable <- function(db, table, temporaryTable) {
+  sendQuery(db, sqlCreateTemporaryTable(table, temporaryTable))
+}
+
+sqlCreateTemporaryTable <- function(table, temporaryTable) {
+  SingleQuery(paste0("create temporary table ", temporaryTable, " like ", table, ";"))
+}
+
+
+updateTargetTable <- function(db, table, temporaryTable, names) {
+  sendQuery(db, sqlUpdateTargetTable(table, temporaryTable, names))
+}
+
+sqlUpdateTargetTable <- function(table, temporaryTable, names) {
+  cols <- unlist(lapply(names, sqlEsc))
+  commaSeperatedCols <- sqlComma(cols)
+  updateStatement <- sqlComma(sprintf("%s = values(%s)", cols, cols))
+
+  SingleQuery(
+    paste(
+      "insert into", table,
+      "select", commaSeperatedCols, "from", temporaryTable,
+      "on duplicate key update",
+      updateStatement, ";"
+    )
   )
 }
