@@ -85,11 +85,11 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   cacheTable(data, path)
   if (mode == "truncate")
     truncateTable(db, table)
-  if (mode == "update") {
+
+  if (mode == "update")
     updateTable(db, path, table, names(data))
-    return(TRUE)
-  }
-  writeTable(db, path, table, names(data), mode)
+  else
+    writeTable(db, path, table, names(data), mode)
 
   TRUE
 }
