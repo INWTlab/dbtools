@@ -101,7 +101,7 @@ convertToCharacter <- function(data) {
 }
 
 truncateTable <- function(db, table) {
-  sendQuery(db, SingleQuery(paste0("TRUNCATE TABLE ", table, ";")))
+  sendQuery(db, SingleQuery(paste0("truncate table ", sqlEsc(table), ";")))
 }
 
 cacheTable <- function(data, path) {
@@ -115,21 +115,15 @@ writeTable <- function(db, path, table, names, mode) {
 sqlLoadData <- function(path, table, names, mode) {
   SingleQuery(
     paste0(
-      "LOAD DATA LOCAL INFILE '",
-      path,
-      "' ",
-      if (mode == "replace")
-        "REPLACE ",
-      "INTO TABLE `",
-      table,
-      "` ",
-      "CHARACTER SET UTF8 ",
-      "FIELDS TERMINATED BY ',' ",
-      "OPTIONALLY ENCLOSED BY '\"' ",
-      "LINES TERMINATED BY '\n' ",
-      "IGNORE 1 LINES ",
-      sqlParan(sqlEsc(names)),
-      ";"
+      "load data local infile '", path, "' ",
+      if (mode == "replace") "replace ",
+      "into table ", sqlEsc(table), " ",
+      "character set utf8 ",
+      "fields terminated by ',' ",
+      "optionally enclosed by '\"' ",
+      "lines terminated by '\n' ",
+      "ignore 1 lines ",
+      sqlParan(sqlEsc(names)), ";"
     )
   )
 }
@@ -158,8 +152,8 @@ createTemporaryTable <- function(db, table) {
 sqlCreateTemporaryTable <- function(table) {
   SingleQuery(
     paste(
-      "create temporary table", addTmpPrefix(table),
-      "like ", table, ";"
+      "create temporary table", sqlEsc(addTmpPrefix(table)),
+      "like ", sqlEsc(table), ";"
     )
   )
 }
@@ -176,7 +170,7 @@ sqlUpdateTargetTable <- function(table, names) {
 
   SingleQuery(
     paste(
-      "insert into", table,
+      "insert into", sqlEsc(table),
       "select", commaSeperatedCols, "from", addTmpPrefix(table),
       "on duplicate key update",
       updateStatement, ";"
