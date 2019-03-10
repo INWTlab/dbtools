@@ -137,31 +137,39 @@ sqlLoadData <- function(path, table, names, mode) {
 updateTable <- function(db, path, table, names) {
 
   # 1. create temporary table like target table
-  temporaryTable <- paste0("tmp_", table)
-  createTemporaryTable(db, table, temporaryTable)
+  createTemporaryTable(db, table)
 
   # 2. insert into temporary table
-  writeTable(db, path, temporaryTable, names, mode = "insert")
+  writeTable(db, path, addTmpPrefix(table), names, mode = "insert")
 
   # 3. actual update via insert into statement
-  updateTargetTable(db, table, temporaryTable, names)
+  updateTargetTable(db, table, names)
 
 }
 
-createTemporaryTable <- function(db, table, temporaryTable) {
-  sendQuery(db, sqlCreateTemporaryTable(table, temporaryTable))
+addTmpPrefix <- function(table) {
+  paste0("tmp_", table)
 }
 
-sqlCreateTemporaryTable <- function(table, temporaryTable) {
-  SingleQuery(paste0("create temporary table ", temporaryTable, " like ", table, ";"))
+createTemporaryTable <- function(db, table) {
+  sendQuery(db, sqlCreateTemporaryTable(table))
+}
+
+sqlCreateTemporaryTable <- function(table) {
+  SingleQuery(
+    paste(
+      "create temporary table", addTmpPrefix(table),
+      "like ", table, ";"
+    )
+  )
 }
 
 
-updateTargetTable <- function(db, table, temporaryTable, names) {
-  sendQuery(db, sqlUpdateTargetTable(table, temporaryTable, names))
+updateTargetTable <- function(db, table, names) {
+  sendQuery(db, sqlUpdateTargetTable(table, names))
 }
 
-sqlUpdateTargetTable <- function(table, temporaryTable, names) {
+sqlUpdateTargetTable <- function(table, names) {
   cols <- unlist(lapply(names, sqlEsc))
   commaSeperatedCols <- sqlComma(cols)
   updateStatement <- sqlComma(sprintf("%s = values(%s)", cols, cols))
@@ -169,7 +177,7 @@ sqlUpdateTargetTable <- function(table, temporaryTable, names) {
   SingleQuery(
     paste(
       "insert into", table,
-      "select", commaSeperatedCols, "from", temporaryTable,
+      "select", commaSeperatedCols, "from", addTmpPrefix(table),
       "on duplicate key update",
       updateStatement, ";"
     )
