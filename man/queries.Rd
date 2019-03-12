@@ -8,7 +8,7 @@
 \title{SQL Query Objects}
 \usage{
 Query(.x, ..., .data = NULL, .envir = parent.frame(),
-  checkSemicolon = TRUE)
+  checkSemicolon = TRUE, keepComments = FALSE)
 }
 \arguments{
 \item{.x}{(character | connection) A character or connection containing a
@@ -23,6 +23,10 @@ environment in which to evaluate code chunks in queries.}
 
 \item{checkSemicolon}{(logical) Should be left with the default. Set to
 false only in case you want to allow for semicolons within the query.}
+
+\item{keepComments}{(logical) In most cases it is safe(er) to remove comments
+from a query. When you want to keep them set the argument to \code{TRUE}.
+This only applies when \code{.x} is a file.}
 }
 \description{
 Data types to represent SQL queries. It should not be necessary to use
