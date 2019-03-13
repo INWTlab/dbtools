@@ -133,10 +133,16 @@ updateTable <- function(db, path, table, names) {
   # 1. create temporary table like target table
   createTemporaryTable(db, table)
 
-  # 2. insert into temporary table
+  # 2. remove redundant fiels - if we want to allow updates of single fields we
+  #    need to remove all fields that are not be included in the update
+  #    statement. Otherwise we have to ensure that these fields all allow null
+  #    null values.
+  dropRedundantFields(db, table, names)
+
+  # 3. insert into temporary table
   writeTable(db, path, addTmpPrefix(table), names, mode = "insert")
 
-  # 3. actual update via insert into statement
+  # 4. actual update via insert into statement
   updateTargetTable(db, table, names)
 
 }
@@ -149,6 +155,15 @@ createTemporaryTable <- function(db, table) {
   sendQuery(db, sqlCreateTemporaryTable(table))
 }
 
+dropRedundantFields <- function(db, table, names) {
+  allFields <- sendQuery(db, SingleQuery("show columns from tmp_mtcars;"))$Field
+  redundantFields <- setdiff(allFields, names)
+  if (length(redundantFields)) {
+    sendQuery(db, sqlDropRedundantColumns(table, redundantFields))
+  }
+}
+
+
 sqlCreateTemporaryTable <- function(table) {
   SingleQuery(
     paste(
@@ -158,6 +173,14 @@ sqlCreateTemporaryTable <- function(table) {
   )
 }
 
+sqlDropRedundantColumns <- function(table, redundantFields) {
+  SingleQuery(
+    paste(
+      "alter table", addTmpPrefix(table),
+      paste("drop", paste0("`", redundantFields, "`"), collapse = ", "), ";"
+    )
+  )
+}
 
 updateTargetTable <- function(db, table, names) {
   sendQuery(db, sqlUpdateTargetTable(table, names))
