@@ -55,7 +55,7 @@ However, there are two notebale exceptions:
   \item row.names is always set to FALSE, i.e., row.names must be converted
   to a variable if you want to keep them
 }
-There are three different modes for sending data to the database:
+There are four different modes for sending data to the database:
 \describe{
   \item{insert}{INSERT INTO TABLE, i.e. in case of duplicates only the first
   entry will be kept}
@@ -63,5 +63,6 @@ There are three different modes for sending data to the database:
   entry will be kept}
   \item{truncate}{like dbWriteTable with argument overwrite = TRUE, i.e., the
   table is truncated before sending the data}
+  \item{update}{like insert but falls back to update on duplicate key}
 }
 }

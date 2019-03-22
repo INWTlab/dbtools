@@ -10,7 +10,7 @@
 #'   \item row.names is always set to FALSE, i.e., row.names must be converted
 #'   to a variable if you want to keep them
 #' }
-#' There are three different modes for sending data to the database:
+#' There are four different modes for sending data to the database:
 #' \describe{
 #'   \item{insert}{INSERT INTO TABLE, i.e. in case of duplicates only the first
 #'   entry will be kept}
@@ -18,6 +18,7 @@
 #'   entry will be kept}
 #'   \item{truncate}{like dbWriteTable with argument overwrite = TRUE, i.e., the
 #'   table is truncated before sending the data}
+#'   \item{update}{like insert but falls back to update on duplicate key}
 #' }
 #'
 #' @inheritParams sendQuery
@@ -71,13 +72,11 @@ sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %
 #' @rdname sendData
 #' @export
 sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-  if (mode == "update") stop("Update mode is only supported for MySQL driver")
   .sendData(db, data, table, ..., mode = mode)
 }
 
 .sendData <- function(db, data, table, ..., mode) {
   stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
-  if (mode == "update") return(.sendDataUpdate(db, data, table, ...))
 
   on.exit(unlink(path))
   data <- convertToCharacter(data)
@@ -86,39 +85,11 @@ sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert")
   cacheTable(data, path)
   if (mode == "truncate")
     truncateTable(db, table)
-  writeTable(db, path, table, names(data), mode)
 
-  TRUE
-}
-
-.sendDataUpdate <- function(db, data, table, ...) {
-  ## con (connection) an open connection!
-
-  quoteValues <- function(x) {
-    ind <- which(is.na(x))
-    x <- paste0("'", x, "'")
-    x[ind] <- "NULL"
-    x
-  }
-
-  if (nrow(data) == 0) return(TRUE)
-
-  # It ain't pretty but fast(er)...
-  table <- sqlEsc(table)
-  data[] <- lapply(data, quoteValues)
-  cols <- unlist(lapply(names(data), sqlEsc))
-  colsInParan <- sqlParan(cols)
-  colsInUpdate <- sqlComma(sprintf("%s=VALUES(%s)", cols, cols))
-  data <- as.matrix(data)
-
-  for (i in 1:nrow(data))
-    .Call(
-      RMySQLExec(),
-      db@Id,
-      sqlUpdateData(table, colsInParan, data[i, ], colsInUpdate)
-    )
-
-  checkForWarnings(db)
+  if (mode == "update")
+    updateTable(db, path, table, names(data))
+  else
+    writeTable(db, path, table, names(data), mode)
 
   TRUE
 }
@@ -130,7 +101,7 @@ convertToCharacter <- function(data) {
 }
 
 truncateTable <- function(db, table) {
-  sendQuery(db, SingleQuery(paste0("TRUNCATE TABLE ", table, ";")))
+  sendQuery(db, SingleQuery(paste0("truncate table ", sqlEsc(table), ";")))
 }
 
 cacheTable <- function(data, path) {
@@ -142,35 +113,111 @@ writeTable <- function(db, path, table, names, mode) {
 }
 
 sqlLoadData <- function(path, table, names, mode) {
-  SingleQuery (
-    paste0 (
-      "LOAD DATA LOCAL INFILE '",
-      path,
-      "' ",
-      if (mode == "replace")
-        "REPLACE ",
-      "INTO TABLE `",
-      table,
-      "` ",
-      "CHARACTER SET UTF8 ",
-      "FIELDS TERMINATED BY ',' ",
-      "OPTIONALLY ENCLOSED BY '\"' ",
-      "LINES TERMINATED BY '\n' ",
-      "IGNORE 1 LINES ",
-      sqlParan(sqlEsc(names)),
-      ";"
+  SingleQuery(
+    paste0(
+      "load data local infile '", path, "' ",
+      if (mode == "replace") "replace ",
+      "into table ", sqlEsc(table), " ",
+      "character set utf8 ",
+      "fields terminated by ',' ",
+      "optionally enclosed by '\"' ",
+      "lines terminated by '\n' ",
+      "ignore 1 lines ",
+      sqlParan(sqlEsc(names)), ";"
     )
   )
 }
 
-sqlUpdateData <- function(table, cols, values, colsUpdate) {
-  paste(
-    sep = " ",
-    "INSERT INTO", table,
-    cols,
-    "VALUES", sqlParan(values),
-    "ON DUPLICATE KEY UPDATE",
-    colsUpdate,
-    ";"
+updateTable <- function(db, path, table, names) {
+
+  # 1. create temporary table like target table
+  createTemporaryTable(db, table)
+
+  # 2. drop indices - this will speed up the process for larger objects
+  dropIndices(db, addTmpPrefix(table))
+
+  # 3. remove redundant fiels - otherwise we won't be able to do updates on
+  # particular fields only without considering defaults
+  dropRedundantFields(db, addTmpPrefix(table), names)
+
+  # 4. insert into temporary table
+  writeTable(db, path, addTmpPrefix(table), names, mode = "insert")
+
+  # 5. actual update via insert into statement
+  updateTargetTable(db, table, names)
+
+}
+
+addTmpPrefix <- function(table) {
+  paste0("tmp_", table)
+}
+
+createTemporaryTable <- function(db, table) {
+  sendQuery(db, sqlCreateTemporaryTable(table))
+}
+
+sqlCreateTemporaryTable <- function(table) {
+  SingleQuery(
+    paste(
+      "create temporary table", sqlEsc(addTmpPrefix(table)),
+      "like ", sqlEsc(table), ";"
+    )
+  )
+}
+
+dropIndices <- function(db, table) {
+  sql <- paste0("show index from ", table, ";")
+  indices <- sendQuery(db, SingleQuery(sql))$Key_name
+
+  if (length(indices)) {
+    sendQuery(db, sqlDropIndices(table, indices))
+  }
+}
+
+sqlDropIndices <- function(table, indices) {
+  SingleQuery(
+    paste(
+      "alter table", sqlEsc(table),
+      paste("drop index", unlist(lapply(indices, sqlNames)), collapse = ", "), ";"
+    )
+  )
+}
+
+dropRedundantFields <- function(db, table, names) {
+  sql <- "show columns from tmp_mtcars;"
+  allFields <- sendQuery(db, SingleQuery(sql))$Field
+  redundantFields <- setdiff(allFields, names)
+
+  if (length(redundantFields)) {
+    sendQuery(db, sqlDropRedundantColumns(table, redundantFields))
+  }
+}
+
+sqlDropRedundantColumns <- function(table, redundantFields) {
+  SingleQuery(
+    paste(
+      "alter table", sqlEsc(table),
+      paste("drop", unlist(lapply(redundantFields, sqlNames)), collapse = ", "), ";"
+    )
+  )
+}
+
+updateTargetTable <- function(db, table, names) {
+  sendQuery(db, sqlUpdateTargetTable(table, names))
+}
+
+sqlUpdateTargetTable <- function(table, names) {
+  cols <- unlist(lapply(names, sqlEsc))
+  commaSeperatedCols <- sqlComma(cols)
+  colsInParan <- sqlParan(cols)
+  updateStatement <- sqlComma(sprintf("%s = values(%s)", cols, cols))
+
+  SingleQuery(
+    paste(
+      "insert ignore into", sqlEsc(table), colsInParan,
+      "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)),
+      "on duplicate key update",
+      updateStatement, ";"
+    )
   )
 }
