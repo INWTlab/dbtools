@@ -133,14 +133,12 @@ updateTable <- function(db, path, table, names) {
   # 1. create temporary table like target table
   createTemporaryTable(db, table)
 
-  # 2. drop index
-  dropIndices(db, table)
+  # 2. drop indices - this will speed up the process for larger objects
+  dropIndices(db, addTmpPrefix(table))
 
-  # 3. remove redundant fiels - if we want to allow updates of single fields we
-  #    need to remove all fields that are not be included in the update
-  #    statement. Otherwise we have to ensure that these fields all allow null
-  #    null values.
-  dropRedundantFields(db, table, names)
+  # 3. remove redundant fiels - otherwise we won't be able to do updates on
+  # particular fields only without considering defaults
+  dropRedundantFields(db, addTmpPrefix(table), names)
 
   # 4. insert into temporary table
   writeTable(db, path, addTmpPrefix(table), names, mode = "insert")
@@ -168,7 +166,9 @@ sqlCreateTemporaryTable <- function(table) {
 }
 
 dropIndices <- function(db, table) {
-  indices <- sendQuery(db, SingleQuery(paste0("show index from ", table, ";")))$Key_name
+  sql <- paste0("show index from ", table, ";")
+  indices <- sendQuery(db, SingleQuery(sql))$Key_name
+
   if (length(indices)) {
     sendQuery(db, sqlDropIndices(table, indices))
   }
@@ -177,15 +177,17 @@ dropIndices <- function(db, table) {
 sqlDropIndices <- function(table, indices) {
   SingleQuery(
     paste(
-      "alter table", addTmpPrefix(table),
-      paste("drop index", paste0("`", indices, "`"), collapse = ", "), ";"
+      "alter table", sqlEsc(table),
+      paste("drop index", unlist(lapply(indices, sqlEsc)), collapse = ", "), ";"
     )
   )
 }
 
 dropRedundantFields <- function(db, table, names) {
-  allFields <- sendQuery(db, SingleQuery("show columns from tmp_mtcars;"))$Field
+  sql <- "show columns from tmp_mtcars;"
+  allFields <- sendQuery(db, SingleQuery(sql))$Field
   redundantFields <- setdiff(allFields, names)
+
   if (length(redundantFields)) {
     sendQuery(db, sqlDropRedundantColumns(table, redundantFields))
   }
@@ -194,8 +196,8 @@ dropRedundantFields <- function(db, table, names) {
 sqlDropRedundantColumns <- function(table, redundantFields) {
   SingleQuery(
     paste(
-      "alter table", addTmpPrefix(table),
-      paste("drop", paste0("`", redundantFields, "`"), collapse = ", "), ";"
+      "alter table", sqlEsc(table),
+      paste("drop", unlist(lapply(redundantFields, sqlEsc)), collapse = ", "), ";"
     )
   )
 }
@@ -207,12 +209,13 @@ updateTargetTable <- function(db, table, names) {
 sqlUpdateTargetTable <- function(table, names) {
   cols <- unlist(lapply(names, sqlEsc))
   commaSeperatedCols <- sqlComma(cols)
+  colsInParan <- sqlParan(cols)
   updateStatement <- sqlComma(sprintf("%s = values(%s)", cols, cols))
 
   SingleQuery(
     paste(
-      "insert into", sqlEsc(table),
-      "select", commaSeperatedCols, "from", addTmpPrefix(table),
+      "insert ignore into", sqlEsc(table), colsInParan,
+      "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)),
       "on duplicate key update",
       updateStatement, ";"
     )
