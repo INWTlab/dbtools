@@ -123,12 +123,16 @@ test_that("Error handling and retry in sendData", {
 
 testSendDataDocker <- function(db = "mysql", version = "latest") {
   tmp <- system(
-    paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
-           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':', version),
+    paste0(
+      'docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
+      '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':', version
+    ),
     intern = TRUE
   )
   on.exit(tmp <- system(
-    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
+    paste0(
+      'docker kill test-', db, '-database; docker rm -v test-', db, '-database'
+    ),
     intern = TRUE
   ))
 
@@ -164,7 +168,7 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
                      `gear` double null default null,
                      `carb` double null default null,
                      primary key (`model`));"
-                     )
+  )
 
   # send data to database
   expect_true(sendData(cred, mtcars))
@@ -197,7 +201,14 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
   mtcars2 <- mtcars[1, ]
   mtcars2$mpg <- mtcars2$mpg + 1
-  expect_true(sendData(cred, mtcars2[c("model", "mpg")], table = "mtcars", mode = "update"))
+  expect_true(
+    sendData(
+      cred,
+      mtcars2[c("model", "mpg")],
+      table = "mtcars",
+      mode = "update"
+    )
+  )
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 32L)
   expect_identical(
@@ -205,7 +216,14 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
     mtcars2[1, ]
   )
   mtcars2[1, "carb"] <- NA_real_
-  expect_true(sendData(cred, mtcars2[1, c("model", "mpg", "carb")], table = "mtcars", mode = "update"))
+  expect_true(
+    sendData(
+      cred,
+      mtcars2[1, c("model", "mpg", "carb")],
+      table = "mtcars",
+      mode = "update"
+    )
+  )
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 32L)
   expect_identical(
@@ -256,7 +274,7 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
     )
   )
 
-  }
+}
 
 context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
