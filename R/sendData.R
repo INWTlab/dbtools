@@ -178,7 +178,7 @@ sqlDropIndices <- function(table, indices) {
   SingleQuery(
     paste(
       "alter table", sqlEsc(table),
-      paste("drop index", unlist(lapply(indices, sqlEsc)), collapse = ", "), ";"
+      paste("drop index", unlist(lapply(indices, sqlNames)), collapse = ", "), ";"
     )
   )
 }
@@ -197,7 +197,7 @@ sqlDropRedundantColumns <- function(table, redundantFields) {
   SingleQuery(
     paste(
       "alter table", sqlEsc(table),
-      paste("drop", unlist(lapply(redundantFields, sqlEsc)), collapse = ", "), ";"
+      paste("drop", unlist(lapply(redundantFields, sqlNames)), collapse = ", "), ";"
     )
   )
 }
