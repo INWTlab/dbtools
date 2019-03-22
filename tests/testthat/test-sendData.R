@@ -195,13 +195,13 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   # mode: update
   sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
   expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
-  mtcars2 <- mtcars[1, c("model", "mpg")]
+  mtcars2 <- mtcars[1, ]
   mtcars2$mpg <- mtcars2$mpg + 1
   expect_true(sendData(cred, mtcars2, table = "mtcars", mode = "update"))
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 32L)
   expect_identical(
-    as.data.frame(res[res$model == mtcars2$model[1], c("model", "mpg")]),
+    as.data.frame(res[res$model == mtcars2$model[1], ]),
     mtcars2[1, ]
   )
   mtcars2[1, "carb"] <- NA_real_
@@ -209,7 +209,7 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 32L)
   expect_identical(
-    as.data.frame(res[res$model == mtcars2$model[1], c("model", "mpg", "carb")]),
+    as.data.frame(res[res$model == mtcars2$model[1], ]),
     mtcars2[1, ]
   )
 
