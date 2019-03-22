@@ -12,6 +12,9 @@
 #'   environment in which to evaluate code chunks in queries.
 #' @param checkSemicolon (logical) Should be left with the default. Set to
 #'   false only in case you want to allow for semicolons within the query.
+#' @param keepComments (logical) In most cases it is safe(er) to remove comments
+#'   from a query. When you want to keep them set the argument to \code{TRUE}.
+#'   This only applies when \code{.x} is a file.
 #'
 #' @rdname queries
 #'
@@ -33,25 +36,26 @@
 #' writeLines(c(query1, query2), tmpFile)
 #' Query(file(tmpFile))
 #' @export
-Query <- function(.x, ..., .data = NULL, .envir = parent.frame(), checkSemicolon = TRUE) {
+Query <- function(.x, ..., .data = NULL, .envir = parent.frame(),
+                  checkSemicolon = TRUE, keepComments = FALSE) {
 
-  query <- queryRead(.x)
+  query <- queryRead(.x, keepComments)
   query <- queryEvalTemplate(query, .data, .envir = .envir, ...)
 
   queryConst(query, checkSemicolon = checkSemicolon)
 
 }
 
-queryRead(x) %g% x
+queryRead(x, ...) %g% x
 
-queryRead(x ~ connection) %m% {
+queryRead(x ~ connection, keepComments, ...) %m% {
   on.exit(close(x))
 
   query <- readLines(x)
-  query <- sub("(-- .*)|(#.*)", "", query)
+  query <- if (keepComments) query else sub("(-- .*)|(#.*)", "", query)
   query <- query[query != ""]
   query <- paste(query, collapse = "\n")
-  query <- gsub("(\\\n)?/\\*.*?\\*/", "", query)
+  query <- if (keepComments) query else gsub("(\\\n)?/\\*.*?\\*/", "", query)
   query <- unlist(strsplit(query, ";"))
   query <- paste0(query, ";")
   query <- sub("^\\n+", "", query)
