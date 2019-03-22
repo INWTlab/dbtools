@@ -122,6 +122,7 @@ test_that("Error handling and retry in sendData", {
 })
 
 testSendDataDocker <- function(db = "mysql", version = "latest") {
+
   tmp <- startContainer(db = db, version = version)
   on.exit(tmp <- stopContainer(db = db))
 
@@ -141,21 +142,21 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   )
 
   # create table
-  sendQuery(cred, "CREATE TABLE `mtcars` (
-                     `model` VARCHAR(20) NOT NULL,
-                     `mpg` DOUBLE NOT NULL,
-                     `cyl` DOUBLE NOT NULL,
-                     `disp` DOUBLE NOT NULL,
-                     `hp` DOUBLE NOT NULL,
-                     `drat` DOUBLE NOT NULL,
-                     `wt` DOUBLE NOT NULL,
-                     `qsec` DOUBLE NOT NULL,
-                     `vs` DOUBLE NOT NULL,
-                     `am` DOUBLE NOT NULL,
-                     `gear` DOUBLE NOT NULL,
-                     `carb` DOUBLE NULL,
-                     PRIMARY KEY (`model`));"
-                     )
+  sendQuery(cred, "create table `mtcars` (
+                     `model` varchar(19) not null,
+                     `mpg` double null default null,
+                     `cyl` double null default null,
+                     `disp` double null default null,
+                     `hp` double null default null,
+                     `drat` double null default null,
+                     `wt` double null default null,
+                     `qsec` double null default null,
+                     `vs` double null default null,
+                     `am` double null default null,
+                     `gear` double null default null,
+                     `carb` double null default null,
+                     primary key (`model`));"
+  )
 
   # send data to database
   expect_true(sendData(cred, mtcars))
@@ -186,17 +187,31 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   # mode: update
   sendData(cred, mtcars[1, ], table = "mtcars", mode = "truncate")
   expect_true(sendData(cred, mtcars, table = "mtcars", mode = "update"))
-  mtcars2 <- mtcars
-  mtcars2[1, "mpg"] <- mtcars2[1, "mpg"] + 1
-  expect_true(sendData(cred, mtcars2[1, ], table = "mtcars", mode = "update"))
+  mtcars2 <- mtcars[1, ]
+  mtcars2$mpg <- mtcars2$mpg + 1
+  expect_true(
+    sendData(
+      cred,
+      mtcars2[c("model", "mpg")],
+      table = "mtcars",
+      mode = "update"
+    )
+  )
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 32L)
   expect_identical(
     as.data.frame(res[res$model == mtcars2$model[1], ]),
     mtcars2[1, ]
   )
-  mtcars2[1, "carb"] <- NA
-  expect_true(sendData(cred, mtcars2[1, ], table = "mtcars", mode = "update"))
+  mtcars2[1, "carb"] <- NA_real_
+  expect_true(
+    sendData(
+      cred,
+      mtcars2[1, c("model", "mpg", "carb")],
+      table = "mtcars",
+      mode = "update"
+    )
+  )
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
   expect_identical(nrow(res), 32L)
   expect_identical(
