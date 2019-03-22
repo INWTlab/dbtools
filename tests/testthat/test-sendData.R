@@ -266,10 +266,10 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
 
 context("sendData-RMySQL")
 test_that("sendData for RMySQL DB", {
-  testSendDataDocker("mysql", "5.7")
+  testSendDataDocker("mysql")
 })
 
 context("sendData-RMariaDB")
 test_that("sendData for MariaDB", {
-  testSendDataDocker("mariadb", "latest")
+  testSendDataDocker("mariadb")
 })
