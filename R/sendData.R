@@ -184,7 +184,7 @@ sqlDropIndices <- function(table, indices) {
 }
 
 dropRedundantFields <- function(db, table, names) {
-  sql <- "show columns from tmp_mtcars;"
+  sql <- paste0("show columns from ", sqlEsc(table), ";")
   allFields <- sendQuery(db, SingleQuery(sql))$Field
   redundantFields <- setdiff(allFields, names)
 
