@@ -133,8 +133,8 @@ updateTable <- function(db, path, table, names) {
   # 1. create temporary table like target table
   createTemporaryTable(db, table)
 
-  # 2. drop indices - this will speed up the process for larger objects
-  dropIndices(db, addTmpPrefix(table))
+  # # 2. drop indices - this will speed up the process for larger objects
+  # dropIndices(db, addTmpPrefix(table))
 
   # 3. remove redundant fiels - otherwise we won't be able to do updates on
   # particular fields only without considering defaults
@@ -165,23 +165,23 @@ sqlCreateTemporaryTable <- function(table) {
   )
 }
 
-dropIndices <- function(db, table) {
-  sql <- paste0("show index from ", table, ";")
-  indices <- sendQuery(db, SingleQuery(sql))$Key_name
-
-  if (length(indices)) {
-    sendQuery(db, sqlDropIndices(table, indices))
-  }
-}
-
-sqlDropIndices <- function(table, indices) {
-  SingleQuery(
-    paste(
-      "alter table", sqlEsc(table),
-      paste("drop index", unlist(lapply(indices, sqlNames)), collapse = ", "), ";"
-    )
-  )
-}
+# dropIndices <- function(db, table) {
+#   sql <- paste0("show index from ", table, ";")
+#   indices <- sendQuery(db, SingleQuery(sql))$Key_name
+#
+#   if (length(indices)) {
+#     sendQuery(db, sqlDropIndices(table, indices))
+#   }
+# }
+#
+# sqlDropIndices <- function(table, indices) {
+#   SingleQuery(
+#     paste(
+#       "alter table", sqlEsc(table),
+#       paste("drop index", unlist(lapply(indices, sqlNames)), collapse = ", "), ";"
+#     )
+#   )
+# }
 
 dropRedundantFields <- function(db, table, names) {
   sql <- paste0("show columns from ", sqlEsc(table), ";")
