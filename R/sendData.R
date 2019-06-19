@@ -214,7 +214,7 @@ sqlUpdateTargetTable <- function(table, names) {
 
   SingleQuery(
     paste(
-      "insert ignore into", sqlEsc(table), colsInParan,
+      "insert into", sqlEsc(table), colsInParan,
       "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)),
       "on duplicate key update",
       updateStatement, ";"
