@@ -22,7 +22,7 @@ pipeline {
             agent { label 'test' }
 
             environment {
-                TMP_SUFFIX = """${sh(returnStdout: true, script: 'echo `cat /dev/urandom | tr -dc \'a-zA-Z\' | fold -w 6 | head -n 1`')}"""
+                TMP_SUFFIX = """${sh(returnStdout: true, script: 'echo `cat /dev/urandom | tr -dc \'a-z\' | fold -w 6 | head -n 1`')}"""
             }
 
             steps {
