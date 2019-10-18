@@ -10,7 +10,7 @@ pipeline {
     INWT_REPO = 'inwt-vmdocker1.inwt.de:8081'
   }
   stages {
-    stage(Launch MariaDB test databases) {
+    stage('Launch MariaDB test databases') {
       steps {
         sh '''
         docker stop test-mariadb-database || :
