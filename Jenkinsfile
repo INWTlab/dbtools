@@ -14,8 +14,8 @@ pipeline {
       agent { label 'test' }
       steps {
         sh '''
-        docker stop test-mariadb-database || :
-        docker build -t mariadb-test inst/db/mariadb && docker run --name mariadb-test -p 3302:3306 -d --rm mariadb-test
+        docker stop mariadb-test-database || :
+        docker build -t mariadb-test-database inst/db/mariadb && docker run --name mariadb-test-database -p 3302:3306 -d --rm mariadb-test-database
         sleep 15s
 
         docker build --pull -t tmp-$CUR_PROJ-$TMP_SUFFIX .
