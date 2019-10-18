@@ -6,3 +6,6 @@ README.Rmd
 ^.*\.db$
 \.Rprofile
 lib
+Dockerfile
+.dockerignore
+Jenkinsfile
