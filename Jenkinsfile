@@ -10,15 +10,6 @@ pipeline {
     INWT_REPO = 'inwt-vmdocker1.inwt.de:8081'
   }
   stages {
-//    stage('Launch MariaDB test databases') {
-//      steps {
-//        sh '''
-//        docker stop test-mariadb-database || :
-//        docker build -t mariadb-test inst/db/mariadb && docker run --name mariadb-test -p 3302:3306 -d --rm mariadb-test
-//        sleep 15s
-//        '''
-//      }
-//    }
     stage('Testing with R') {
       agent { label 'test' }
       environment {
