@@ -147,12 +147,12 @@ testSendQueryDocker <- function(db = "mysql", version = "latest") {
   # Sys.sleep(15) # Takes some time to fire up db:
 
   cred <- Credentials(
-    drv = MariaDB,
+    drv = if (db == "mysql") MySQL else MariaDB,
     user = "root",
     password = "root",
     dbname = "test",
     host = "127.0.0.1",
-    port = 3302
+    port = if (db == "mysql") 3301 else 3302
   )
 
   dat <- sendQuery(cred, "SELECT 1 AS x;")

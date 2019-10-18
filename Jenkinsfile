@@ -17,19 +17,21 @@ pipeline {
       }
       steps {
         sh '''
-        # launch mariadb test database
-        docker stop mariadb-test-database || :
-        docker build -t mariadb-test-database inst/db/mariadb && docker run --name mariadb-test-database -p 3302:3306 -d --rm mariadb-test-database
-
         # launch mysql test database
         docker stop mysql-test-database || :
         docker build -t mysql-test-database inst/db/mysql && docker run --name mysql-test-database -p 3301:3306 -d --rm mysql-test-database
+
+        # launch mariadb test database
+        docker stop mariadb-test-database || :
+        docker build -t mariadb-test-database inst/db/mariadb && docker run --name mariadb-test-database -p 3302:3306 -d --rm mariadb-test-database
         sleep 15s
 
+        # perform check
         docker build --pull -t tmp-$CUR_PROJ-$TMP_SUFFIX .
         docker run --rm --network host tmp-$CUR_PROJ-$TMP_SUFFIX check
         docker rmi tmp-$CUR_PROJ-$TMP_SUFFIX
 
+        # stop test databases
         docker stop mysql-test-database || :
         docker stop mariadb-test-database || :
         '''
