@@ -202,3 +202,49 @@ context("sendQuery-RMariaDB")
 test_that("sendQuery for MariaDB", {
   testSendQueryDocker("mariadb", "latest")
 })
+
+context("timestamps (RMySQL and RMariaDB)")
+testTimezoneDocker <- function(db = "mysql", version = "latest", driver = MySQL) {
+  tmp <- system(
+    paste0('docker run --name test-', db, '-database -p 127.0.0.1:3307:3306 ',
+           '-e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=test -d ', db, ':', version),
+    intern = TRUE
+  )
+  on.exit(tmp <- system(
+    paste0('docker kill test-', db, '-database; docker rm -v test-', db, '-database'),
+    intern = TRUE
+  ))
+
+  Sys.sleep(15) # Takes some time to fire up db:
+
+  cred <- Credentials(
+    drv = driver,
+    user = "root",
+    password = "root",
+    dbname = "test",
+    host = "127.0.0.1",
+    port = 3307
+  )
+
+  sendQuery(cred, "create table tmp_test (time timestamp not null);")
+
+  sendQuery(cred, "insert into tmp_test (time) values ('2019-01-01 12:00:00');")
+  res <- sendQuery(cred, "select time from tmp_test;", tz = "CET")$time
+  expect_equal(as.character(res), '2019-01-01 12:00:00');
+
+  if (identical(driver, MariaDB)) {
+    res <- sendQuery(cred, "select time from tmp_test;", tz = "UTC")$time
+    attr(res, "tzone") <- "CET"
+    expect_equal(as.character(res), '2019-01-01 13:00:00');
+  }
+
+  sendQuery(cred, "truncate tmp_test;")
+}
+
+test_that("check input / output of timestamps for MySQL driver", {
+  testTimezoneDocker("mysql", "5.7", driver = MySQL)
+})
+
+test_that("check input / output of timestamps for MySQL driver", {
+  testTimezoneDocker("mysql", "5.7", driver = MariaDB)
+})

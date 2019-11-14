@@ -143,15 +143,16 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m%
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
+sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8", tz = "CET") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
-  .sendQuery(db, query, ..., encoding = encoding)
+  .sendQuery(db, query, ..., encoding = encoding, tz = tz)
 }
 
-.sendQuery <- function(db, query, ..., encoding) {
+.sendQuery <- function(db, query, ..., encoding, tz = NULL) {
   setNamesEncoding(db, encoding)
   dat <- sendQueryDb(db, query)
+  dat <- fixTimezone(dat, tz)
   checkForWarnings(db)
   dat
 }
@@ -220,7 +221,7 @@ setNamesEncoding <- function(con, encoding) {
 
 checkForWarnings <- function(con) {
   res <- sendQueryDb(con, "SHOW WARNINGS;")
-  if (nrow(res) > 0) {
+  if (!is.null(res) && nrow(res) > 0) {
     warn <- formatWarnings(res)
     warning(warn)
   }
@@ -230,4 +231,18 @@ formatWarnings <- function(dat) {
   dat <- capture.output(dat)
   dat <- paste(dat, collapse = "\n")
   dat
+}
+
+fixTimezone <- function(dat, tz) {
+  timeVars <- lapply(dat, inherits, what = "POSIXct")
+  lapply(timeVars, function(x){
+    dat[[x]] <<- convertTimestampTZ(dat[[x]], from = "UTC", to = tz)
+  })
+  dat
+}
+
+convertTimestampTZ <- function(x, from, to) {
+  attr(x, "tzone") <- from
+  x <- as.character(x)
+  as.POSIXct(x, to)
 }
