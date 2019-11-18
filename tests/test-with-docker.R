@@ -12,7 +12,5 @@ TEST <- function(topic, expr, envir = parent.frame()) {
 
 cat("Testing:\n")
 
-Sys.sleep(30)
-
 testFiles <- list.files("test-with-docker.d", full.names = TRUE)
 for (file in testFiles) source(file, new.env())
