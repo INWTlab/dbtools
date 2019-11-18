@@ -91,18 +91,8 @@ testSendData <- function(db = "mysql") {
     )
   )
 
-  # datetime fields
-  sendQuery(cred, "CREATE TABLE `dtm` (
-    `dtm` DATETIME NOT NULL);"
-  )
-
   expect_silent(
     sendData(cred, data.frame(dtm = Sys.time()), table = "dtm")
-  )
-
-  # NaN
-  sendQuery(cred, "CREATE TABLE `nan` (
-    `nan` INT NULL);"
   )
 
   expect_silent(

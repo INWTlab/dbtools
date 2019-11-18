@@ -18,6 +18,14 @@ create table `mtcars` (
   primary key (`model`)
 ) engine = InnoDB default charset = utf8;
 
+create table `dtm` (
+  `dtm` datetime not null
+) engine = InnoDB default charset = utf8;
+
+create table `nan` (
+  `nan` int null
+) engine = InnoDB default charset = utf8;
+
 create user 'testUser'@'%' identified by password '*33F7676C1A7AF4D85DAF98885017F9FD7CF31BD5';
 grant select, insert, update, delete, drop, create temporary tables on `testSchema`.* to 'testUser'@'%';
 flush privileges;
