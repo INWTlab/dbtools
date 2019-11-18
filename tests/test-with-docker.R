@@ -1,4 +1,5 @@
 library("dbtools")
+library("testthat")
 
 TEST <- function(topic, expr, envir = parent.frame()) {
   cat(paste0(topic, ":"))
