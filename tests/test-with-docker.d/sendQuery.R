@@ -4,7 +4,7 @@ testSendQuery <- function(db = "mysql", version = "latest") {
     drv = if (db == "mysql") MySQL else MariaDB,
     user = "testUser",
     password = "3WBUT7My996BLVoTZHo3",
-    dbname = "test",
+    dbname = "testSchema",
     host = "127.0.0.1",
     port = if (db == "mysql") 3301 else 3302
   )
