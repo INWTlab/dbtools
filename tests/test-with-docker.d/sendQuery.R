@@ -9,6 +9,8 @@ testSendQuery <- function(db = "mysql", version = "latest") {
     port = if (db == "mysql") 3301 else 3302
   )
 
+  dummyQuery <- function(i, const) paste0("SELECT ", i + const, " AS x;")
+
   dat <- sendQuery(cred, "SELECT 1 AS x;")
 
   expect_equal(nrow(dat), 1)
