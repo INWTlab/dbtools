@@ -1,11 +1,7 @@
-testSendDataDocker <- function(db = "mysql", version = "latest") {
+testSendData <- function(db = "mysql", version = "latest") {
 
-  cred <- Credentials(
+  cred <- CREDENTIALS(
     drv = if (db == "mysql") MySQL else MariaDB,
-    user = "testUser",
-    password = "3WBUT7My996BLVoTZHo3",
-    dbname = "test",
-    host = "127.0.0.1",
     port = if (db == "mysql") 3301 else 3302
   )
 
@@ -14,24 +10,6 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   mtcars$model <- row.names(mtcars)
   mtcars <- mtcars[c(length(mtcars), 1:(length(mtcars) - 1))]
   row.names(mtcars) <- NULL
-
-
-  # create table
-  sendQuery(cred, "create table `mtcars` (
-                     `model` varchar(19) not null,
-                     `mpg` double null default null,
-                     `cyl` double null default null,
-                     `disp` double null default null,
-                     `hp` double null default null,
-                     `drat` double null default null,
-                     `wt` double null default null,
-                     `qsec` double null default null,
-                     `vs` double null default null,
-                     `am` double null default null,
-                     `gear` double null default null,
-                     `carb` double null default null,
-                     primary key (`model`));"
-  )
 
   # send data to database
   expect_true(sendData(cred, mtcars))
@@ -138,13 +116,3 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   )
 
 }
-
-context("sendData-RMySQL")
-test_that("sendData for RMySQL DB", {
-  testSendDataDocker("mysql", "5.7")
-})
-
-context("sendData-RMariaDB")
-test_that("sendData for MariaDB", {
-  testSendDataDocker("mariadb", "latest")
-})
