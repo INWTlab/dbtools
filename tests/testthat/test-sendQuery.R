@@ -194,9 +194,9 @@ testSendQueryDocker <- function(db = "mysql", version = "latest") {
   )
 }
 
-# test_that("sendQuery for RMySQL DB", {
-#   testSendQueryDocker("mysql", "5.7")
-# })
+test_that("sendQuery for RMySQL DB", {
+  testSendQueryDocker("mysql", "5.7")
+})
 
 context("sendQuery-RMariaDB")
 test_that("sendQuery for MariaDB", {
