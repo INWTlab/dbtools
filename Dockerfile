@@ -1,4 +1,4 @@
-FROM inwt/r-batch:3.5.1
+FROM inwt/r-batch:3.6.0
 
 ADD . .
 

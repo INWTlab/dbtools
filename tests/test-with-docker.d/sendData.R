@@ -122,7 +122,7 @@ testSendData <- function(db = "mysql") {
 }
 
 TEST("sendData for MySQL", {
-  testSendDatar("mysql")
+  testSendData("mysql")
 })
 
 TEST("sendData for MariaDB", {
