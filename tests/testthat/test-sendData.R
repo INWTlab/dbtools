@@ -145,12 +145,12 @@ testSendDataDocker <- function(db = "mysql", version = "latest") {
   row.names(mtcars) <- NULL
 
   cred <- Credentials(
-    drv = MariaDB,
+    drv = if (db == "mysql") MySQL else MariaDB,
     user = "root",
     password = "root",
     dbname = "test",
     host = "127.0.0.1",
-    port = 3302
+    port = if (db == "mysql") 3301 else 3302
   )
 
   # create table
