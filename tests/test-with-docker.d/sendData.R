@@ -1,7 +1,11 @@
-testSendData <- function(db = "mysql", version = "latest") {
+testSendData <- function(db = "mysql") {
 
-  cred <- CREDENTIALS(
+  Credentials(
     drv = if (db == "mysql") MySQL else MariaDB,
+    user = "testUser",
+    password = "3WBUT7My996BLVoTZHo3",
+    dbname = "test",
+    host = "127.0.0.1",
     port = if (db == "mysql") 3301 else 3302
   )
 
@@ -116,3 +120,11 @@ testSendData <- function(db = "mysql", version = "latest") {
   )
 
 }
+
+TEST("sendData for MySQL", {
+  testSendDatar("mysql")
+})
+
+TEST("sendData for MariaDB", {
+  testSendData("mariadb")
+})
