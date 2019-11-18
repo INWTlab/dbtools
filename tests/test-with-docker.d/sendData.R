@@ -1,7 +1,7 @@
-testSendData <- function(db = "mysql") {
+testSendData <- function(db = "mysql", drv = MySQL) {
 
   cred <- Credentials(
-    drv = if (db == "mysql") MySQL else MariaDB,
+    drv = drv,
     user = "testUser",
     password = "3WBUT7My996BLVoTZHo3",
     dbname = "testSchema",
@@ -112,9 +112,9 @@ testSendData <- function(db = "mysql") {
 }
 
 TEST("sendData for MySQL", {
-  testSendData("mysql")
+  testSendData("mysql", drv = MySQL)
 })
 
 TEST("sendData for MariaDB", {
-  testSendData("mariadb")
+  testSendData("mariadb", drv = MariaDB)
 })
