@@ -1,6 +1,6 @@
 testSendData <- function(db = "mysql") {
 
-  Credentials(
+  cred <- Credentials(
     drv = if (db == "mysql") MySQL else MariaDB,
     user = "testUser",
     password = "3WBUT7My996BLVoTZHo3",
