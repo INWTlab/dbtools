@@ -14,7 +14,7 @@ pipeline {
       steps {
         sh '''
           docker stop mysql-test-database || :
-          docker build -t mysql-test-database inst/db/mysql && docker run --name mysql-test-database -p 3301:3306 -d --rm mysql-test-database
+          docker build -t mysql-test-database -f mysql/Dockerfile inst/db/. && docker run --name mysql-test-database -p 3301:3306 -d --rm mysql-test-database
         '''
       }
     }
@@ -22,7 +22,7 @@ pipeline {
       steps {
         sh '''
           docker stop mariadb-test-database || :
-          docker build -t mariadb-test-database inst/db/mariadb && docker run --name mariadb-test-database -p 3302:3306 -d --rm mariadb-test-database
+          docker build -t mariadb-test-database -f mariadb/Dockerfile inst/db/. && docker run --name mariadb-test-database -p 3302:3306 -d --rm mariadb-test-database
         '''
       }
     }
