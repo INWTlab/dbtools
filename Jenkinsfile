@@ -15,6 +15,7 @@ pipeline {
       steps {
         sh '''
           docker stop mysql-test-database || :
+          docker rm mysql-test-database || :
           docker build -t mysql-test-database -f inst/db/mysql/Dockerfile . && docker run --name mysql-test-database -p 3301:3306 -d mysql-test-database
           sleep 15s
           docker logs mysql-test-database
@@ -25,6 +26,7 @@ pipeline {
       steps {
         sh '''
           docker stop mariadb-test-database || :
+          docker rm mariadb-test-database || :
           docker build -t mariadb-test-database -f inst/db/mariadb/Dockerfile . && docker run --name mariadb-test-database -p 3302:3306 -d mariadb-test-database
           sleep 15s
           docker logs mariadb-test-database
@@ -43,7 +45,7 @@ pipeline {
   post {
   always {
     sh '''
-      docker rmi tmp-$CUR_PROJ-$TMP_SUFFIX
+      docker rmi tmp-$CUR_PROJ-$TMP_SUFFIX || :
       docker stop mysql-test-database || :
       docker rm mysql-test-database || :
       docker stop mariadb-test-database || :
