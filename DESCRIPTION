@@ -1,7 +1,7 @@
 Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
-Version: 0.5.3
+Version: 0.6.1
 Authors@R: c(
     person("Jonathan", "Bob", , "jonathan.bob@inwt-statistics.de", c("aut")),
     person("Sebastian", "Warnholz", , "sebastian.warnholz@inwt-statistics.de", role = c("aut", "cre")))
