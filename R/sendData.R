@@ -118,7 +118,7 @@ sqlLoadData <- function(path, table, names, mode) {
       "load data local infile '", path, "' ",
       if (mode == "replace") "replace ",
       "into table ", sqlEsc(table), " ",
-      "character set utf8mb4 ",
+      "character set utf8 ",
       "fields terminated by ',' ",
       "optionally enclosed by '\"' ",
       "lines terminated by '\n' ",
@@ -214,7 +214,7 @@ sqlUpdateTargetTable <- function(table, names) {
 
   SingleQuery(
     paste(
-      "insert ignore into", sqlEsc(table), colsInParan,
+      "insert into", sqlEsc(table), colsInParan,
       "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)),
       "on duplicate key update",
       updateStatement, ";"
