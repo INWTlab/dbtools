@@ -26,6 +26,6 @@ create table `nan` (
   `nan` int null
 ) engine = InnoDB default charset = utf8;
 
-create user 'testUser'@'%' identified by password '*33F7676C1A7AF4D85DAF98885017F9FD7CF31BD5';
+create user 'testUser' identified by '3WBUT7My996BLVoTZHo3';
 grant select, insert, update, delete, drop, create temporary tables on `testSchema`.* to 'testUser'@'%';
 flush privileges;
