@@ -16,15 +16,15 @@ create table `mtcars` (
   `gear` double default null,
   `carb` double default null,
   primary key (`model`)
-) engine = InnoDB default charset = utf8mb3;
+) engine = InnoDB default charset = utf8mb4;
 
 create table `dtm` (
   `dtm` datetime not null
-) engine = InnoDB default charset = utf8mb3;
+) engine = InnoDB default charset = utf8mb4;
 
 create table `nan` (
   `nan` int null
-) engine = InnoDB default charset = utf8mb3;
+) engine = InnoDB default charset = utf8mb4;
 
 create user 'testUser' identified by '3WBUT7My996BLVoTZHo3';
 grant select, insert, update, delete, drop, create temporary tables on `testSchema`.* to 'testUser'@'%';
