@@ -25,10 +25,10 @@ sendQuery(db, query, ...)
 \S4method{sendQuery}{DBIConnection,SingleQuery}(db, query, ...)
 
 \S4method{sendQuery}{MySQLConnection,SingleQuery}(db, query, ...,
-  encoding = "utf8")
+  encoding = "utf8mb3")
 
 \S4method{sendQuery}{MariaDBConnection,SingleQuery}(db, query, ...,
-  encoding = "utf8")
+  encoding = "utf8mb3")
 }
 \arguments{
 \item{db}{one in: \cr (\link{Credentials}) the credentials to get a

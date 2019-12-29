@@ -118,7 +118,7 @@ sqlLoadData <- function(path, table, names, mode) {
       "load data local infile '", path, "' ",
       if (mode == "replace") "replace ",
       "into table ", sqlEsc(table), " ",
-      "character set utf8 ",
+      "character set utf8mb3 ",
       "fields terminated by ',' ",
       "optionally enclosed by '\"' ",
       "lines terminated by '\n' ",
