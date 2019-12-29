@@ -135,7 +135,7 @@ sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8") %m% {
+sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8mb4") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
   .sendQuery(db, query, ..., encoding = encoding)
