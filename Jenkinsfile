@@ -16,7 +16,7 @@ pipeline {
         sh '''
           docker stop mysql-test-database || :
           docker rm mysql-test-database || :
-          docker build -t mysql-test-database -f inst/db/mysql/Dockerfile . && docker run --name mysql-test-database -p 3301:3306 -d mysql-test-database
+          docker build -t mysql-test-database -f inst/db/mysql/Dockerfile . && docker run --name mysql-test-database -p 3301:3306 -d mysql-test-database --default-authentication-plugin=mysql_native_password --local-infile
           sleep 15s
           docker logs mysql-test-database
         '''

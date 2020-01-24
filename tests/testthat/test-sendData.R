@@ -120,4 +120,3 @@ test_that("Error handling and retry in sendData", {
   unlink("db1.db")
 
 })
-
