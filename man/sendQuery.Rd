@@ -28,7 +28,7 @@ sendQuery(db, query, ...)
   encoding = "utf8mb4")
 
 \S4method{sendQuery}{MariaDBConnection,SingleQuery}(db, query, ...,
-  encoding = "utf8mb4")
+  encoding = "utf8mb4", tz = "Europe/Berlin")
 }
 \arguments{
 \item{db}{one in: \cr (\link{Credentials}) the credentials to get a
@@ -51,6 +51,8 @@ implicitly to reTry \cr else ignored}
 \item{encoding}{(character | NULL) the encoding used in a \code{SET NAMES}
 statement. Currently only implemented for MySQL connections. The
 default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.}
+
+\item{tz}{timezone of the server. Only used for MariaDB driver}
 }
 \value{
 one in:

@@ -17,7 +17,8 @@
 #' @param encoding (character | NULL) the encoding used in a \code{SET NAMES}
 #'   statement. Currently only implemented for MySQL connections. The
 #'   default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.
-#'
+#' @param tz timezone of the server. Only used for MariaDB driver
+#' 
 #' @details \code{simplify} the default is to simplify results. If you send
 #'   multiple queries to one database it is tried to rbind the results - when
 #'   you have different column names this can be like a full join. If you send
