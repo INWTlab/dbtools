@@ -24,6 +24,6 @@ testTimezone <- function(db = "mysql", drv = MySQL) {
   expect_equal(as.numeric(resUTC), as.numeric(timeUTC))
 }
 
-TEST("sendData for MariaDB", {
-  testSendData("maria", drv = MariaDB)
+TEST("setTimezone for MariaDB", {
+  testTimezone("maria", drv = MariaDB)
 })
