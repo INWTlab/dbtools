@@ -234,8 +234,10 @@ formatWarnings <- function(dat) {
 }
 
 fixTimezone <- function(dat, tz) {
-  timeFields <- which(unlist(lapply(dat, inherits, what = "POSIXct")))
-  lapply(timeFields, function(i) {
+  timeFields <- unlist(lapply(dat, inherits, what = "POSIXct"))
+  if (length(timeFiels) == 0) return(dat)
+
+  lapply(which(timeFields), function(i) {
     dat[, i] <<- forceTZ(dat[, i], tz = tz)
   })
   dat
