@@ -143,10 +143,11 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8mb4") 
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8mb4") %m% {
+sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8mb4", tz = "Europe/Berlin") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
-  .sendQuery(db, query, ..., encoding = encoding)
+  dat <- .sendQuery(db, query, ..., encoding = encoding)
+  dat <- fixTimezone(dat, tz = tz)
 }
 
 .sendQuery <- function(db, query, ..., encoding) {
@@ -230,4 +231,16 @@ formatWarnings <- function(dat) {
   dat <- capture.output(dat)
   dat <- paste(dat, collapse = "\n")
   dat
+}
+
+fixTimezone <- function(dat, tz) {
+  timeFields <- unlist(lapply(dat, inherits, what = "POSIXct"))
+  dat[timeFields] <- lapply(dat[timeFields], forceTZ, tz = tz)
+  dat
+}
+
+forceTZ <- function(x, tz) {
+  attr(x, "tzone") <- "UTC"
+  x <- as.character(x)
+  as.POSIXct(x, tz = tz)
 }

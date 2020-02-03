@@ -1,6 +1,4 @@
 testTimezone <- function(db = "mysql", drv = MySQL) {
-
-  drv <- MariaDB
   cred <- Credentials(
     drv = drv,
     user = "testUser",
