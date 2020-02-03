@@ -220,7 +220,7 @@ setNamesEncoding <- function(con, encoding) {
 
 checkForWarnings <- function(con) {
   res <- sendQueryDb(con, "SHOW WARNINGS;")
-  if (nrow(res) > 0) {
+  if (!is.null(res) && nrow(res) > 0) {
     warn <- formatWarnings(res)
     warning(warn)
   }
