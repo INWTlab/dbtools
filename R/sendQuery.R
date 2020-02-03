@@ -238,7 +238,7 @@ fixTimezone <- function(dat, tz) {
   if (length(timeFields) == 0) return(dat)
 
   lapply(names(dat)[timeFields], function(n) {
-    dat[, get(n)] <<- forceTZ(dat[, get(n)], tz = tz)
+    dat[[n]] <<- forceTZ(dat[[n]], tz = tz)
   })
   dat
 }
