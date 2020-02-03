@@ -5,7 +5,7 @@ testTimezone <- function(db = "mysql", drv = MySQL) {
     password = "3WBUT7My996BLVoTZHo3",
     dbname = "testSchema",
     host = "127.0.0.1",
-    port = if (db == "mysql") 3301 else 3302
+    port = if (db == "mysql") 33001 else 33002
   )
 
   sendQuery(cred, "drop table if exists tz;")

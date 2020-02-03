@@ -16,7 +16,7 @@ pipeline {
         sh '''
           docker stop mysql-test-database || :
           docker rm mysql-test-database || :
-          docker build -t mysql-test-database -f inst/db/mysql/Dockerfile . && docker run --name mysql-test-database -p 3301:3306 -d mysql-test-database --default-authentication-plugin=mysql_native_password --local-infile
+          docker build -t mysql-test-database -f inst/db/mysql/Dockerfile . && docker run --name mysql-test-database -p 33001:3306 -d mysql-test-database --default-authentication-plugin=mysql_native_password --local-infile
           sleep 15s
           docker logs mysql-test-database
         '''
@@ -27,7 +27,7 @@ pipeline {
         sh '''
           docker stop mariadb-test-database || :
           docker rm mariadb-test-database || :
-          docker build -t mariadb-test-database -f inst/db/mariadb/Dockerfile . && docker run --name mariadb-test-database -p 3302:3306 -d mariadb-test-database
+          docker build -t mariadb-test-database -f inst/db/mariadb/Dockerfile . && docker run --name mariadb-test-database -p 33002:3306 -d mariadb-test-database
           sleep 15s
           docker logs mariadb-test-database
         '''
