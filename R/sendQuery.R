@@ -17,7 +17,8 @@
 #' @param encoding (character | NULL) the encoding used in a \code{SET NAMES}
 #'   statement. Currently only implemented for MySQL connections. The
 #'   default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.
-#'
+#' @param tz timezone of the server. Only used for MariaDB driver
+#' 
 #' @details \code{simplify} the default is to simplify results. If you send
 #'   multiple queries to one database it is tried to rbind the results - when
 #'   you have different column names this can be like a full join. If you send
@@ -143,10 +144,11 @@ sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8mb4") 
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8mb4") %m% {
+sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8mb4", tz = "Europe/Berlin") %m% {
   # db: is a MySQL connection
   # query: is a character of length 1
-  .sendQuery(db, query, ..., encoding = encoding)
+  dat <- .sendQuery(db, query, ..., encoding = encoding)
+  dat <- fixTimezone(dat, tz = tz)
 }
 
 .sendQuery <- function(db, query, ..., encoding) {
@@ -220,7 +222,7 @@ setNamesEncoding <- function(con, encoding) {
 
 checkForWarnings <- function(con) {
   res <- sendQueryDb(con, "SHOW WARNINGS;")
-  if (nrow(res) > 0) {
+  if (!is.null(res) && nrow(res) > 0) {
     warn <- formatWarnings(res)
     warning(warn)
   }
@@ -230,4 +232,20 @@ formatWarnings <- function(dat) {
   dat <- capture.output(dat)
   dat <- paste(dat, collapse = "\n")
   dat
+}
+
+fixTimezone <- function(dat, tz) {
+  timeFields <- unlist(lapply(dat, inherits, what = "POSIXct"))
+  if (length(timeFields) == 0) return(dat)
+
+  lapply(names(dat)[timeFields], function(n) {
+    dat[[n]] <<- forceTZ(dat[[n]], tz = tz)
+  })
+  dat
+}
+
+forceTZ <- function(x, tz) {
+  attr(x, "tzone") <- "UTC"
+  x <- as.character(x)
+  as.POSIXct(x, tz = tz)
 }
