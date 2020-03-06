@@ -59,8 +59,8 @@ pipeline {
               --name tmp-$CUR_PROJ-$TMP_SUFFIX-deploy-package \
               inwt/r-batch:latest R -e "drat::insertPackage('$PKG_FILE', '/var/www/html/r-repo'); drat::archivePackages(repopath = '/var/www/html/r-repo')"
             '''
-        }
       }
+    }
   }
   post {
   always {
@@ -73,5 +73,6 @@ pipeline {
           docker rm mariadb-test-database || :
           '''
       }
+    }
   }
 }
