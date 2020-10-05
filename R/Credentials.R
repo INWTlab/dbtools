@@ -14,13 +14,16 @@
 #' Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 #'
 #' @export
-list : Credentials(drv ~ "function") %type% {
+setClass("Credentials", slots = c(drv = "function"), contains = "list")
+
+setMethod("initialize", "Credentials", function(.Object, ...) {
+  .Object <- callNextMethod()
   assert_that(
     .Object %has_attr% "names",
     all(names(.Object) != "")
   )
   .Object
-}
+})
 
 #' @export
 #' @rdname Credentials
@@ -47,17 +50,18 @@ as.character.Credentials <- function(x, ...) {
   as.character.default(x)
 }
 
-show(object ~ Credentials) %m% {
+setMethod("show", "Credentials", function(object) {
   cat('An object of class "Credentials"\n', sep = "")
   cat('drv:', class(object@drv()), "\n", sep = "")
   cat(paste0(names(object), ": ", as.character(object)), sep = "\n")
   invisible(object)
-}
-
+})
 
 #' @export
 #' @rdname Credentials
-list : CredentialsList() %type% {
+setClass("CredentialsList", contains = "list")
+
+setMethod("initialize", "CredentialsList", function(.Object, ...) {
 
   # Validate input:
   has_valid_lengths <- function(.Object) {
@@ -81,11 +85,12 @@ list : CredentialsList() %type% {
   }
 
   # Init:
+  .Object <- callNextMethod()
   assert_that(has_valid_lengths(.Object))
   S3Part(.Object) <- makeCredList(.Object)
   .Object
 
-}
+})
 
 #' @export
 #' @rdname Credentials

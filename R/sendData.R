@@ -134,7 +134,9 @@ updateTable <- function(db, path, table, names) {
   createTemporaryTable(db, table)
 
   # # 2. drop indices - this will speed up the process for larger objects
+  # nolint start
   # dropIndices(db, addTmpPrefix(table))
+  # nolint end
 
   # 3. remove redundant fiels - otherwise we won't be able to do updates on
   # particular fields only without considering defaults
@@ -165,6 +167,7 @@ sqlCreateTemporaryTable <- function(table) {
   )
 }
 
+# nolint start
 # dropIndices <- function(db, table) {
 #   sql <- paste0("show index from ", table, ";")
 #   indices <- sendQuery(db, SingleQuery(sql))$Key_name
@@ -182,6 +185,7 @@ sqlCreateTemporaryTable <- function(table) {
 #     )
 #   )
 # }
+# nolint end
 
 dropRedundantFields <- function(db, table, names) {
   sql <- paste0("show columns from ", sqlEsc(table), ";")
