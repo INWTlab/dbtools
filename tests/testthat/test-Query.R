@@ -5,9 +5,9 @@ test_that("Single Query is good", {
   goodQuery <- "SELECT 1;"
   expect_true(SingleQuery(goodQuery) == goodQuery)
 
-  expect_error(SingleQuery("SELECT 2"))
-  expect_error(SingleQuery("SELECT 2; SELECT 1;"))
-  expect_length(dbtools:::SingleQuery("SELECT 2; SELECT 1;", checkSemicolon = FALSE), 1)
+  testthat::expect_error(SingleQuery("SELECT 2"))
+  testthat::expect_error(SingleQuery("SELECT 2; SELECT 1;"))
+  testthat::expect_length(dbtools:::SingleQuery("SELECT 2; SELECT 1;", checkSemicolon = FALSE), 1)
 
 })
 
