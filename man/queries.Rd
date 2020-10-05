@@ -7,8 +7,14 @@
 \alias{SingleQueryList-class}
 \title{SQL Query Objects}
 \usage{
-Query(.x, ..., .data = NULL, .envir = parent.frame(),
-  checkSemicolon = TRUE, keepComments = FALSE)
+Query(
+  .x,
+  ...,
+  .data = NULL,
+  .envir = parent.frame(),
+  checkSemicolon = TRUE,
+  keepComments = FALSE
+)
 }
 \arguments{
 \item{.x}{(character | connection) A character or connection containing a
