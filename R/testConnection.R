@@ -20,11 +20,13 @@
 #'
 #' @export
 #' @rdname testConnection
-testConnection(x, logger = loggerConnection, ...) %g% standardGeneric("testConnection")
+setGeneric("testConnection", function(x, logger = loggerConnection, ...) {
+  standardGeneric("testConnection")
+})
 
 #' @export
 #' @rdname testConnection
-testConnection(x ~ Credentials, logger, ...) %m% {
+setMethod("testConnection", "Credentials", function(x, logger, ...) {
 
   out <- try(
     silent = TRUE,
@@ -34,13 +36,13 @@ testConnection(x ~ Credentials, logger, ...) %m% {
   logger(x, status)
   invisible(status)
 
-}
+})
 
 #' @export
 #' @rdname testConnection
-testConnection(x ~ CredentialsList, logger, ...) %m% {
+setMethod("testConnection", "CredentialsList", function(x, logger, ...) {
   invisible(all(vapply(x, testConnection, logical(1), logger = logger, ...)))
-}
+})
 
 #' @export
 #' @rdname testConnection
