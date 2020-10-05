@@ -18,7 +18,7 @@
 #'   statement. Currently only implemented for MySQL connections. The
 #'   default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.
 #' @param tz timezone of the server. Only used for MariaDB driver
-#' 
+#'
 #' @details \code{simplify} the default is to simplify results. If you send
 #'   multiple queries to one database it is tried to rbind the results - when
 #'   you have different column names this can be like a full join. If you send
@@ -66,90 +66,107 @@
 #'
 #' @rdname sendQuery
 #' @export
-sendQuery(db, query, ...) %g% {
+setGeneric("sendQuery", function(db, query, ...) {
   standardGeneric("sendQuery")
-}
+})
 
 #' @rdname sendQuery
 #' @export
-sendQuery(db ~ CredentialsList, query ~ SingleQueryList, ...,
-          applyFun = lapply, simplify = TRUE) %m% {
+setMethod(
+  "sendQuery", c(db = "CredentialsList", query = "SingleQueryList"),
+  function(db, query, ..., applyFun = lapply, simplify = TRUE) {
 
-  insideOut <- function(x) {
-    if (isNestedList(x)) {
-      do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
-    } else {
-      x
-    }
-  }
-
-  isNestedList <- function(x) {
-    is.list(x) && all(unlist(lapply(x, is, class2 = "list")))
-  }
-
-  res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
-  res <- insideOut(res)
-  simplifyIfPossible(res, skipBindRows = !simplify)
-
-}
-
-
-#' @rdname sendQuery
-#' @export
-sendQuery(db ~ Credentials | CredentialsList, query ~ character, ...) %m% {
-  sendQuery(db, SingleQueryList(as.list(query)), ...)
-}
-
-#' @rdname sendQuery
-#' @export
-sendQuery(db ~ Credentials, query ~ SingleQueryList, ..., simplify = TRUE) %m% {
-  # db: is a list
-  # query: is a single query
-
-  downloadedData <- reTry(..., fun = function(...) {
-
-    on.exit({
-      if (exists("con")) {
-        dbDisconnect(con)
+    insideOut <- function(x) {
+      if (isNestedList(x)) {
+        do.call(mapply, c(FUN = list, x, SIMPLIFY = FALSE, recursive = FALSE))
+      } else {
+        x
       }
-    })
+    }
 
-    con <- do.call(dbConnect, as.list(db))
-    lapply(query, sendQuery, db = con, ...)
+    isNestedList <- function(x) {
+      is.list(x) && all(unlist(lapply(x, is, class2 = "list")))
+    }
+
+    res <- applyFun(db, sendQuery, query = query, ..., simplify = FALSE)
+    res <- insideOut(res)
+    simplifyIfPossible(res, skipBindRows = !simplify)
 
   })
 
-  simplifyIfPossible(downloadedData, skipBindRows = !simplify)
 
-}
+setClassUnion(
+  "CredentialsORCredentialsList",
+  c("Credentials", "CredentialsList")
+)
+
+#' @rdname sendQuery
+#' @export
+setMethod(
+  "sendQuery", c(db = "CredentialsORCredentialsList", query = "character"),
+  function(db, query, ...) {
+    sendQuery(db, SingleQueryList(as.list(query)), ...)
+  })
+
+#' @rdname sendQuery
+#' @export
+setMethod(
+  "sendQuery", c(db = "Credentials", query = "SingleQueryList"),
+  function(db, query, ..., simplify = TRUE) {
+    # db: is a list
+    # query: is a single query
+
+    downloadedData <- reTry(..., fun = function(...) {
+
+      on.exit({
+        if (exists("con")) {
+          dbDisconnect(con)
+        }
+      })
+
+      con <- do.call(dbConnect, as.list(db))
+      lapply(query, sendQuery, db = con, ...)
+
+    })
+
+    simplifyIfPossible(downloadedData, skipBindRows = !simplify)
+
+  })
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ DBIConnection, query ~ SingleQuery, ...) %m% {
-  # db: is a connection
-  # query: is a character of length 1
+setMethod(
+  "sendQuery", c(db = "DBIConnection", query = "SingleQuery"),
+  function(db, query, ...) {
+    # db: is a connection
+    # query: is a character of length 1
 
-  res <- dbSendQuery(db, query)
-  fetchResult(res)
+    res <- dbSendQuery(db, query)
+    fetchResult(res)
 
-}
-
-#' @export
-#' @rdname sendQuery
-sendQuery(db ~ MySQLConnection, query ~ SingleQuery, ..., encoding = "utf8mb4") %m% {
-  # db: is a MySQL connection
-  # query: is a character of length 1
-  .sendQuery(db, query, ..., encoding = encoding)
-}
+  })
 
 #' @export
 #' @rdname sendQuery
-sendQuery(db ~ MariaDBConnection, query ~ SingleQuery, ..., encoding = "utf8mb4", tz = "Europe/Berlin") %m% {
-  # db: is a MySQL connection
-  # query: is a character of length 1
-  dat <- .sendQuery(db, query, ..., encoding = encoding)
-  dat <- fixTimezone(dat, tz = tz)
-}
+setMethod(
+  "sendQuery", c(db = "MySQLConnection", query = "SingleQuery"),
+  function(db, query, ..., encoding = "utf8mb4") {
+    # db: is a MySQL connection
+    # query: is a character of length 1
+    .sendQuery(db, query, ..., encoding = encoding)
+  })
+
+#' @export
+#' @rdname sendQuery
+setMethod(
+  "sendQuery", c(db = "MariaDBConnection", query = "SingleQuery"),
+  function(db, query, ..., encoding = "utf8mb4", tz = "Europe/Berlin") {
+    # db: is a MySQL connection
+    # query: is a character of length 1
+    dat <- .sendQuery(db, query, ..., encoding = encoding)
+    dat <- fixTimezone(dat, tz = tz)
+    dat
+  })
 
 .sendQuery <- function(db, query, ..., encoding) {
   setNamesEncoding(db, encoding)
