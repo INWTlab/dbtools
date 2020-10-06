@@ -14,9 +14,9 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{RMariaDB}{\code{\link[RMariaDB]{MariaDB}}}
+  \item{RMariaDB}{\code{\link[RMariaDB:dbConnect-MariaDBDriver-method]{MariaDB}}}
 
-  \item{RMySQL}{\code{\link[RMySQL]{MySQL}}, \code{\link[RMySQL]{CLIENT_SSL}}}
+  \item{RMySQL}{\code{\link[RMySQL:constants]{CLIENT_SSL}}, \code{\link[RMySQL:MySQLDriver-class]{MySQL}}}
 
   \item{RSQLite}{\code{\link[RSQLite]{SQLite}}}
 }}

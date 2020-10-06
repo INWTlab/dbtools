@@ -46,9 +46,10 @@ Query <- function(.x, ..., .data = NULL, .envir = parent.frame(),
 
 }
 
-queryRead(x, ...) %g% x
+setGeneric("queryRead", function(x, ...) x)
 
-queryRead(x ~ connection, keepComments, ...) %m% {
+setMethod("queryRead", "connection", function(x, keepComments, ...) {
+
   on.exit(close(x))
 
   query <- readLines(x)
@@ -61,26 +62,26 @@ queryRead(x ~ connection, keepComments, ...) %m% {
   query <- sub("^\\n+", "", query)
   query
 
-}
+})
 
-queryEvalTemplate(x, .data, ...) %g% x
+setGeneric("queryEvalTemplate", function(x, .data, ...) x)
 
-queryEvalTemplate(x ~ list, .data ~ NULL, ...) %m% {
+setMethod("queryEvalTemplate", c(x = "list", .data = NULL), function(x, .data, ...) {
   x <- lapply(x, as.character)
   x <- lapply(x, tmpl, ...)
   x <- lapply(x, as.character)
   x
-}
+})
 
-queryEvalTemplate(x ~ character, .data ~ ANY, ...) %m% {
+setMethod("queryEvalTemplate", c(x = "character", .data = "ANY"), function(x, .data, ...) {
   queryEvalTemplate(as.list(x), .data, ...)
-}
+})
 
-queryEvalTemplate(x ~ list, .data ~ data.frame, ...) %m% {
+setMethod("queryEvalTemplate", c(x = "list", .data = "data.frame"), function(x, .data, ...) {
   queryEvalTemplate(x, as.list(.data), ...)
-}
+})
 
-queryEvalTemplate(x ~ list, .data ~ list, ...) %m% {
+setMethod("queryEvalTemplate", c(x = "list", .data = "list"), function(x, .data, ...) {
 
   localQueryEval <- function(...) {
     do.call(
@@ -93,7 +94,7 @@ queryEvalTemplate(x ~ list, .data ~ list, ...) %m% {
 
   do.call(Map, c(list(f = localQueryEval), .data))
 
-}
+})
 
 queryConst <- function(x, checkSemicolon) {
   if (length(x) == 1) SingleQuery(x[[1]], checkSemicolon = checkSemicolon)
@@ -102,7 +103,10 @@ queryConst <- function(x, checkSemicolon) {
 
 #' @exportClass SingleQuery
 #' @rdname queries
-character : SingleQuery(checkSemicolon = TRUE) %type% {
+setClass("SingleQuery", slots = c(checkSemicolon = "logical"), contains = "character")
+
+setMethod("initialize", "SingleQuery", function(.Object, checkSemicolon, ...) {
+  .Object <- callNextMethod()
   assert_that(
     is.scalar(.Object),
     grepl(";$", .Object),
@@ -110,7 +114,7 @@ character : SingleQuery(checkSemicolon = TRUE) %type% {
       length(unlist(strsplit(.Object, ";"))) == 1 else TRUE
   )
   .Object
-}
+})
 
 SingleQuery <- function(..., checkSemicolon = TRUE) new(
   'SingleQuery', checkSemicolon = checkSemicolon, ...
@@ -118,21 +122,24 @@ SingleQuery <- function(..., checkSemicolon = TRUE) new(
 
 #' @exportClass SingleQueryList
 #' @rdname queries
-list : SingleQueryList(checkSemicolon = TRUE) %type% {
+setClass("SingleQueryList", slots = c(checkSemicolon = "logical"), contains = "list")
+
+setMethod("initialize", "SingleQueryList", function(.Object, checkSemicolon, ...) {
+  .Object <- callNextMethod()
   S3Part(.Object) <- lapply(.Object, SingleQuery, checkSemicolon = .Object@checkSemicolon)
   .Object
-}
+})
 
 SingleQueryList <- function(..., checkSemicolon = TRUE) new(
   'SingleQueryList', checkSemicolon = checkSemicolon, ...
 )
 
-show(object ~ SingleQuery) %m% {
+setMethod("show", "SingleQuery", function(object) {
   cat("Query:\n", S3Part(object, TRUE), "\n\n", sep = "")
   invisible(object)
-}
+})
 
-show(object ~ SingleQueryList) %m% {
+setMethod("show", "SingleQueryList", function(object) {
   lapply(object, show)
   invisible(object)
-}
+})

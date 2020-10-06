@@ -28,52 +28,62 @@
 #' @param ... arguments passed to methods and to \link[dbtools]{reTry}
 #' @rdname sendData
 #' @export
-sendData(db, data, table = deparse(substitute(data)), ...) %g% {
+setGeneric("sendData", function(db, data, table = deparse(substitute(data)), ...) {
   standardGeneric("sendData")
-}
+})
 
 #' @rdname sendData
 #' @export
-sendData(db ~ CredentialsList, data ~ data.frame, table, ..., applyFun = lapply) %m% {
-  applyFun(db, sendData, data = data, table = table, ...)
-}
+setMethod(
+  "sendData", c(db = "CredentialsList", data = "data.frame"),
+  function(db, data, table, ..., applyFun = lapply) {
+    applyFun(db, sendData, data = data, table = table, ...)
+  })
 
 #' @rdname sendData
 #' @export
-sendData(db ~ Credentials, data ~ data.frame, table, ...) %m% {
+setMethod(
+  "sendData", c(db = "Credentials", data = "data.frame"),
+  function(db, data, table, ...) {
 
-  reTry(..., fun = function(...) {
+    reTry(..., fun = function(...) {
 
-    on.exit({
-      if (exists("con")) {
-        dbDisconnect(con)
-      }
+      on.exit({
+        if (exists("con")) {
+          dbDisconnect(con)
+        }
+      })
+
+      con <- do.call(dbConnect, as.list(db))
+      sendData(db = con, data = data, table = table, ...)
+
     })
-
-    con <- do.call(dbConnect, as.list(db))
-    sendData(db = con, data = data, table = table, ...)
 
   })
 
-}
+#' @rdname sendData
+#' @export
+setMethod(
+  "sendData", c(db = "DBIConnection", data = "data.frame"),
+  function(db, data, table, ...) {
+    dbWriteTable(db, table, data, append = TRUE, row.names = FALSE)
+  })
 
 #' @rdname sendData
 #' @export
-sendData(db ~ DBIConnection, data ~ data.frame, table, ...) %m% {
-  dbWriteTable(db, table, data, append = TRUE, row.names = FALSE)
-}
+setMethod(
+  "sendData", c(db = "MySQLConnection", data = "data.frame"),
+  function(db, data, table, ..., mode = "insert") {
+    .sendData(db, data, table, ..., mode = mode)
+  })
 
 #' @rdname sendData
 #' @export
-sendData(db ~ MySQLConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-  .sendData(db, data, table, ..., mode = mode)
-}
-
-#' @rdname sendData
-#' @export
-sendData(db ~ MariaDBConnection, data ~ data.frame, table, ..., mode = "insert") %m% {
-  .sendData(db, data, table, ..., mode = mode)
-}
+setMethod(
+  "sendData", c(db = "MariaDBConnection", data = "data.frame"),
+  function(db, data, table, ..., mode = "insert") {
+    .sendData(db, data, table, ..., mode = mode)
+  })
 
 .sendData <- function(db, data, table, ..., mode) {
   stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
@@ -133,8 +143,8 @@ updateTable <- function(db, path, table, names) {
   # 1. create temporary table like target table
   createTemporaryTable(db, table)
 
-  # # 2. drop indices - this will speed up the process for larger objects
-  # dropIndices(db, addTmpPrefix(table))
+  # 2. (not implemented) drop indices - this will speed up the process for
+  # larger objects
 
   # 3. remove redundant fiels - otherwise we won't be able to do updates on
   # particular fields only without considering defaults
@@ -164,24 +174,6 @@ sqlCreateTemporaryTable <- function(table) {
     )
   )
 }
-
-# dropIndices <- function(db, table) {
-#   sql <- paste0("show index from ", table, ";")
-#   indices <- sendQuery(db, SingleQuery(sql))$Key_name
-#
-#   if (length(indices)) {
-#     sendQuery(db, sqlDropIndices(table, indices))
-#   }
-# }
-#
-# sqlDropIndices <- function(table, indices) {
-#   SingleQuery(
-#     paste(
-#       "alter table", sqlEsc(table),
-#       paste("drop index", unlist(lapply(indices, sqlNames)), collapse = ", "), ";"
-#     )
-#   )
-# }
 
 dropRedundantFields <- function(db, table, names) {
   sql <- paste0("show columns from ", sqlEsc(table), ";")
