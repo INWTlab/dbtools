@@ -8,6 +8,8 @@ services:
   - docker
 
 before_install:
+  - sudo apt-get update
+  - sudo apt-get -y install libmariadb-dev # fix connection error to DBs
   - sudo service docker restart; sleep 10 # fix https://github.com/travis-ci/travis-ci/issues/4778
 
 notifications:
