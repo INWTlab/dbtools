@@ -15,3 +15,8 @@ notifications:
     - sebastian.warnholz@inwt-statistics.de
     - jonathan.bob@inwt-statistics.de
 
+after_success:
+    - test $TRAVIS_PULL_REQUEST == "false" &&
+      test $TRAVIS_BRANCH == "master" &&
+      curl https://raw.githubusercontent.com/INWTlab/drat/main/deploy.sh > deploy.sh &&
+      bash deploy.sh
