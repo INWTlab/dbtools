@@ -15,7 +15,6 @@ TEST <- function(topic, expr, envir = parent.frame()) {
 
 cat("Testing:\n")
 
-sink("check.out")
 RUN_TESTS <- function() {
   system("bash start-db.sh")
   on.exit(system("bash stop-db.sh"))
