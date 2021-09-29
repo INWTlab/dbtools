@@ -1,3 +1,5 @@
+if (Sys.getenv("SKIP_DB_TESTS") == "1") q()
+
 library("dbtools")
 library("testthat")
 
