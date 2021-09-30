@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting MySQL database"
+echo "Starting both a MySQL and a MariaDB database instance"
 
 docker build -t mysql-test-database -f db/mysql/Dockerfile db \
     && docker run \
