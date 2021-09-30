@@ -4,14 +4,14 @@ output:
     variant: markdown_github
 ---
 
-[![Travis-CI Build Status](https://travis-ci.org/INWT/dbtools.svg?branch=master)](https://travis-ci.org/INWT/dbtools)
+[![Travis-CI Build Status](https://app.travis-ci.com/INWTlab/dbtools.svg?branch=master)](https://app.travis-ci.com/INWTlab/dbtools)
 
 ```{r echo=FALSE}
 options(datatable.print.nrows = 10)
 ```
 
-This package abstracts typical patterns used when connecting to and 
-communicating with databases in R. It aims to provide very few, simple and 
+This package abstracts typical patterns used when connecting to and
+communicating with databases in R. It aims to provide very few, simple and
 reliable functions for sending queries and data to databases.
 
 ## Installation
@@ -21,17 +21,17 @@ devtools::install_github("INWT/dbtools")
 ```
 
 We will start with a simple example showing how to use `dbtools` to send queries
-and data to a database. The example will introduce the main parts of the 
-package, namely the *Credentials* class as well as both `sendQuery` and 
+and data to a database. The example will introduce the main parts of the
+package, namely the *Credentials* class as well as both `sendQuery` and
 `sendData`.
 
 ## Introductory example
-In this example we show how to connect to a database, how to communicate with 
-the database, how to set up a database table, and finally how to send and 
+In this example we show how to connect to a database, how to communicate with
+the database, how to set up a database table, and finally how to send and
 retrieve data.
 
-To begin with, we have to define an object of class *Credentials* which will 
-store all necessary information to connect to a database. The driver is 
+To begin with, we have to define an object of class *Credentials* which will
+store all necessary information to connect to a database. The driver is
 mandatory, all other arguments depend on the specific back-end.
 
 ```{r}
@@ -39,20 +39,20 @@ library("dbtools")
 cred <- Credentials(drv = RSQLite::SQLite, dbname = "example.db")
 ```
 
-Opposed to the functions available from DBI, functions from `dbtools` need a 
+Opposed to the functions available from DBI, functions from `dbtools` need a
 *Credentials* instance as argument that takes care of connecting to the
 database, communicating with the database and closing the connection.
 
-Now, let's check whether we can actually access the database example.db. 
+Now, let's check whether we can actually access the database example.db.
 
 ```{r}
 testConnection(cred)
 cred
 ```
 
-For the remainder of this example, we make use of the USArrests dataset. 
-Unfortunately, the data contains some information in its row names, namely the 
-respective state. Since `dbtools` does not support row names, we have to convert 
+For the remainder of this example, we make use of the USArrests dataset.
+Unfortunately, the data contains some information in its row names, namely the
+respective state. Since `dbtools` does not support row names, we have to convert
 them to a variable.
 
 ```{r results = 'hide'}
@@ -68,9 +68,9 @@ the database.
 
 ```{r results = 'hide'}
 sendQuery(
-  cred, 
+  cred,
   "CREATE TABLE `USArrests` (
-  State TEXT PRIMARY KEY, 
+  State TEXT PRIMARY KEY,
   Murder INTEGER,
   Assault REAL,
   UrbanPop REAL,
@@ -78,7 +78,7 @@ sendQuery(
 )
 ```
 
-Now, we can write the USArrests data to the USArrests database table by using 
+Now, we can write the USArrests data to the USArrests database table by using
 the `sendData` function.
 
 ```{r results = 'hide'}
@@ -96,12 +96,12 @@ dat
 Now we will dig a bit deeper into the functionality of `dbtools`.
 
 ## sendQuery
-Basically, you already know how to use `sendQuery`. In our introductory example 
-we used it to create a database table and to query some data. 
+Basically, you already know how to use `sendQuery`. In our introductory example
+we used it to create a database table and to query some data.
 
-In your normal work-flow you will sometimes want to split up a complex query 
-into more tangible chunks. The approach we take here is to allow for a vector of 
-queries as argument. The result of these queries have to be *row-bindable*. To 
+In your normal work-flow you will sometimes want to split up a complex query
+into more tangible chunks. The approach we take here is to allow for a vector of
+queries as argument. The result of these queries have to be *row-bindable*. To
 make an example lets say we want to query each state separately:
 
 ```{r}
@@ -112,19 +112,19 @@ queryFun <- function(state) {
 sendQuery(cred, queryFun(dat$State))
 ```
 
-In such a case `sendQuery` will perform all queries on one connection. A 
+In such a case `sendQuery` will perform all queries on one connection. A
 different approach is to fetch the results of the original query in chunks,
 which we do not support yet.
 
 ## sendData
-As with `sendQuery`, you basically already know how to use `sendData`. In the 
+As with `sendQuery`, you basically already know how to use `sendData`. In the
 introductory example we used it to send the USArrests data to the USArrests
-database table. 
+database table.
 
-When using `sendData` you might be interesting in how to handle possible 
-primary key violations. By default, `sendData` will keep old rows and ignore any 
-duplicates. But you may use the mode argument and set it to "replace" (replace 
-old rows) or "truncate" (delete old rows from database table before writing 
+When using `sendData` you might be interesting in how to handle possible
+primary key violations. By default, `sendData` will keep old rows and ignore any
+duplicates. But you may use the mode argument and set it to "replace" (replace
+old rows) or "truncate" (delete old rows from database table before writing
 data). If you are using a non MySQL connection, you may notice that this feature
 is not available yet.
 
@@ -138,7 +138,7 @@ and how the error messages should be logged:
 
 ```{r error=TRUE}
 dat <- sendQuery(
-  cred, 
+  cred,
   "SELECT * FROM USArrest;", # wrong name for illustration
   tries = 2,
   intSleep = 1
@@ -149,7 +149,7 @@ dat <- sendQuery(
 
 Sometimes your data can be distributed on different servers but you want to send
 the same query to those servers. What you can do is give `sendQuery` a
-*CredentialsList*. 
+*CredentialsList*.
 
 ```{r results='hide'}
 file.copy("example.db", "example1.db")
@@ -160,7 +160,7 @@ implemented as follows:
 
 ```{r}
 cred <- Credentials(
-  RSQLite::SQLite, 
+  RSQLite::SQLite,
   dbname = c("example.db", "example1.db")
 )
 
@@ -173,9 +173,9 @@ like mclapply or something else:
 
 ```{r}
 sendQuery(
-  cred, 
-  "SELECT * FROM USArrests;", 
-  mc.cores = 2, 
+  cred,
+  "SELECT * FROM USArrests;",
+  mc.cores = 2,
   applyFun = parallel::mclapply
 )
 ```
