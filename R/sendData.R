@@ -215,12 +215,11 @@ sqlUpdateTargetTable <- function(table, names) {
   cols <- unlist(lapply(names, sqlEsc))
   commaSeperatedCols <- sqlComma(cols)
   colsInParan <- sqlParan(cols)
-  updateStatement <- sqlComma(sprintf("%s = values(%s)", cols, cols))
-
+  updateStatement <- sqlComma(sprintf("%s = `new`.%s", cols, cols))
   SingleQuery(
     paste(
       "insert into", sqlEsc(table), colsInParan,
-      "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)),
+      "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)), "as `new`",
       "on duplicate key update",
       updateStatement, ";"
     )
