@@ -63,7 +63,7 @@ setMethod(
       con <- do.call(dbConnect, as.list(db))
       chunkInd <- ceiling(seq_len(NROW(data)) / chunkSize)
       for (chunk in unique(chunkInd)) {
-        sendData(db = con, data = data[chunkInd == chunk, ], table = table, ...)
+        sendData(db = con, data = data[chunkInd == chunk, , drop = FALSE], table = table, ...)
       }
       TRUE
     })
