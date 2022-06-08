@@ -151,7 +151,7 @@ updateTable <- function(db, path, table, names) {
   dropRedundantFields(db, addTmpPrefix(table), names)
 
   # 4. insert into temporary table
-  writeTable(db, path, addTmpPrefix(table), names, mode = "insert")
+  writeTable(db, path, addTmpPrefix(table), names, mode = "replace")
 
   # 5. actual update via insert into statement
   updateTargetTable(db, table, names)
