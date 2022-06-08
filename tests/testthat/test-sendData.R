@@ -28,11 +28,51 @@ test_that("sendData", {
     `vs` REAL,
     `am` REAL,
     `gear` REAL,
-    `carb` REAL);"
-  )
+    `carb` REAL);")
 
   # send data to database
   sendData(cred, mtcars)
+
+  # retrieve data
+  res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
+
+  # objects should be equal
+  expect_identical(res, data.table::as.data.table(mtcars))
+
+  # delete database
+  unlink("test.db")
+})
+
+test_that("chunkSize works for send data", {
+
+  # prepare data
+  data(mtcars, envir = environment())
+  mtcars$model <- row.names(mtcars)
+  mtcars <- mtcars[c(length(mtcars), 1:(length(mtcars) - 1))]
+  row.names(mtcars) <- NULL
+
+  # set up connection
+  cred <- Credentials(drv = SQLite, dbname = "test.db")
+
+  # create table
+  sendQuery(cred, "DROP TABLE IF EXISTS `mtcars`;")
+
+  sendQuery(cred, "CREATE TABLE `mtcars` (
+    `model` TEXT PRIMARY KEY,
+    `mpg` REAL,
+    `cyl` REAL,
+    `disp` REAL,
+    `hp` REAL,
+    `drat` REAL,
+    `wt` REAL,
+    `qsec` REAL,
+    `vs` REAL,
+    `am` REAL,
+    `gear` REAL,
+    `carb` REAL);")
+
+  # send data to database
+  sendData(cred, mtcars, chunkSize = 1)
 
   # retrieve data
   res <- sendQuery(cred, "SELECT * FROM `mtcars`;")
@@ -73,8 +113,7 @@ test_that("sendData can operate on CredentialsList", {
     `vs` REAL,
     `am` REAL,
     `gear` REAL,
-    `carb` REAL);"
-  )
+    `carb` REAL);")
 
   # send data to database
   sendData(cred, mtcars)
@@ -88,11 +127,9 @@ test_that("sendData can operate on CredentialsList", {
 
   # delete database
   unlink(c("db1.db", "db2.db"))
-
 })
 
 test_that("Error handling and retry in sendData", {
-
   data(mtcars, envir = environment())
   cred <- Credentials(drv = MySQL, dbname = "Nirvana")
 
@@ -118,5 +155,4 @@ test_that("Error handling and retry in sendData", {
   })
 
   unlink("db1.db")
-
 })
