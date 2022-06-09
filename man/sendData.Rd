@@ -13,7 +13,7 @@ sendData(db, data, table = deparse(substitute(data)), ...)
 
 \S4method{sendData}{CredentialsList,data.frame}(db, data, table, ..., applyFun = lapply)
 
-\S4method{sendData}{Credentials,data.frame}(db, data, table = deparse(substitute(data)), ...)
+\S4method{sendData}{Credentials,data.frame}(db, data, table, chunkSize = Inf, ...)
 
 \S4method{sendData}{DBIConnection,data.frame}(db, data, table = deparse(substitute(data)), ...)
 
@@ -34,6 +34,9 @@ connection to a database.  \cr (DBIConnection)
 \item{...}{arguments passed to methods and to \link[dbtools]{reTry}}
 
 \item{applyFun}{(function) something like lapply or mclapply}
+
+\item{chunkSize}{An integer specifying the number of rows send to the db at
+a time. Defaults to \code{Inf}.}
 
 \item{mode}{One of "insert", "replace", or "truncate"}
 }

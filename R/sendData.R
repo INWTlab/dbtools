@@ -25,6 +25,8 @@
 #' @param data A data.frame (or coercible to data.frame)
 #' @param table A character string specifying a DBMS table name
 #' @param mode One of "insert", "replace", or "truncate"
+#' @param chunkSize An integer specifying the number of rows send to the db at
+#' a time. Defaults to \code{Inf}.
 #' @param ... arguments passed to methods and to \link[dbtools]{reTry}
 #' @rdname sendData
 #' @export
@@ -38,16 +40,20 @@ setMethod(
   "sendData", c(db = "CredentialsList", data = "data.frame"),
   function(db, data, table, ..., applyFun = lapply) {
     applyFun(db, sendData, data = data, table = table, ...)
-  })
+  }
+)
 
 #' @rdname sendData
 #' @export
 setMethod(
   "sendData", c(db = "Credentials", data = "data.frame"),
-  function(db, data, table, ...) {
-
+  function(db, data, table, chunkSize = Inf, ...) {
+    stopifnot(chunkSize > 0)
+    if (NROW(data) == 0) {
+      # Fixes https://github.com/INWTlab/dbtools/issues/48
+      return(TRUE)
+    }
     reTry(..., fun = function(...) {
-
       on.exit({
         if (exists("con")) {
           dbDisconnect(con)
@@ -55,11 +61,14 @@ setMethod(
       })
 
       con <- do.call(dbConnect, as.list(db))
-      sendData(db = con, data = data, table = table, ...)
-
+      chunkInd <- ceiling(seq_len(NROW(data)) / chunkSize)
+      for (chunk in unique(chunkInd)) {
+        sendData(db = con, data = data[chunkInd == chunk, , drop = FALSE], table = table, ...)
+      }
+      TRUE
     })
-
-  })
+  }
+)
 
 #' @rdname sendData
 #' @export
@@ -67,7 +76,8 @@ setMethod(
   "sendData", c(db = "DBIConnection", data = "data.frame"),
   function(db, data, table, ...) {
     dbWriteTable(db, table, data, append = TRUE, row.names = FALSE)
-  })
+  }
+)
 
 #' @rdname sendData
 #' @export
@@ -75,7 +85,8 @@ setMethod(
   "sendData", c(db = "MySQLConnection", data = "data.frame"),
   function(db, data, table, ..., mode = "insert") {
     .sendData(db, data, table, ..., mode = mode)
-  })
+  }
+)
 
 #' @rdname sendData
 #' @export
@@ -83,7 +94,8 @@ setMethod(
   "sendData", c(db = "MariaDBConnection", data = "data.frame"),
   function(db, data, table, ..., mode = "insert") {
     .sendData(db, data, table, ..., mode = mode)
-  })
+  }
+)
 
 .sendData <- function(db, data, table, ..., mode) {
   stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
@@ -93,13 +105,15 @@ setMethod(
   path <- normalizePath(tempfile("dbtools"), "/", FALSE)
 
   cacheTable(data, path)
-  if (mode == "truncate")
+  if (mode == "truncate") {
     truncateTable(db, table)
+  }
 
-  if (mode == "update")
+  if (mode == "update") {
     updateTable(db, path, table, names(data))
-  else
+  } else {
     writeTable(db, path, table, names(data), mode)
+  }
 
   TRUE
 }
@@ -155,7 +169,6 @@ updateTable <- function(db, path, table, names) {
 
   # 5. actual update via insert into statement
   updateTargetTable(db, table, names)
-
 }
 
 addTmpPrefix <- function(table) {
@@ -202,12 +215,11 @@ sqlUpdateTargetTable <- function(table, names) {
   cols <- unlist(lapply(names, sqlEsc))
   commaSeperatedCols <- sqlComma(cols)
   colsInParan <- sqlParan(cols)
-  updateStatement <- sqlComma(sprintf("%s = values(%s)", cols, cols))
-
+  updateStatement <- sqlComma(sprintf("%s = `new`.%s", cols, cols))
   SingleQuery(
     paste(
       "insert into", sqlEsc(table), colsInParan,
-      "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)),
+      "select", commaSeperatedCols, "from", sqlEsc(addTmpPrefix(table)), "as `new`",
       "on duplicate key update",
       updateStatement, ";"
     )
