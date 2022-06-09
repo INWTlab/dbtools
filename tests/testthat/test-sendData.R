@@ -86,7 +86,7 @@ test_that("chunkSize works for send data", {
 
 test_that("send empty dataframe see #48", {
   # set up connection - we will never actually open it
-  cred <- Credentials(drv = MySQL)
+  cred <- Credentials(drv = dbtools::MySQL, db = NULL)
   # create table
   expect_true(sendData(cred, data.frame(someCol = numeric())))
 })
