@@ -26,10 +26,11 @@ Collate:
     'Credentials.R'
     'NAMESPACE.R'
     'Query.R'
+    'databaseURL.R'
     'reTry.R'
     'sendData.R'
     'sendQuery.R'
     'sqlAssertions.R'
     'testConnection.R'
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.0

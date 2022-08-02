@@ -4,8 +4,7 @@ dummyQuery <- function(i, const) paste0("SELECT ", i + const, " AS x;")
 noErrorLogging <- function(x, ...) NULL
 
 test_that("sendQuery", {
-
-  cred <- Credentials(drv = SQLite, dbname = ":memory:")
+  cred <- CredentialsFromURL("RSQLite::SQLite://memory")
 
   dat <- sendQuery(cred, "SELECT 1 AS x;")
 
@@ -27,18 +26,17 @@ test_that("sendQuery", {
   expect_equal(ncol(dat), 1)
   expect_equal(names(dat), "x")
   expect_true(all(dat$x == 3:4))
-
 })
 
 test_that("Error handling and retry in sendQuery", {
-
   cred <- Credentials(drv = SQLite, dbname = ":memory:")
 
   expect_error(
     sendQuery(
       cred,
       "SELECT * FRM Tabelle;",
-      errorLogging = noErrorLogging)
+      errorLogging = noErrorLogging
+    )
   )
 
   expect_error(
@@ -47,15 +45,14 @@ test_that("Error handling and retry in sendQuery", {
       "SELECT 1 FRM Tabelle;",
       tries = 2,
       intSleep = 1,
-      errorLogging = noErrorLogging)
+      errorLogging = noErrorLogging
+    )
   )
 
   expect_error(sendQuery(cred, "SELECT 1; SELECT 2"))
-
 })
 
 test_that("sendQuery can operate on CredentialsList", {
-
   cred <- CredentialsList(
     drv = list(SQLite, SQLite),
     dbname = c(":memory:", ":memory:")
@@ -66,11 +63,9 @@ test_that("sendQuery can operate on CredentialsList", {
   expect_equal(NROW(dat), 2)
   expect_equal(NCOL(dat), 1)
   expect_equal(names(dat), "x")
-
 })
 
 test_that("sendQuery can handle simplification", {
-
   cred <- Credentials(
     drv = SQLite,
     dbname = ":memory:"
@@ -118,17 +113,14 @@ test_that("sendQuery can handle simplification", {
   expect_equal(names(dat), "x")
   expect_equal(NROW(dat), 4)
   expect_true(all(dat$x == 1))
-
 })
 
 context("sendQuery-RMySQL")
 
 test_that("sendQuery for failing RMySQL DB", {
-
   cred <- Credentials(drv = MySQL, dbname = "Nirvana")
 
   expect_error(
     sendQuery(cred, "SELECT 1;", errorLogging = noErrorLogging)
   )
-
 })
