@@ -16,6 +16,7 @@ Imports:
     assertthat,
     data.table,
     futile.logger,
+    stringi,
     templates
 License: MIT + file LICENSE
 LazyData: TRUE
