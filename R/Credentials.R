@@ -110,7 +110,8 @@ setMethod("[", c("CredentialsList", "ANY", "missing"), function(x, i, j, ..., dr
 })
 
 #' @export
-#' @param url (character) a database url of the form \code{pkg::driver://username:password@host:port/database}.
+#' @param url (character) a database url of the form
+#'   \code{pkg::driver://username:password@host:port/database}.
 #' @rdname Credentials
 #' @details \code{CredentialsFromURL} can be used to construct a Credential
 #'   objects from a dabase URL.

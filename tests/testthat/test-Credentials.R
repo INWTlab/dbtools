@@ -57,7 +57,9 @@ test_that("Extract credentials from CredentialsList", {
 
 test_that("Credentials from URL", {
   # MySQL
-  creds <- CredentialsFromURL("dbtools::MySQL://testUser:3WBUT7My996BLVoTZHo3@127.0.0.1:33001/testSchema")
+  creds <- CredentialsFromURL(
+    "dbtools::MySQL://testUser:3WBUT7My996BLVoTZHo3@127.0.0.1:33001/testSchema"
+  )
   expect_equal(creds$dbname, "testSchema")
   expect_equal(creds$user, "testUser")
   expect_equal(creds$password, "3WBUT7My996BLVoTZHo3")
