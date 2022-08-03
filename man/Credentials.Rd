@@ -33,7 +33,8 @@ CredentialsFromURL(url, ...)
 
 \item{i, j, drop}{passed to S3 extract method}
 
-\item{url}{(character) a database url of the form \code{pkg::driver://username:password@host:port/database}.}
+\item{url}{(character) a database url of the form
+\code{pkg::driver://username:password@host:port/database}.}
 }
 \description{
 Use this function to store your database credentials.
