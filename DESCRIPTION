@@ -21,7 +21,6 @@ Imports:
 License: MIT + file LICENSE
 LazyData: TRUE
 Suggests:
-    lintr,
     testthat
 Collate:
     'Credentials.R'
