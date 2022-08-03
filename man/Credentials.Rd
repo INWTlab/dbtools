@@ -9,6 +9,7 @@
 \alias{CredentialsList-class}
 \alias{CredentialsList}
 \alias{[,CredentialsList,ANY,missing-method}
+\alias{CredentialsFromURL}
 \title{Credentials Class}
 \usage{
 Credentials(drv, ...)
@@ -20,6 +21,8 @@ Credentials(drv, ...)
 CredentialsList(...)
 
 \S4method{[}{CredentialsList,ANY,missing}(x, i, j, ..., drop = TRUE)
+
+CredentialsFromURL(url, ...)
 }
 \arguments{
 \item{drv}{(function) a driver. Will be called and passed to \link[DBI]{dbConnect}}
@@ -29,6 +32,9 @@ CredentialsList(...)
 \item{x}{(Credentials) an instance}
 
 \item{i, j, drop}{passed to S3 extract method}
+
+\item{url}{(character) a database url of the form
+\code{pkg::driver://username:password@host:port/database}.}
 }
 \description{
 Use this function to store your database credentials.
@@ -39,9 +45,13 @@ Use this function to store your database credentials.
   length one are replicated to match the appropriate number of credentials.
   This is usefull whenever you run the same query on multiple databases where
   they only differ in the port but else expect the same credentials.
+
+\code{CredentialsFromURL} can be used to construct a Credential
+  objects from a dabase URL.
 }
 \examples{
 Credentials(drv = SQLite, dbname = ":memory:")
 Credentials(drv = SQLite, dbname = c(":memory:", ":memory:"))
 
+CredentialsFromURL("RSQLite::SQLite://memory")
 }

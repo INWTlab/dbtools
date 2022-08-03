@@ -52,7 +52,7 @@ as.character.Credentials <- function(x, ...) {
 
 setMethod("show", "Credentials", function(object) {
   cat('An object of class "Credentials"\n', sep = "")
-  cat('drv:', class(object@drv()), "\n", sep = "")
+  cat("drv:", class(object@drv()), "\n", sep = "")
   cat(paste0(names(object), ": ", as.character(object)), sep = "\n")
   invisible(object)
 })
@@ -89,7 +89,6 @@ setMethod("initialize", "CredentialsList", function(.Object, ...) {
   assert_that(has_valid_lengths(.Object))
   S3Part(.Object) <- makeCredList(.Object)
   .Object
-
 })
 
 #' @export
@@ -109,3 +108,18 @@ setMethod("[", c("CredentialsList", "ANY", "missing"), function(x, i, j, ..., dr
   x@.Data <- S3Part(x, TRUE)[i]
   x
 })
+
+#' @export
+#' @param url (character) a database url of the form
+#'   \code{pkg::driver://username:password@host:port/database}.
+#' @rdname Credentials
+#' @details \code{CredentialsFromURL} can be used to construct a Credential
+#'   objects from a dabase URL.
+#' @examples
+#' CredentialsFromURL("RSQLite::SQLite://memory")
+CredentialsFromURL <- function(url, ...) {
+  urlArgs <- deparseURL(url)
+  driver <- eval(parse(text = urlArgs$driver))
+  args <- c(mapURLToDriverArguments(driver(), urlArgs), drv = driver, ...)
+  do.call("Credentials", args)
+}

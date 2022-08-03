@@ -11,3 +11,4 @@
 ^Jenkinsfile$
 ^\.aws$
 ^\.lintr$
+^\.vscode$
