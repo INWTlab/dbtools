@@ -66,7 +66,7 @@ mapURLToDriverArguments.ClickhouseDriver <- function(driver, arguments, ...) {
     args[!is.na(args)]
 }
 
-mapURLToDriverArguments.PgDriver <- function(driver, arguments, ...) {
+mapURLToDriverArguments.PqDriver <- function(driver, arguments, ...) {
     args <- list(
         user = arguments$username,
         password = arguments$password,
