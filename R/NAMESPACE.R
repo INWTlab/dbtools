@@ -18,10 +18,6 @@
 #' @importFrom utils capture.output
 NULL
 
-#' @importFrom RMariaDB MariaDB
-#' @export
-RMariaDB::MariaDB
-
 #' @importFrom RMySQL MySQL
 #' @export
 RMySQL::MySQL

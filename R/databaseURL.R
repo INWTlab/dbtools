@@ -51,10 +51,6 @@ mapURLToDriverArguments.MySQLDriver <- function(driver, arguments, ...) {
     args[!is.na(args)]
 }
 
-mapURLToDriverArguments.MariaDBDriver <- function(driver, arguments, ...) {
-    mapURLToDriverArguments.MySQLDriver(driver, arguments, ...)
-}
-
 mapURLToDriverArguments.ClickhouseDriver <- function(driver, arguments, ...) {
     args <- list(
         user = arguments$username,

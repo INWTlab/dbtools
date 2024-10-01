@@ -88,15 +88,6 @@ setMethod(
   }
 )
 
-#' @rdname sendData
-#' @export
-setMethod(
-  "sendData", c(db = "MariaDBConnection", data = "data.frame"),
-  function(db, data, table, ..., mode = "insert") {
-    .sendData(db, data, table, ..., mode = mode)
-  }
-)
-
 .sendData <- function(db, data, table, ..., mode) {
   stopifnot(is.element(mode, c("insert", "replace", "truncate", "update")))
 

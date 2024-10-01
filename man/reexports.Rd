@@ -3,7 +3,6 @@
 \docType{import}
 \name{reexports}
 \alias{reexports}
-\alias{MariaDB}
 \alias{MySQL}
 \alias{CLIENT_SSL}
 \alias{SQLite}
@@ -14,8 +13,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{RMariaDB}{\code{\link[RMariaDB:dbConnect-MariaDBDriver-method]{MariaDB}}}
-
   \item{RMySQL}{\code{\link[RMySQL:constants]{CLIENT_SSL}}, \code{\link[RMySQL:MySQLDriver-class]{MySQL}}}
 
   \item{RSQLite}{\code{\link[RSQLite]{SQLite}}}

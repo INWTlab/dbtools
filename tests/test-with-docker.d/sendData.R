@@ -116,5 +116,5 @@ TEST("sendData for MySQL", {
 })
 
 TEST("sendData for MariaDB", {
-  testSendData("mariadb", drv = MariaDB)
+  testSendData("mariadb", drv = MySQL)
 })

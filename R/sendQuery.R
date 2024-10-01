@@ -17,7 +17,6 @@
 #' @param encoding (character | NULL) the encoding used in a \code{SET NAMES}
 #'   statement. Currently only implemented for MySQL connections. The
 #'   default is 'utf8'. Use \code{NULL} if you do not want to set the encoding.
-#' @param tz timezone of the server. Only used for MariaDB driver
 #'
 #' @details \code{simplify} the default is to simplify results. If you send
 #'   multiple queries to one database it is tried to rbind the results - when
@@ -154,18 +153,6 @@ setMethod(
     # db: is a MySQL connection
     # query: is a character of length 1
     .sendQuery(db, query, ..., encoding = encoding)
-  })
-
-#' @export
-#' @rdname sendQuery
-setMethod(
-  "sendQuery", c(db = "MariaDBConnection", query = "SingleQuery"),
-  function(db, query, ..., encoding = "utf8mb4", tz = "Europe/Berlin") {
-    # db: is a MySQL connection
-    # query: is a character of length 1
-    dat <- .sendQuery(db, query, ..., encoding = encoding)
-    dat <- fixTimezone(dat, tz = tz)
-    dat
   })
 
 .sendQuery <- function(db, query, ..., encoding) {

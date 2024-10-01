@@ -1,3 +1,6 @@
+Version 24.10.0
+- remove support for MariaDB driver from RMariaDB package
+
 Version 0.3.0
 - addtional sendQuery and sendData methods for MariaDB-Connection
 

@@ -1,7 +1,7 @@
 Package: dbtools
 Type: Package
 Title: Tools for Querying Databases
-Version: 22.8.1
+Version: 24.10.0
 Authors@R: c(
     person("Jonathan", "Bob", , "jonathan.bob@inwt-statistics.de", c("aut")),
     person("Sebastian", "Warnholz", , "sebastian.warnholz@inwt-statistics.de", role = c("aut", "cre")))
@@ -10,7 +10,6 @@ Depends:
     methods
 Imports:
     DBI,
-    RMariaDB,
     RMySQL,
     RSQLite,
     assertthat,
@@ -34,4 +33,4 @@ Collate:
     'sqlAssertions.R'
     'testConnection.R'
 Encoding: UTF-8
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.1
