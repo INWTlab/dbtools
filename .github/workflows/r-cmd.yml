@@ -47,23 +47,23 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-steps:
- - uses: actions/checkout@v3
-
- - name: Wait for MySQL to be ready
-   run: |
-     echo "Waiting for MySQL..."
-     sleep 30  # Wait a bit longer to ensure MySQL is fully ready
-
- - name: Check MySQL connection
-   run: |
-     mysql -h 127.0.0.1 -P 3306 -u root --password=root -e "SHOW DATABASES;"
-
- - name: Wait for MariaDB to be ready
-   run: |
-     echo "Waiting for MariaDB..."
-     sleep 30  # Wait a bit longer to ensure MariaDB is fully ready
-
- - name: Check MariaDB connection
-   run: |
-     mysql -h 127.0.0.1 -P 3307 -u root --password=root -e "SHOW DATABASES;"
+    steps:
+     - uses: actions/checkout@v3
+    
+     - name: Wait for MySQL to be ready
+       run: |
+         echo "Waiting for MySQL..."
+         sleep 30  # Wait a bit longer to ensure MySQL is fully ready
+    
+     - name: Check MySQL connection
+       run: |
+         mysql -h 127.0.0.1 -P 3306 -u root --password=root -e "SHOW DATABASES;"
+    
+     - name: Wait for MariaDB to be ready
+       run: |
+         echo "Waiting for MariaDB..."
+         sleep 30  # Wait a bit longer to ensure MariaDB is fully ready
+    
+     - name: Check MariaDB connection
+       run: |
+         mysql -h 127.0.0.1 -P 3307 -u root --password=root -e "SHOW DATABASES;"
