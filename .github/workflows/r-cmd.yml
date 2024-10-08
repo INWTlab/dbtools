@@ -51,6 +51,7 @@ jobs:
           upload-snapshots: true
 
       - name: Test Mariadb & Mysql
-        run: cd tests && Rscript test-with-docker.R
-
-
+        run: |
+          R CMD INSTALL .
+          cd tests
+          Rscript test-with-docker.R
