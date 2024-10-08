@@ -1,69 +1,50 @@
 on:
   push:
-    branches:
-      - master  # Adjust if your default branch has a different name
+    branches: [main, master]
   pull_request:
-    branches:
-      - master
+    branches: [main, master]
+
+name: R-CMD-check
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
 
-    services:
-      mysql:
-        image: mysql-custom:latest
-        build:
-          context: .
-          dockerfile: tests/db/mysql/Dockerfile
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: testSchema
-          MYSQL_USER: testUser
-          MYSQL_PASSWORD: 3WBUT7My996BLVoTZHo3
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root --password=root"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
-      mariadb:
-        image: mariadb-custom:latest
-        build:
-          context: .
-          dockerfile: tests/db/mariadb/Dockerfile
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: testSchema
-          MYSQL_USER: testUser
-          MYSQL_PASSWORD: 3WBUT7My996BLVoTZHo3
-        ports:
-          - 3307:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root --password=root"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          # We only test only a subset of os & r combination for non CRAN packages
+          #- {os: macos-latest,   r: 'release'}
+          #- {os: windows-latest, r: 'release'}
+          #- {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          #- {os: ubuntu-latest,   r: 'oldrel-1'}
+          #- {os: ubuntu-latest,   r: 'oldrel-2'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
 
     steps:
-     - uses: actions/checkout@v3
-    
-     - name: Wait for MySQL to be ready
-       run: |
-         echo "Waiting for MySQL..."
-         sleep 30  # Wait a bit longer to ensure MySQL is fully ready
-    
-     - name: Check MySQL connection
-       run: |
-         mysql -h 127.0.0.1 -P 3306 -u root --password=root -e "SHOW DATABASES;"
-    
-     - name: Wait for MariaDB to be ready
-       run: |
-         echo "Waiting for MariaDB..."
-         sleep 30  # Wait a bit longer to ensure MariaDB is fully ready
-    
-     - name: Check MariaDB connection
-       run: |
-         mysql -h 127.0.0.1 -P 3307 -u root --password=root -e "SHOW DATABASES;"
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+          extra-repositories: https://Pandora-IsoMemo.github.io/drat/
+      
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
