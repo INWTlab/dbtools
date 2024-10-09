@@ -54,10 +54,10 @@ testSendQuery <- function(db = "mysql", drv = MySQL) {
   )
 }
 
-TEST("sendData for MySQL", {
+TEST("sendData for MySQL database", {
   testSendQuery("mysql", drv = MySQL)
 })
 
-TEST("sendData for MariaDB", {
-  testSendQuery("mariadb", drv = MariaDB)
+TEST("sendData for MariaDB database", {
+  testSendQuery("mariadb", drv = MySQL)
 })
