@@ -1,5 +1,4 @@
-[![Travis-CI Build
-Status](https://app.travis-ci.com/INWTlab/dbtools.svg?branch=master)](https://app.travis-ci.com/INWTlab/dbtools)
+[![R-CMD-check](https://github.com/INWTlab/dbtools/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/INWTlab/dbtools/actions/workflows/R-CMD-check.yml)
 
 This package abstracts typical patterns used when connecting to and
 communicating with databases in R. It aims to provide very few, simple

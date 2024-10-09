@@ -1,6 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\.travis\.yml$
 ^prepareRepo.R$
 ^README.Rmd$
 ^.*\.db$
