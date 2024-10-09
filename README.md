@@ -1,4 +1,4 @@
-[![R-CMD-check](https://github.com/INWTlab/dbtools/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/INWTlab/dbtools/actions/workflows/R-CMD-check.yml)
+[![R-CMD-check](https://github.com/INWTlab/dbtools/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/INWTlab/dbtools/actions/workflows/R-CMD-check.yaml)
 
 This package abstracts typical patterns used when connecting to and
 communicating with databases in R. It aims to provide very few, simple
